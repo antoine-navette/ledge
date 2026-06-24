@@ -12,7 +12,5 @@ type Output = {
 export const connectToSmtp = async ({ smtpUrl }: Input): Promise<Output> => {
     const smtpTransporter: Transporter = createTransport(smtpUrl);
 
-    await smtpTransporter.verify();
-
     return { smtpTransporter };
 };
