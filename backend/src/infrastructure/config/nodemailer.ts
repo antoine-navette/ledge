@@ -9,10 +9,8 @@ type Output = {
     smtpTransporter: Transporter;
 };
 
-export const connectToSmtp = async ({ smtpUrl }: Input): Promise<Output> => {
+export const connectToSmtp = ({ smtpUrl }: Input): Output => {
     const smtpTransporter: Transporter = createTransport(smtpUrl);
-
-    await smtpTransporter.verify();
 
     return { smtpTransporter };
 };

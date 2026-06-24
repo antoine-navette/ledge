@@ -34,7 +34,7 @@ const start = async () => {
     const { mongoClient, mongoDb } = await connectToMongo({ mongoUrl });
     logger.info('Mongo connected');
 
-    const { smtpTransporter } = await connectToSmtp({ smtpUrl });
+    const { smtpTransporter } = connectToSmtp({ smtpUrl });
     logger.info('SMTP connected');
 
     const idManager = new MongoIdManager();
