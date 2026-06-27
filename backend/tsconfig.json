@@ -48,5 +48,5 @@
             "@shared/*": ["../shared/src/*"]
         }
     },
-    "include": ["./scripts", "./src", "./tests", "../shared/src"] // Added by me
+    "include": ["./scripts", "./migrations", "./src", "./tests", "../shared/src"] // Added by me
 }

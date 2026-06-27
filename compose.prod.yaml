@@ -59,7 +59,7 @@ services:
         required: true
     depends_on:
       - loki
-    entrypoint: ["node", "dist/backend/scripts/migrate.js", "up"]
+    entrypoint: ["node", "dist/backend/scripts/migrate.js"]
 
 volumes:
   loki:

@@ -1,8 +1,13 @@
+import { fileURLToPath } from 'node:url';
+import path from 'node:path';
+import { MongoDBStorage, Umzug } from 'umzug';
+import type { Db } from 'mongodb';
 import { createPinoInstance } from '../src/infrastructure/config/pino.js';
 import { connectToMongo } from '../src/infrastructure/config/mongo.js';
 import { PinoLogger } from '../src/infrastructure/adapters/pino.logger.js';
 import { loadEnv } from '../src/infrastructure/config/env.js';
-import { createMigrationRunner } from '../src/infrastructure/config/umzug.js';
+
+export type Context = { mongoDb: Db };
 
 // .env is not verified yet, but we need a logger now
 const logger = new PinoLogger(
@@ -12,35 +17,34 @@ const logger = new PinoLogger(
     }),
 );
 
-const run = async () => {
+try {
     const { mongoUrl } = loadEnv();
     logger.info('Environment loaded');
 
     const { mongoDb, mongoClient } = await connectToMongo({ mongoUrl });
     logger.info('Mongo connected');
 
-    try {
-        const umzug = createMigrationRunner({ mongoDb, logger });
+    const __filename = fileURLToPath(import.meta.url);
+    const __dirname = path.dirname(__filename);
+    const umzug = new Umzug<Context>({
+        migrations: {
+            glob: [path.join(__dirname, '../migrations', '*.{js,ts}'), { ignore: '**/*.d.ts' }],
+        },
+        context: { mongoDb },
+        storage: new MongoDBStorage({ connection: mongoDb }),
+        logger,
+    });
+    await umzug.up();
+    logger.info('Migrations applied successfully');
 
-        const command = process.argv[2];
-        if (command !== 'up' && command !== 'down') {
-            throw new Error("Invalid migration command. Please choose between 'up' and 'down'");
-        }
+    await mongoClient.close();
+    logger.info('Mongo disconnected');
 
-        await umzug[command]();
-        logger.info(`Migration '${command}' executed successfully`);
-    } finally {
-        await mongoClient.close().catch(() => {});
-        logger.info('Mongo disconnected');
-    }
-};
-
-try {
-    await run();
     await new Promise((r) => setTimeout(r, 250));
     process.exit(0);
-} catch (error) {
-    logger.fatal({ err: error }, error instanceof Error ? error.message : 'Unknown error');
+} catch (err) {
+    logger.fatal({ err }, err instanceof Error ? err.message : 'Unknown error');
+
     await new Promise((r) => setTimeout(r, 250));
     process.exit(1);
 }
