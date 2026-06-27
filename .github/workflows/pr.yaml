@@ -106,13 +106,14 @@ jobs:
     runs-on: [self-hosted, ledge]
     env:
       TARGET_PATH: /srv/apps/ledge/staging
+      HEAD_SHA: ${{ github.event.pull_request.head.sha }}
       IMAGE_TAG: ${{ github.event.pull_request.head.sha }}
     steps:
       - name: Checkout PR code
         run: |
           cd "$TARGET_PATH"
           git fetch
-          git checkout ${{ github.event.pull_request.head.sha }}
+          git checkout $HEAD_SHA
       - name: Login to GHCR
         run: echo "${{ secrets.GITHUB_TOKEN }}" | docker login ghcr.io -u antoine-navette --password-stdin
       - name: Deploy
