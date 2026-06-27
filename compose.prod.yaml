@@ -52,15 +52,6 @@ services:
       - loki
     restart: unless-stopped
 
-  migrate:
-    image: ghcr.io/antoine-navette/ledge-backend:${IMAGE_TAG:-latest}
-    env_file:
-      - path: backend/.env
-        required: true
-    depends_on:
-      - loki
-    entrypoint: ["node", "dist/backend/scripts/migrate.js"]
-
 volumes:
   loki:
   grafana:

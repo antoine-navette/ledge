@@ -119,7 +119,6 @@ jobs:
         run: |
           cd "$TARGET_PATH"
           IMAGE_TAG=$IMAGE_TAG docker compose pull
+          IMAGE_TAG=$IMAGE_TAG docker compose run --rm --no-deps backend node dist/backend/scripts/migrate.js
           IMAGE_TAG=$IMAGE_TAG docker compose down --remove-orphans
-          IMAGE_TAG=$IMAGE_TAG docker compose up -d mongo loki
-          IMAGE_TAG=$IMAGE_TAG docker compose run --rm migrate
           IMAGE_TAG=$IMAGE_TAG docker compose up -d

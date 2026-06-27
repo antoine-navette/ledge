@@ -20,11 +20,6 @@ services:
     volumes:
       - redis:/data
 
-  migrate:
-    profiles: ["migrations"]
-    depends_on:
-      - mongo
-
 volumes:
   mongo:
   redis:
