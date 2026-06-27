@@ -1,4 +1,4 @@
-import type { Context } from '../../src/infrastructure/config/umzug.js';
+import type { Context } from '../scripts/migrate.js';
 
 export const up = async ({ context: { mongoDb } }: { context: Context }) => {
     await mongoDb
@@ -8,5 +8,3 @@ export const up = async ({ context: { mongoDb } }: { context: Context }) => {
             { $unset: { emailVerificationCooldownExpiresAt: '' } },
         );
 };
-
-export const down = async () => {};
