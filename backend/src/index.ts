@@ -24,17 +24,17 @@ const logger = new PinoLogger(
     }),
 );
 
-const start = async () => {
+try {
     const { redisUrl, mongoUrl, smtpUrl, tokenSecret, emailFrom, allowedOrigins, port } = loadEnv();
     logger.info('Environment loaded');
 
-    const { redisClient } = await connectToRedis({ redisUrl });
-    logger.info('Redis connected');
-
-    const { mongoClient, mongoDb } = await connectToMongo({ mongoUrl });
+    const mongo = await connectToMongo(mongoUrl);
     logger.info('Mongo connected');
 
-    const { smtpTransporter } = connectToSmtp({ smtpUrl });
+    const redis = await connectToRedis(redisUrl);
+    logger.info('Redis connected');
+
+    const smtp = connectToSmtp(smtpUrl);
     logger.info('SMTP connected');
 
     const idManager = new MongoIdManager();
@@ -44,13 +44,13 @@ const start = async () => {
     const container = buildContainer({
         tokenManager,
         hasher: new BcryptHasher(),
-        emailSender: new NodemailerEmailSender(smtpTransporter),
-        cacheStore: new RedisCacheStore(redisClient),
+        emailSender: new NodemailerEmailSender(smtp.transporter),
+        cacheStore: new RedisCacheStore(redis.client),
         idManager,
         tokenGenerator,
-        userRepository: new MongoUserRepository(mongoDb.collection('users')),
-        transactionRepository: new MongoTransactionRepository(mongoDb.collection('transactions')),
-        refreshTokenRepository: new MongoRefreshTokenRepository(mongoDb.collection('refreshtokens')),
+        userRepository: new MongoUserRepository(mongo.db.collection('users')),
+        transactionRepository: new MongoTransactionRepository(mongo.db.collection('transactions')),
+        refreshTokenRepository: new MongoRefreshTokenRepository(mongo.db.collection('refreshtokens')),
         emailFrom,
     });
 
@@ -63,10 +63,10 @@ const start = async () => {
         allowedOrigins,
     });
 
-    const { server } = await startServer({ app, port });
+    const server = await startServer(app, port);
     logger.info('Server started');
 
-    const gracefulShutdown = async (signal: 'SIGINT' | 'SIGTERM') => {
+    const gracefulShutdown = async (signal: NodeJS.Signals) => {
         logger.info(`Received ${signal}. Starting graceful shutdown...`);
 
         try {
@@ -75,14 +75,14 @@ const start = async () => {
             });
             logger.info('HTTP server closed');
 
-            await mongoClient.close();
-            logger.info('Mongo disconnected');
+            smtp.transporter.close();
+            logger.info('SMTP disconnected');
 
-            await redisClient.quit();
+            await redis.client.quit();
             logger.info('Redis disconnected');
 
-            smtpTransporter.close();
-            logger.info('SMTP disconnected');
+            await mongo.client.close();
+            logger.info('Mongo disconnected');
 
             logger.info('Graceful shutdown completed successfully. Exiting.');
             process.exit(0);
@@ -94,11 +94,7 @@ const start = async () => {
 
     process.on('SIGINT', () => gracefulShutdown('SIGINT'));
     process.on('SIGTERM', () => gracefulShutdown('SIGTERM'));
-};
-
-try {
-    await start();
-} catch (error) {
-    logger.fatal({ err: error }, error instanceof Error ? error.message : 'Unknown error');
+} catch (err) {
+    logger.fatal({ err }, err instanceof Error ? err.message : 'Unknown error');
     process.exit(1);
 }

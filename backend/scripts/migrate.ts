@@ -7,7 +7,7 @@ import { connectToMongo } from '../src/infrastructure/config/mongo.js';
 import { PinoLogger } from '../src/infrastructure/adapters/pino.logger.js';
 import { loadEnv } from '../src/infrastructure/config/env.js';
 
-export type Context = { mongoDb: Db };
+export type Context = { mongo: { db: Db } };
 
 // .env is not verified yet, but we need a logger now
 const logger = new PinoLogger(
@@ -21,7 +21,7 @@ try {
     const { mongoUrl } = loadEnv();
     logger.info('Environment loaded');
 
-    const { mongoDb, mongoClient } = await connectToMongo({ mongoUrl });
+    const mongo = await connectToMongo(mongoUrl);
     logger.info('Mongo connected');
 
     const __filename = fileURLToPath(import.meta.url);
@@ -30,14 +30,14 @@ try {
         migrations: {
             glob: [path.join(__dirname, '../migrations', '*.{js,ts}'), { ignore: '**/*.d.ts' }],
         },
-        context: { mongoDb },
-        storage: new MongoDBStorage({ connection: mongoDb }),
+        context: { mongo },
+        storage: new MongoDBStorage({ connection: mongo.db }),
         logger,
     });
     await umzug.up();
     logger.info('Migrations applied successfully');
 
-    await mongoClient.close();
+    await mongo.client.close();
     logger.info('Mongo disconnected');
 
     await new Promise((r) => setTimeout(r, 250));

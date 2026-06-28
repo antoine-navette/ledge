@@ -1,16 +1,8 @@
-import { createTransport, type Transporter } from 'nodemailer';
+import { createTransport } from 'nodemailer';
 import type { Env } from './env.js';
 
-type Input = {
-    smtpUrl: Env['smtpUrl'];
-};
+export const connectToSmtp = (smtpUrl: Env['smtpUrl']) => {
+    const transporter = createTransport(smtpUrl);
 
-type Output = {
-    smtpTransporter: Transporter;
-};
-
-export const connectToSmtp = ({ smtpUrl }: Input): Output => {
-    const smtpTransporter: Transporter = createTransport(smtpUrl);
-
-    return { smtpTransporter };
+    return { transporter };
 };
