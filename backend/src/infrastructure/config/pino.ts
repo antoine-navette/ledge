@@ -1,32 +1,33 @@
-import pino, { type Logger as PinoInstance } from 'pino';
+import pino from 'pino';
 import type { Env } from './env.js';
 
-type Input = {
-    nodeEnv: Env['nodeEnv'];
-    lokiUrl: Env['lokiUrl'];
-};
+export const createPino = (nodeEnv: Env['nodeEnv'], lokiUrl: Env['lokiUrl']) => {
+    if (nodeEnv === 'development') {
+        const transport = pino.transport({
+            target: 'pino-pretty',
+            options: { colorize: true },
+        });
+        const logger = pino({ level: 'debug' }, transport);
+        const flush = () => new Promise<void>((resolve, reject) => {
+            transport.once('close', resolve);
+            transport.once('error', reject);
+            transport.end();
+        });
+        return { logger, flush };
+    }
 
-export const createPinoInstance = ({ nodeEnv, lokiUrl }: Input): PinoInstance => {
-    const isDev = nodeEnv === 'development';
-
-    return pino({
-        level: isDev ? 'debug' : 'info', // Minimum level to show. List: fatal > error > warn > info > debug > trace
-        transport: isDev
-            ? {
-                  target: 'pino-pretty',
-                  options: {
-                      colorize: true,
-                  },
-              }
-            : {
-                  target: 'pino-loki',
-                  options: {
-                      host: lokiUrl,
-                      batching: false,
-                      labels: {
-                          service_name: 'backend',
-                      },
-                  },
-              },
+    const transport = pino.transport({
+        target: 'pino-loki',
+        options: {
+            host: lokiUrl,
+            labels: { service_name: 'backend' },
+        },
     });
+    const logger = pino({ level: 'info' }, transport);
+    const flush = () => new Promise<void>((resolve, reject) => {
+        transport.once('close', resolve);
+        transport.once('error', reject);
+        transport.end();
+    });
+    return { logger, flush };
 };

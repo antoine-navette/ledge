@@ -17,7 +17,7 @@ import type { DeleteTransactionUseCase } from '../../application/transaction/del
 import type { RequestEmailVerificationUseCase } from '../../application/user/request-email-verification.use-case.js';
 import type { VerifyEmailUseCase } from '../../application/user/verify-email.use-case.js';
 import type { GetCurrentUserUseCase } from '../../application/user/get-current-user.use-case.js';
-import type { Logger } from '../../domain/ports/logger.js';
+import type { Logger } from 'pino';
 import { requestLoggerMiddleware } from './middlewares/request-logger.middleware.js';
 import type { TokenGenerator } from '../../domain/ports/token-generator.js';
 import { routes } from './routes/routes.js';

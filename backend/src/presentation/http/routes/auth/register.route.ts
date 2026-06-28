@@ -55,7 +55,7 @@ export const registerHandler = ({ registerUseCase }: Deps) => {
     return async (req: Request, res: Response) => {
         const { body } = validateOrThrow(req, registerSchema());
 
-        const result = await registerUseCase.execute({ email: body.email, password: body.password }, req.logger);
+        const result = await registerUseCase.execute({ email: body.email, password: body.password });
         if (!result.success) {
             switch (result.error) {
                 case 'DUPLICATE_EMAIL':

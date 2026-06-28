@@ -1,7 +1,6 @@
 import type { UserRepository } from '../../domain/repositories/user.repository.js';
 import type { TokenManager, VerifyTokenError } from '../../domain/ports/token-manager.js';
 import type { User } from '../../domain/entities/user.js';
-import type { Logger } from '../../domain/ports/logger.js';
 import { fail, ok, type Result } from '../../core/result.js';
 
 type VerifyEmailInput = {
@@ -16,7 +15,7 @@ export class VerifyEmailUseCase {
         private tokenManager: TokenManager,
     ) {}
 
-    execute = async (input: VerifyEmailInput, logger: Logger): Promise<VerifyEmailResult> => {
+    execute = async (input: VerifyEmailInput): Promise<VerifyEmailResult> => {
         const verification = this.tokenManager.verifyEmailVerification(input.emailVerificationToken);
         if (!verification.success) return fail(verification.error);
         const { userId } = verification.data;
@@ -34,7 +33,6 @@ export class VerifyEmailUseCase {
             updatedAt: new Date(),
         };
         await this.userRepository.save(updatedUser);
-        logger.info({ userId: user.id }, 'User updated');
 
         return ok(undefined);
     };

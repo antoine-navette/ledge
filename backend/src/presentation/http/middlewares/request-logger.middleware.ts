@@ -1,4 +1,4 @@
-import type { Logger } from '../../../domain/ports/logger.js';
+import type { Logger } from 'pino';
 import type { NextFunction, Request, Response } from 'express';
 import type { TokenGenerator } from '../../../domain/ports/token-generator.js';
 

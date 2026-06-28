@@ -49,7 +49,6 @@ export const verifyEmailHandler = ({ verifyEmailUseCase }: Deps) => {
 
         const result = await verifyEmailUseCase.execute(
             { emailVerificationToken: body.emailVerificationToken },
-            req.logger,
         );
         if (!result.success) {
             switch (result.error) {

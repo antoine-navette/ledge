@@ -2,7 +2,6 @@ import type { RefreshTokenRepository } from '../../domain/repositories/refresh-t
 import type { TokenManager } from '../../domain/ports/token-manager.js';
 import type { TokenGenerator } from '../../domain/ports/token-generator.js';
 import type { RefreshToken } from '../../domain/entities/refresh-token.js';
-import type { Logger } from '../../domain/ports/logger.js';
 import { fail, ok, type Result } from '../../core/result.js';
 
 type RefreshInput = { refreshToken: string | undefined };
@@ -21,7 +20,7 @@ export class RefreshUseCase {
         private tokenGenerator: TokenGenerator,
     ) {}
 
-    execute = async (input: RefreshInput, logger: Logger): Promise<RefreshResult> => {
+    execute = async (input: RefreshInput): Promise<RefreshResult> => {
         const now = new Date();
 
         if (!input.refreshToken) return fail('MISSING_REFRESH_TOKEN');
@@ -39,7 +38,6 @@ export class RefreshUseCase {
             updatedAt: now,
         };
         await this.refreshTokenRepository.save(updatedRefreshToken);
-        logger.info({ refreshTokenId: refreshToken.id, userId: refreshToken.userId }, 'Refresh token updated');
 
         const accessToken = this.tokenManager.signAccess({ userId: refreshToken.userId });
 

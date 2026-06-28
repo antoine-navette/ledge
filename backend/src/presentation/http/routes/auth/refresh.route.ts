@@ -34,7 +34,7 @@ export const refreshHandler = ({ refreshUseCase }: Deps) => {
     return async (req: Request, res: Response) => {
         const { cookies } = validateOrThrow(req, refreshSchema());
 
-        const result = await refreshUseCase.execute({ refreshToken: cookies.refreshToken }, req.logger);
+        const result = await refreshUseCase.execute({ refreshToken: cookies.refreshToken });
         if (!result.success) {
             switch (result.error) {
                 case 'MISSING_REFRESH_TOKEN':

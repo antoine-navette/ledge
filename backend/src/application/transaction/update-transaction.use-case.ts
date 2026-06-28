@@ -1,6 +1,5 @@
 import type { TransactionRepository } from '../../domain/repositories/transaction.repository.js';
 import type { Transaction } from '../../domain/entities/transaction.js';
-import type { Logger } from '../../domain/ports/logger.js';
 import { fail, ok, type Result } from '../../core/result.js';
 
 type UpdateTransactionInput = { transactionId: string; userId: string; name: string; value: number } & (
@@ -13,7 +12,7 @@ type UpdateTransactionResult = Result<{ transaction: Transaction }, 'TRANSACTION
 export class UpdateTransactionUseCase {
     constructor(private transactionRepository: TransactionRepository) {}
 
-    execute = async (input: UpdateTransactionInput, logger: Logger): Promise<UpdateTransactionResult> => {
+    execute = async (input: UpdateTransactionInput): Promise<UpdateTransactionResult> => {
         const transaction = await this.transactionRepository.findById(input.transactionId);
         if (!transaction) return fail('TRANSACTION_NOT_FOUND');
         if (transaction.userId !== input.userId) return fail('TRANSACTION_NOT_OWNED');
@@ -31,7 +30,6 @@ export class UpdateTransactionUseCase {
             updatedAt: new Date(),
         };
         await this.transactionRepository.save(updatedTransaction);
-        logger.info({ transactionId: transaction.id, userId: transaction.userId }, 'Transaction updated');
 
         return ok({ transaction: updatedTransaction });
     };

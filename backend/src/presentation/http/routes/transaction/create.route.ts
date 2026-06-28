@@ -71,7 +71,6 @@ export const createTransactionHandler = ({ createTransactionUseCase, tokenManage
                     ? { type: 'expense', expenseCategory: body.expenseCategory }
                     : { type: 'income', expenseCategory: null }),
             },
-            req.logger,
         );
 
         const response: ApiSuccess<TransactionDto> = {

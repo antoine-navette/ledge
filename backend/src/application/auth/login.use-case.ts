@@ -6,7 +6,6 @@ import type { User } from '../../domain/entities/user.js';
 import type { RefreshToken } from '../../domain/entities/refresh-token.js';
 import type { IdManager } from '../../domain/ports/id-manager.js';
 import type { TokenGenerator } from '../../domain/ports/token-generator.js';
-import type { Logger } from '../../domain/ports/logger.js';
 import { fail, ok, type Result } from '../../core/result.js';
 
 type LoginInput = { email: string; password: string };
@@ -28,7 +27,7 @@ export class LoginUseCase {
         private tokenGenerator: TokenGenerator,
     ) {}
 
-    execute = async (input: LoginInput, logger: Logger): Promise<LoginResult> => {
+    execute = async (input: LoginInput): Promise<LoginResult> => {
         const now = new Date();
 
         const user = await this.userRepository.findByEmail(input.email);
@@ -46,7 +45,6 @@ export class LoginUseCase {
             updatedAt: now,
         };
         await this.refreshTokenRepository.create(refreshToken);
-        logger.info({ refreshTokenId: refreshToken.id, userId: refreshToken.userId }, 'Refresh token created');
 
         const accessToken = this.tokenManager.signAccess({ userId: user.id });
 

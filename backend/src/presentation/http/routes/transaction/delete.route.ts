@@ -50,7 +50,6 @@ export const deleteTransactionHandler = ({ deleteTransactionUseCase, tokenManage
 
         const result = await deleteTransactionUseCase.execute(
             { transactionId: params.transactionId, userId },
-            req.logger,
         );
         if (!result.success) {
             switch (result.error) {

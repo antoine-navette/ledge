@@ -55,7 +55,7 @@ export const loginHandler = ({ loginUseCase }: Deps) => {
     return async (req: Request, res: Response) => {
         const { body } = validateOrThrow(req, loginSchema());
 
-        const result = await loginUseCase.execute({ email: body.email, password: body.password }, req.logger);
+        const result = await loginUseCase.execute({ email: body.email, password: body.password });
         if (!result.success) {
             switch (result.error) {
                 case 'USER_NOT_FOUND':

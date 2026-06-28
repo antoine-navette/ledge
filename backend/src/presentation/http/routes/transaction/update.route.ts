@@ -76,7 +76,6 @@ export const updateTransactionHandler = ({ updateTransactionUseCase, tokenManage
                     ? { type: 'expense', expenseCategory: body.expenseCategory }
                     : { type: 'income', expenseCategory: null }),
             },
-            req.logger,
         );
         if (!result.success) {
             switch (result.error) {
