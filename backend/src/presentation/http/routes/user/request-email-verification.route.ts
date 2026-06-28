@@ -13,7 +13,6 @@ import { authenticateOrThrow } from '../../helpers/authenticate.js';
 type Deps = {
     requestEmailVerificationUseCase: RequestEmailVerificationUseCase;
     tokenManager: TokenManager;
-    allowedOrigins: string[];
 };
 
 export const requestEmailVerificationRoute = (router: Router, deps: Deps) => {
@@ -24,22 +23,9 @@ export const requestEmailVerificationRoute = (router: Router, deps: Deps) => {
      *     tags:
      *       - User
      *     summary: Request email verification
-     *     requestBody:
-     *       required: true
-     *       content:
-     *         application/json:
-     *           schema:
-     *             type: object
-     *             required:
-     *               - frontendBaseUrl
-     *             properties:
-     *               frontendBaseUrl:
-     *                 type: string
      *     responses:
      *       200:
      *         description: Verification email sent successfully
-     *       400:
-     *         description: Validation error
      *       401:
      *         description: Authentication error
      *       409:
@@ -55,16 +41,12 @@ export const requestEmailVerificationRoute = (router: Router, deps: Deps) => {
 export const requestEmailVerificationHandler = ({
     requestEmailVerificationUseCase,
     tokenManager,
-    allowedOrigins,
 }: Deps) => {
     return async (req: Request, res: Response): Promise<void> => {
-        const { body, cookies } = validateOrThrow(req, requestEmailVerificationSchema(allowedOrigins));
+        const { cookies } = validateOrThrow(req, requestEmailVerificationSchema());
         const { userId } = authenticateOrThrow(tokenManager, cookies.accessToken);
 
-        const result = await requestEmailVerificationUseCase.execute({
-            userId,
-            frontendBaseUrl: body.frontendBaseUrl,
-        });
+        const result = await requestEmailVerificationUseCase.execute({ userId });
         if (!result.success) {
             switch (result.error) {
                 case 'USER_NOT_FOUND':

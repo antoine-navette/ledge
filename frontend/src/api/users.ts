@@ -14,13 +14,10 @@ const usersApi = axios.create({
     validateStatus: () => true,
 });
 
-export const requestEmailVerification = async (
-    body: RequestEmailVerificationSchema['body'],
-): Promise<ApiResponse<void, RequestEmailVerificationSchema>> => {
+export const requestEmailVerification = async (): Promise<ApiResponse<void, RequestEmailVerificationSchema>> => {
     try {
         const response = await usersApi.post<ApiResponse<void, RequestEmailVerificationSchema>>(
             '/request-email-verification',
-            body,
         );
         return response.data;
     } catch {

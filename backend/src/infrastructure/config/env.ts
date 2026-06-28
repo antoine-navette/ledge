@@ -13,10 +13,11 @@ const schema = z
         REDIS_URL: z.url(),
         SMTP_URL: z.url(),
         EMAIL_FROM: z.string(),
+        WEB_URL: z.url(),
         LOKI_URL: z.url(),
     })
     .transform(
-        ({ NODE_ENV, TOKEN_SECRET, ALLOWED_ORIGINS, PORT, MONGO_URL, REDIS_URL, SMTP_URL, EMAIL_FROM, LOKI_URL }) => ({
+        ({ NODE_ENV, TOKEN_SECRET, ALLOWED_ORIGINS, PORT, MONGO_URL, REDIS_URL, SMTP_URL, EMAIL_FROM, WEB_URL, LOKI_URL }) => ({
             nodeEnv: NODE_ENV,
             tokenSecret: TOKEN_SECRET,
             allowedOrigins: ALLOWED_ORIGINS,
@@ -25,6 +26,7 @@ const schema = z
             redisUrl: REDIS_URL,
             smtpUrl: SMTP_URL,
             emailFrom: EMAIL_FROM,
+            webUrl: WEB_URL,
             lokiUrl: LOKI_URL,
         }),
     );

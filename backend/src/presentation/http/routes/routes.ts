@@ -26,7 +26,6 @@ import { requestEmailVerificationRoute } from './user/request-email-verification
 import { verifyEmailRoute } from './user/verify-email.route.js';
 import { meRoute } from './user/me.route.js';
 import { docsRoute } from './docs/docs.route.js';
-import type { Env } from '../../../infrastructure/config/env.js';
 
 type Deps = {
     tokenManager: TokenManager;
@@ -46,8 +45,6 @@ type Deps = {
     requestEmailVerificationUseCase: RequestEmailVerificationUseCase;
     verifyEmailUseCase: VerifyEmailUseCase;
     getCurrentUserUseCase: GetCurrentUserUseCase;
-
-    allowedOrigins: Env['allowedOrigins'];
 };
 
 export const routes = (
@@ -70,8 +67,6 @@ export const routes = (
         requestEmailVerificationUseCase,
         verifyEmailUseCase,
         getCurrentUserUseCase,
-
-        allowedOrigins,
     }: Deps,
 ) => {
     registerRoute(router, { registerUseCase });
@@ -87,7 +82,7 @@ export const routes = (
     updateTransactionRoute(router, { updateTransactionUseCase, tokenManager, idManager });
     deleteTransactionRoute(router, { deleteTransactionUseCase, tokenManager, idManager });
 
-    requestEmailVerificationRoute(router, { requestEmailVerificationUseCase, tokenManager, allowedOrigins });
+    requestEmailVerificationRoute(router, { requestEmailVerificationUseCase, tokenManager });
     verifyEmailRoute(router, { verifyEmailUseCase });
     meRoute(router, { getCurrentUserUseCase, tokenManager });
 

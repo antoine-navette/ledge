@@ -32,6 +32,7 @@ type Input = {
     transactionRepository: TransactionRepository;
     refreshTokenRepository: RefreshTokenRepository;
     emailFrom: Env['emailFrom'];
+    webUrl: Env['webUrl'];
 };
 
 export const buildContainer = ({
@@ -45,6 +46,7 @@ export const buildContainer = ({
     transactionRepository,
     refreshTokenRepository,
     emailFrom,
+    webUrl,
 }: Input) => {
     return {
         registerUseCase: new RegisterUseCase(
@@ -78,6 +80,7 @@ export const buildContainer = ({
             tokenManager,
             cacheStore,
             emailFrom,
+            webUrl,
         ),
         verifyEmailUseCase: new VerifyEmailUseCase(userRepository, tokenManager),
         getCurrentUserUseCase: new GetCurrentUserUseCase(userRepository),

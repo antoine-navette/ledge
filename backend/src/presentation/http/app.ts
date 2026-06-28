@@ -96,7 +96,6 @@ export const createHttpApp = ({
             requestEmailVerificationUseCase,
             verifyEmailUseCase,
             getCurrentUserUseCase,
-            allowedOrigins,
         }),
     );
     app.use(() => {

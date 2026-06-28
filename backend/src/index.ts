@@ -19,7 +19,7 @@ import { CryptoTokenGenerator } from './infrastructure/adapters/crypto.token-gen
 const pino = createPino(process.env.NODE_ENV as Env['nodeEnv'], process.env.LOKI_URL as Env['lokiUrl']);
 
 try {
-    const { redisUrl, mongoUrl, smtpUrl, tokenSecret, emailFrom, allowedOrigins, port } = loadEnv();
+    const { redisUrl, mongoUrl, smtpUrl, tokenSecret, emailFrom, webUrl, allowedOrigins, port } = loadEnv();
     pino.logger.info('Environment loaded');
 
     const mongo = await connectToMongo(mongoUrl);
@@ -46,6 +46,7 @@ try {
         transactionRepository: new MongoTransactionRepository(mongo.db.collection('transactions')),
         refreshTokenRepository: new MongoRefreshTokenRepository(mongo.db.collection('refreshtokens')),
         emailFrom,
+        webUrl,
     });
 
     const app = createHttpApp({

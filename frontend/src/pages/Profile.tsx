@@ -18,7 +18,7 @@ const Profile = () => {
         setMessage(null);
 
         setIsSending(true);
-        const response = await requestEmailVerification({ frontendBaseUrl: window.location.origin });
+        const response = await requestEmailVerification();
         setIsSending(false);
 
         if (!response.success) {

@@ -6,7 +6,6 @@ import { fail, ok, type Result } from '../../core/result.js';
 
 type RequestEmailVerificationInput = {
     userId: string;
-    frontendBaseUrl: string;
 };
 
 type RequestEmailVerificationResult = Result<void, 'USER_NOT_FOUND' | 'EMAIL_ALREADY_VERIFIED' | 'ACTIVE_COOLDOWN'>;
@@ -18,6 +17,7 @@ export class RequestEmailVerificationUseCase {
         private tokenManager: TokenManager,
         private cacheStore: CacheStore,
         private emailFrom: string,
+        private webUrl: string,
     ) {}
 
     execute = async (input: RequestEmailVerificationInput): Promise<RequestEmailVerificationResult> => {
@@ -28,12 +28,10 @@ export class RequestEmailVerificationUseCase {
         const activeCooldown = await this.cacheStore.hasEmailVerificationCooldown(user.id);
         if (activeCooldown) return fail('ACTIVE_COOLDOWN');
 
-        await this.emailSender.sendEmailVerification({
-            from: this.emailFrom,
-            to: user.email,
-            frontendBaseUrl: input.frontendBaseUrl,
-            emailVerificationToken: this.tokenManager.signEmailVerification({ userId: user.id }),
-        });
+        const subject = 'Please verify your email address';
+        const token = this.tokenManager.signEmailVerification({ userId: user.id });
+        const html = `Click here to verify your email address: <a href="${this.webUrl}/verify-email/${token}">verify email</a>. This link will expire in 1 hour.`;
+        await this.emailSender.send(this.emailFrom, user.email, subject, html);
 
         await this.cacheStore.setEmailVerificationCooldown(user.id);
 
