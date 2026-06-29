@@ -78,9 +78,9 @@ export const routes = (
 
     createTransactionRoute(router, { createTransactionUseCase, tokenManager });
     readAllTransactionRoute(router, { getUserTransactionsUseCase, tokenManager });
-    readTransactionRoute(router, { getTransactionUseCase, tokenManager, idManager });
-    updateTransactionRoute(router, { updateTransactionUseCase, tokenManager, idManager });
-    deleteTransactionRoute(router, { deleteTransactionUseCase, tokenManager, idManager });
+    readTransactionRoute(router, { getTransactionUseCase, tokenManager });
+    updateTransactionRoute(router, { updateTransactionUseCase, tokenManager });
+    deleteTransactionRoute(router, { deleteTransactionUseCase, tokenManager });
 
     requestEmailVerificationRoute(router, { requestEmailVerificationUseCase, tokenManager });
     verifyEmailRoute(router, { verifyEmailUseCase });

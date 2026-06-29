@@ -53,7 +53,7 @@ export const loginRoute = (router: Router, deps: Deps) => {
 
 export const loginHandler = ({ loginUseCase }: Deps) => {
     return async (req: Request, res: Response) => {
-        const { body } = validateOrThrow(req, loginSchema());
+        const { body } = validateOrThrow(req, loginSchema);
 
         const result = await loginUseCase.execute({ email: body.email, password: body.password });
         if (!result.success) {

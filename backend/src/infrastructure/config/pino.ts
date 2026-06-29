@@ -8,11 +8,12 @@ export const createPino = (nodeEnv: Env['nodeEnv'], lokiUrl: Env['lokiUrl']) => 
             options: { colorize: true },
         });
         const logger = pino({ level: 'debug' }, transport);
-        const flush = () => new Promise<void>((resolve, reject) => {
-            transport.once('close', resolve);
-            transport.once('error', reject);
-            transport.end();
-        });
+        const flush = () =>
+            new Promise<void>((resolve, reject) => {
+                transport.once('close', resolve);
+                transport.once('error', reject);
+                transport.end();
+            });
         return { logger, flush };
     }
 
@@ -24,10 +25,11 @@ export const createPino = (nodeEnv: Env['nodeEnv'], lokiUrl: Env['lokiUrl']) => 
         },
     });
     const logger = pino({ level: 'info' }, transport);
-    const flush = () => new Promise<void>((resolve, reject) => {
-        transport.once('close', resolve);
-        transport.once('error', reject);
-        transport.end();
-    });
+    const flush = () =>
+        new Promise<void>((resolve, reject) => {
+            transport.once('close', resolve);
+            transport.once('error', reject);
+            transport.end();
+        });
     return { logger, flush };
 };

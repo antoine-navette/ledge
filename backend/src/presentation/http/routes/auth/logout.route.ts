@@ -29,7 +29,7 @@ export const logoutRoute = (router: Router, deps: Deps) => {
 
 export const logoutHandler = ({ logoutUseCase }: Deps) => {
     return async (req: Request, res: Response) => {
-        const { cookies } = validateOrThrow(req, logoutSchema());
+        const { cookies } = validateOrThrow(req, logoutSchema);
 
         clearAuthCookies(res);
 

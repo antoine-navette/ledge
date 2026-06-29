@@ -1,7 +1,6 @@
 import type { Router } from 'express';
 import type { DeleteTransactionUseCase } from '../../../../application/transaction/delete-transaction.use-case.js';
 import type { TokenManager } from '../../../../domain/ports/token-manager.js';
-import type { IdManager } from '../../../../domain/ports/id-manager.js';
 import type { Request, Response } from 'express';
 import { deleteTransactionSchema } from '../../../schemas/transaction.schemas.js';
 import type { ApiSuccess } from '@shared/api/api-response.js';
@@ -15,7 +14,6 @@ import { toTransactionDto } from '../../../mappers/transaction.mapper.js';
 type Deps = {
     deleteTransactionUseCase: DeleteTransactionUseCase;
     tokenManager: TokenManager;
-    idManager: IdManager;
 };
 
 export const deleteTransactionRoute = (router: Router, deps: Deps) => {
@@ -43,14 +41,12 @@ export const deleteTransactionRoute = (router: Router, deps: Deps) => {
     router.delete('/transactions/:transactionId', deleteTransactionHandler(deps));
 };
 
-export const deleteTransactionHandler = ({ deleteTransactionUseCase, tokenManager, idManager }: Deps) => {
+export const deleteTransactionHandler = ({ deleteTransactionUseCase, tokenManager }: Deps) => {
     return async (req: Request, res: Response) => {
-        const { params, cookies } = validateOrThrow(req, deleteTransactionSchema(idManager));
+        const { params, cookies } = validateOrThrow(req, deleteTransactionSchema);
         const { userId } = authenticateOrThrow(tokenManager, cookies.accessToken);
 
-        const result = await deleteTransactionUseCase.execute(
-            { transactionId: params.transactionId, userId },
-        );
+        const result = await deleteTransactionUseCase.execute({ transactionId: params.transactionId, userId });
         if (!result.success) {
             switch (result.error) {
                 case 'TRANSACTION_NOT_OWNED':

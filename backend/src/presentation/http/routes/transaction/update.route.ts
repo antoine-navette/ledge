@@ -2,7 +2,6 @@ import type { Router } from 'express';
 import type { UpdateTransactionUseCase } from '../../../../application/transaction/update-transaction.use-case.js';
 import type { TokenManager } from '../../../../domain/ports/token-manager.js';
 import type { Request, Response } from 'express';
-import type { IdManager } from '../../../../domain/ports/id-manager.js';
 import { updateTransactionSchema } from '../../../schemas/transaction.schemas.js';
 import type { ApiSuccess } from '@shared/api/api-response.js';
 import { ForbiddenError } from '../../errors/forbidden.error.js';
@@ -15,7 +14,6 @@ import { toTransactionDto } from '../../../mappers/transaction.mapper.js';
 type Deps = {
     updateTransactionUseCase: UpdateTransactionUseCase;
     tokenManager: TokenManager;
-    idManager: IdManager;
 };
 
 export const updateTransactionRoute = (router: Router, deps: Deps) => {
@@ -61,22 +59,20 @@ export const updateTransactionRoute = (router: Router, deps: Deps) => {
     router.put('/transactions/:transactionId', updateTransactionHandler(deps));
 };
 
-export const updateTransactionHandler = ({ updateTransactionUseCase, tokenManager, idManager }: Deps) => {
+export const updateTransactionHandler = ({ updateTransactionUseCase, tokenManager }: Deps) => {
     return async (req: Request, res: Response) => {
-        const { body, params, cookies } = validateOrThrow(req, updateTransactionSchema(idManager));
+        const { body, params, cookies } = validateOrThrow(req, updateTransactionSchema);
         const { userId } = authenticateOrThrow(tokenManager, cookies.accessToken);
 
-        const result = await updateTransactionUseCase.execute(
-            {
-                transactionId: params.transactionId,
-                userId,
-                name: body.name,
-                value: body.value,
-                ...(body.type === 'expense'
-                    ? { type: 'expense', expenseCategory: body.expenseCategory }
-                    : { type: 'income', expenseCategory: null }),
-            },
-        );
+        const result = await updateTransactionUseCase.execute({
+            transactionId: params.transactionId,
+            userId,
+            name: body.name,
+            value: body.value,
+            ...(body.type === 'expense'
+                ? { type: 'expense', expenseCategory: body.expenseCategory }
+                : { type: 'income', expenseCategory: null }),
+        });
         if (!result.success) {
             switch (result.error) {
                 case 'TRANSACTION_NOT_OWNED':

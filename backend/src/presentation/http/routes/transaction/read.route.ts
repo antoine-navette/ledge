@@ -2,7 +2,6 @@ import type { Router } from 'express';
 import type { GetTransactionUseCase } from '../../../../application/transaction/get-transaction.use-case.js';
 import type { TokenManager } from '../../../../domain/ports/token-manager.js';
 import type { Request, Response } from 'express';
-import type { IdManager } from '../../../../domain/ports/id-manager.js';
 import { readTransactionSchema } from '../../../schemas/transaction.schemas.js';
 import type { ApiSuccess } from '@shared/api/api-response.js';
 import { ForbiddenError } from '../../errors/forbidden.error.js';
@@ -15,7 +14,6 @@ import { toTransactionDto } from '../../../mappers/transaction.mapper.js';
 type Deps = {
     getTransactionUseCase: GetTransactionUseCase;
     tokenManager: TokenManager;
-    idManager: IdManager;
 };
 
 export const readTransactionRoute = (router: Router, deps: Deps) => {
@@ -43,9 +41,9 @@ export const readTransactionRoute = (router: Router, deps: Deps) => {
     router.get('/transactions/:transactionId', readTransactionHandler(deps));
 };
 
-export const readTransactionHandler = ({ getTransactionUseCase, tokenManager, idManager }: Deps) => {
+export const readTransactionHandler = ({ getTransactionUseCase, tokenManager }: Deps) => {
     return async (req: Request, res: Response) => {
-        const { params, cookies } = validateOrThrow(req, readTransactionSchema(idManager));
+        const { params, cookies } = validateOrThrow(req, readTransactionSchema);
         const { userId } = authenticateOrThrow(tokenManager, cookies.accessToken);
 
         const result = await getTransactionUseCase.execute({ transactionId: params.transactionId, userId });

@@ -45,11 +45,9 @@ export const verifyEmailRoute = (router: Router, deps: Deps) => {
 
 export const verifyEmailHandler = ({ verifyEmailUseCase }: Deps) => {
     return async (req: Request, res: Response): Promise<void> => {
-        const { body } = validateOrThrow(req, verifyEmailSchema());
+        const { body } = validateOrThrow(req, verifyEmailSchema);
 
-        const result = await verifyEmailUseCase.execute(
-            { emailVerificationToken: body.emailVerificationToken },
-        );
+        const result = await verifyEmailUseCase.execute({ emailVerificationToken: body.emailVerificationToken });
         if (!result.success) {
             switch (result.error) {
                 case 'INACTIVE_TOKEN':

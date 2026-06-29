@@ -58,20 +58,18 @@ export const createTransactionRoute = (router: Router, deps: Deps) => {
 
 export const createTransactionHandler = ({ createTransactionUseCase, tokenManager }: Deps) => {
     return async (req: Request, res: Response) => {
-        const { body, cookies } = validateOrThrow(req, createTransactionSchema());
+        const { body, cookies } = validateOrThrow(req, createTransactionSchema);
         const { userId } = authenticateOrThrow(tokenManager, cookies.accessToken);
 
-        const { transaction } = await createTransactionUseCase.execute(
-            {
-                userId,
-                month: body.month,
-                name: body.name,
-                value: body.value,
-                ...(body.type === 'expense'
-                    ? { type: 'expense', expenseCategory: body.expenseCategory }
-                    : { type: 'income', expenseCategory: null }),
-            },
-        );
+        const { transaction } = await createTransactionUseCase.execute({
+            userId,
+            month: body.month,
+            name: body.name,
+            value: body.value,
+            ...(body.type === 'expense'
+                ? { type: 'expense', expenseCategory: body.expenseCategory }
+                : { type: 'income', expenseCategory: null }),
+        });
 
         const response: ApiSuccess<TransactionDto> = {
             success: true,

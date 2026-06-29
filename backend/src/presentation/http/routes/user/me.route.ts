@@ -36,7 +36,7 @@ export const meRoute = (router: Router, deps: Deps) => {
 
 export const meHandler = ({ getCurrentUserUseCase, tokenManager }: Deps) => {
     return async (req: Request, res: Response): Promise<void> => {
-        const { cookies } = validateOrThrow(req, meSchema());
+        const { cookies } = validateOrThrow(req, meSchema);
         const { userId } = authenticateOrThrow(tokenManager, cookies.accessToken);
 
         const result = await getCurrentUserUseCase.execute({ userId });

@@ -17,7 +17,18 @@ const schema = z
         LOKI_URL: z.url(),
     })
     .transform(
-        ({ NODE_ENV, TOKEN_SECRET, ALLOWED_ORIGINS, PORT, MONGO_URL, REDIS_URL, SMTP_URL, EMAIL_FROM, WEB_URL, LOKI_URL }) => ({
+        ({
+            NODE_ENV,
+            TOKEN_SECRET,
+            ALLOWED_ORIGINS,
+            PORT,
+            MONGO_URL,
+            REDIS_URL,
+            SMTP_URL,
+            EMAIL_FROM,
+            WEB_URL,
+            LOKI_URL,
+        }) => ({
             nodeEnv: NODE_ENV,
             tokenSecret: TOKEN_SECRET,
             allowedOrigins: ALLOWED_ORIGINS,

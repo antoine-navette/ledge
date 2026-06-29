@@ -35,7 +35,7 @@ export const readAllTransactionRoute = (router: Router, deps: Deps) => {
 
 export const readAllTransactionsHandler = ({ getUserTransactionsUseCase, tokenManager }: Deps) => {
     return async (req: Request, res: Response) => {
-        const { cookies } = validateOrThrow(req, readAllTransactionsSchema());
+        const { cookies } = validateOrThrow(req, readAllTransactionsSchema);
         const { userId } = authenticateOrThrow(tokenManager, cookies.accessToken);
 
         const { transactions } = await getUserTransactionsUseCase.execute({ userId });

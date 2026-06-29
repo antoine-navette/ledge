@@ -38,12 +38,9 @@ export const requestEmailVerificationRoute = (router: Router, deps: Deps) => {
     router.post('/users/request-email-verification', requestEmailVerificationHandler(deps));
 };
 
-export const requestEmailVerificationHandler = ({
-    requestEmailVerificationUseCase,
-    tokenManager,
-}: Deps) => {
+export const requestEmailVerificationHandler = ({ requestEmailVerificationUseCase, tokenManager }: Deps) => {
     return async (req: Request, res: Response): Promise<void> => {
-        const { cookies } = validateOrThrow(req, requestEmailVerificationSchema());
+        const { cookies } = validateOrThrow(req, requestEmailVerificationSchema);
         const { userId } = authenticateOrThrow(tokenManager, cookies.accessToken);
 
         const result = await requestEmailVerificationUseCase.execute({ userId });
