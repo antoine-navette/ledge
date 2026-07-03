@@ -1,38 +1,32 @@
 import type { UserRepository } from '../../domain/repositories/user.repository.js';
-import type { TokenManager, VerifyTokenError } from '../../domain/ports/token-manager.js';
+import type { EmailVerificationRepository } from '../../domain/repositories/email-verification.repository.js';
 import type { User } from '../../domain/entities/user.js';
 import { fail, ok, type Result } from '../../core/result.js';
 
-type VerifyEmailInput = {
-    emailVerificationToken: string;
-};
+type VerifyEmailInput = { token: string };
 
-type VerifyEmailResult = Result<void, VerifyTokenError | 'USER_NOT_FOUND' | 'EMAIL_ALREADY_VERIFIED'>;
+type VerifyEmailResult = Result<void, 'INVALID_TOKEN' | 'TOKEN_EXPIRED' | 'USER_NOT_FOUND' | 'EMAIL_ALREADY_VERIFIED'>;
 
 export class VerifyEmailUseCase {
     constructor(
         private userRepository: UserRepository,
-        private tokenManager: TokenManager,
+        private emailVerificationRepository: EmailVerificationRepository,
     ) {}
 
     execute = async (input: VerifyEmailInput): Promise<VerifyEmailResult> => {
-        const verification = this.tokenManager.verifyEmailVerification(input.emailVerificationToken);
-        if (!verification.success) return fail(verification.error);
-        const { userId } = verification.data;
+        const now = new Date();
 
-        const user = await this.userRepository.findById(userId);
+        const emailVerification = await this.emailVerificationRepository.findByToken(input.token);
+        if (!emailVerification) return fail('INVALID_TOKEN');
+        if (emailVerification.expiresAt < now) return fail('TOKEN_EXPIRED');
+
+        const user = await this.userRepository.findById(emailVerification.userId);
         if (!user) return fail('USER_NOT_FOUND');
         if (user.isEmailVerified) return fail('EMAIL_ALREADY_VERIFIED');
 
-        const updatedUser: User = {
-            id: user.id,
-            email: user.email,
-            passwordHash: user.passwordHash,
-            isEmailVerified: true,
-            createdAt: user.createdAt,
-            updatedAt: new Date(),
-        };
+        const updatedUser: User = { ...user, isEmailVerified: true, updatedAt: now };
         await this.userRepository.save(updatedUser);
+        await this.emailVerificationRepository.delete(emailVerification);
 
         return ok(undefined);
     };

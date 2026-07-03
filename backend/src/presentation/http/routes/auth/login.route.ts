@@ -1,7 +1,7 @@
 import type { Router } from 'express';
 import type { Request, Response } from 'express';
 import { loginSchema } from '../../../schemas/auth.schemas.js';
-import { setAuthCookies } from '../../helpers/cookies.js';
+import { setSessionCookie } from '../../helpers/cookies.js';
 import type { LoginUseCase } from '../../../../application/auth/login.use-case.js';
 import type { ApiSuccess } from '@shared/api/api-response.js';
 import { InvalidCredentialsError } from '../../errors/invalid-credentials.error.js';
@@ -63,9 +63,9 @@ export const loginHandler = ({ loginUseCase }: Deps) => {
                     throw new InvalidCredentialsError();
             }
         }
-        const { user, accessToken, refreshToken } = result.data;
+        const { user, session } = result.data;
 
-        setAuthCookies(res, accessToken, refreshToken, body.rememberMe);
+        setSessionCookie(res, session, body.rememberMe);
 
         const response: ApiSuccess<UserDto> = {
             success: true,

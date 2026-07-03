@@ -3,6 +3,6 @@ export type ReadTransactionSchema = {
         transactionId: string;
     };
     cookies: {
-        accessToken?: string | undefined;
+        sessionToken?: string | undefined;
     };
 };

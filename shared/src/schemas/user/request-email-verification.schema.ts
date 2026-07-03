@@ -1,5 +1,5 @@
 export type RequestEmailVerificationSchema = {
     cookies: {
-        accessToken?: string | undefined;
+        sessionToken?: string | undefined;
     };
 };

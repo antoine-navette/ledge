@@ -1,18 +1,17 @@
 import type { Router } from 'express';
 import type { RequestEmailVerificationUseCase } from '../../../../application/user/request-email-verification.use-case.js';
+import type { AuthenticateUseCase } from '../../../../application/auth/authenticate.use-case.js';
 import type { Request, Response } from 'express';
 import { requestEmailVerificationSchema } from '../../../schemas/user.schemas.js';
-import type { TokenManager } from '../../../../domain/ports/token-manager.js';
 import type { ApiSuccess } from '@shared/api/api-response.js';
 import { UnauthorizedError } from '../../errors/unauthorized.error.js';
 import { ActiveCooldownError } from '../../errors/active-cooldown.error.js';
 import { EmailAlreadyVerifiedError } from '../../errors/email-already-verified.error.js';
 import { validateOrThrow } from '../../helpers/validate.js';
-import { authenticateOrThrow } from '../../helpers/authenticate.js';
 
 type Deps = {
     requestEmailVerificationUseCase: RequestEmailVerificationUseCase;
-    tokenManager: TokenManager;
+    authenticateUseCase: AuthenticateUseCase;
 };
 
 export const requestEmailVerificationRoute = (router: Router, deps: Deps) => {
@@ -38,12 +37,14 @@ export const requestEmailVerificationRoute = (router: Router, deps: Deps) => {
     router.post('/users/request-email-verification', requestEmailVerificationHandler(deps));
 };
 
-export const requestEmailVerificationHandler = ({ requestEmailVerificationUseCase, tokenManager }: Deps) => {
+export const requestEmailVerificationHandler = ({ requestEmailVerificationUseCase, authenticateUseCase }: Deps) => {
     return async (req: Request, res: Response): Promise<void> => {
         const { cookies } = validateOrThrow(req, requestEmailVerificationSchema);
-        const { userId } = authenticateOrThrow(tokenManager, cookies.accessToken);
 
-        const result = await requestEmailVerificationUseCase.execute({ userId });
+        const authResult = await authenticateUseCase.execute({ sessionToken: cookies.sessionToken ?? '' });
+        if (!authResult.success) throw new UnauthorizedError();
+
+        const result = await requestEmailVerificationUseCase.execute({ userId: authResult.data.userId });
         if (!result.success) {
             switch (result.error) {
                 case 'USER_NOT_FOUND':

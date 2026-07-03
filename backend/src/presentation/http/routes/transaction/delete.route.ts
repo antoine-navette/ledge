@@ -1,19 +1,19 @@
 import type { Router } from 'express';
 import type { DeleteTransactionUseCase } from '../../../../application/transaction/delete-transaction.use-case.js';
-import type { TokenManager } from '../../../../domain/ports/token-manager.js';
+import type { AuthenticateUseCase } from '../../../../application/auth/authenticate.use-case.js';
 import type { Request, Response } from 'express';
 import { deleteTransactionSchema } from '../../../schemas/transaction.schemas.js';
 import type { ApiSuccess } from '@shared/api/api-response.js';
 import { ForbiddenError } from '../../errors/forbidden.error.js';
 import { TransactionNotFoundError } from '../../errors/transaction-not-found.error.js';
+import { UnauthorizedError } from '../../errors/unauthorized.error.js';
 import { validateOrThrow } from '../../helpers/validate.js';
-import { authenticateOrThrow } from '../../helpers/authenticate.js';
 import type { TransactionDto } from '@shared/dto/transaction.dto.js';
 import { toTransactionDto } from '../../../mappers/transaction.mapper.js';
 
 type Deps = {
     deleteTransactionUseCase: DeleteTransactionUseCase;
-    tokenManager: TokenManager;
+    authenticateUseCase: AuthenticateUseCase;
 };
 
 export const deleteTransactionRoute = (router: Router, deps: Deps) => {
@@ -41,12 +41,14 @@ export const deleteTransactionRoute = (router: Router, deps: Deps) => {
     router.delete('/transactions/:transactionId', deleteTransactionHandler(deps));
 };
 
-export const deleteTransactionHandler = ({ deleteTransactionUseCase, tokenManager }: Deps) => {
+export const deleteTransactionHandler = ({ deleteTransactionUseCase, authenticateUseCase }: Deps) => {
     return async (req: Request, res: Response) => {
         const { params, cookies } = validateOrThrow(req, deleteTransactionSchema);
-        const { userId } = authenticateOrThrow(tokenManager, cookies.accessToken);
 
-        const result = await deleteTransactionUseCase.execute({ transactionId: params.transactionId, userId });
+        const authResult = await authenticateUseCase.execute({ sessionToken: cookies.sessionToken ?? '' });
+        if (!authResult.success) throw new UnauthorizedError();
+
+        const result = await deleteTransactionUseCase.execute({ transactionId: params.transactionId, userId: authResult.data.userId });
         if (!result.success) {
             switch (result.error) {
                 case 'TRANSACTION_NOT_OWNED':

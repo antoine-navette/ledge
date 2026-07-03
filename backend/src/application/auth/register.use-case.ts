@@ -1,25 +1,23 @@
 import type { UserRepository } from '../../domain/repositories/user.repository.js';
-import type { RefreshTokenRepository } from '../../domain/repositories/refresh-token.repository.js';
+import type { SessionRepository } from '../../domain/repositories/session.repository.js';
 import type { Hasher } from '../../domain/ports/hasher.js';
-import type { TokenManager } from '../../domain/ports/token-manager.js';
 import type { IdManager } from '../../domain/ports/id-manager.js';
-import type { User } from '../../domain/entities/user.js';
-import type { RefreshToken } from '../../domain/entities/refresh-token.js';
 import type { TokenGenerator } from '../../domain/ports/token-generator.js';
+import type { User } from '../../domain/entities/user.js';
+import type { Session } from '../../domain/entities/session.js';
 import { fail, ok, type Result } from '../../core/result.js';
 
 type RegisterInput = { email: string; password: string };
 
-type RegisterResult = Result<{ user: User; accessToken: string; refreshToken: string }, 'DUPLICATE_EMAIL'>;
+type RegisterResult = Result<{ user: User; session: Session }, 'DUPLICATE_EMAIL'>;
 
 export class RegisterUseCase {
-    private readonly REFRESH_TOKEN_DURATION = 7 * 24 * 60 * 60 * 1000;
+    private readonly SESSION_DURATION = 30 * 24 * 60 * 60 * 1000;
 
     constructor(
         private userRepository: UserRepository,
-        private refreshTokenRepository: RefreshTokenRepository,
+        private sessionRepository: SessionRepository,
         private hasher: Hasher,
-        private tokenManager: TokenManager,
         private idManager: IdManager,
         private tokenGenerator: TokenGenerator,
     ) {}
@@ -40,18 +38,16 @@ export class RegisterUseCase {
         };
         await this.userRepository.create(user);
 
-        const refreshToken: RefreshToken = {
+        const session: Session = {
             id: this.idManager.generate(),
             userId: user.id,
-            value: this.tokenGenerator.generate(),
-            expiresAt: new Date(now.getTime() + this.REFRESH_TOKEN_DURATION),
+            token: this.tokenGenerator.generate(),
+            expiresAt: new Date(now.getTime() + this.SESSION_DURATION),
             createdAt: now,
             updatedAt: now,
         };
-        await this.refreshTokenRepository.create(refreshToken);
+        await this.sessionRepository.create(session);
 
-        const accessToken = this.tokenManager.signAccess({ userId: user.id });
-
-        return ok({ user, accessToken, refreshToken: refreshToken.value });
+        return ok({ user, session });
     };
 }

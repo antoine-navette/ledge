@@ -1,18 +1,17 @@
 import type { Router } from 'express';
 import type { GetCurrentUserUseCase } from '../../../../application/user/get-current-user.use-case.js';
-import type { TokenManager } from '../../../../domain/ports/token-manager.js';
+import type { AuthenticateUseCase } from '../../../../application/auth/authenticate.use-case.js';
 import type { Request, Response } from 'express';
 import type { ApiSuccess } from '@shared/api/api-response.js';
 import { meSchema } from '../../../schemas/user.schemas.js';
 import { UnauthorizedError } from '../../errors/unauthorized.error.js';
 import { validateOrThrow } from '../../helpers/validate.js';
-import { authenticateOrThrow } from '../../helpers/authenticate.js';
 import type { UserDto } from '@shared/dto/user.dto.js';
 import { toUserDto } from '../../../mappers/user.mapper.js';
 
 type Deps = {
     getCurrentUserUseCase: GetCurrentUserUseCase;
-    tokenManager: TokenManager;
+    authenticateUseCase: AuthenticateUseCase;
 };
 
 export const meRoute = (router: Router, deps: Deps) => {
@@ -34,12 +33,14 @@ export const meRoute = (router: Router, deps: Deps) => {
     router.get('/users/me', meHandler(deps));
 };
 
-export const meHandler = ({ getCurrentUserUseCase, tokenManager }: Deps) => {
+export const meHandler = ({ getCurrentUserUseCase, authenticateUseCase }: Deps) => {
     return async (req: Request, res: Response): Promise<void> => {
         const { cookies } = validateOrThrow(req, meSchema);
-        const { userId } = authenticateOrThrow(tokenManager, cookies.accessToken);
 
-        const result = await getCurrentUserUseCase.execute({ userId });
+        const authResult = await authenticateUseCase.execute({ sessionToken: cookies.sessionToken ?? '' });
+        if (!authResult.success) throw new UnauthorizedError();
+
+        const result = await getCurrentUserUseCase.execute({ userId: authResult.data.userId });
         if (!result.success) {
             switch (result.error) {
                 case 'USER_NOT_FOUND':

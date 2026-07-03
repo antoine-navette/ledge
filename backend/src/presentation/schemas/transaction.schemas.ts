@@ -43,13 +43,13 @@ export const createTransactionSchema: ZodType<CreateTransactionSchema> = z.objec
         }),
     ]),
     cookies: z.object({
-        accessToken: z.string().optional(),
+        sessionToken: z.string().optional(),
     }),
 });
 
 export const readAllTransactionsSchema: ZodType<ReadAllTransactionSchema> = z.object({
     cookies: z.object({
-        accessToken: z.string().optional(),
+        sessionToken: z.string().optional(),
     }),
 });
 
@@ -58,7 +58,7 @@ export const readTransactionSchema: ZodType<ReadTransactionSchema> = z.object({
         transactionId: transactionIdSchema,
     }),
     cookies: z.object({
-        accessToken: z.string().optional(),
+        sessionToken: z.string().optional(),
     }),
 });
 
@@ -81,7 +81,7 @@ export const updateTransactionSchema: ZodType<UpdateTransactionSchema> = z.objec
         transactionId: transactionIdSchema,
     }),
     cookies: z.object({
-        accessToken: z.string().optional(),
+        sessionToken: z.string().optional(),
     }),
 });
 
@@ -90,6 +90,6 @@ export const deleteTransactionSchema: ZodType<DeleteTransactionSchema> = z.objec
         transactionId: transactionIdSchema,
     }),
     cookies: z.object({
-        accessToken: z.string().optional(),
+        sessionToken: z.string().optional(),
     }),
 });

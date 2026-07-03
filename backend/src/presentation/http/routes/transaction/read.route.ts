@@ -1,19 +1,19 @@
 import type { Router } from 'express';
 import type { GetTransactionUseCase } from '../../../../application/transaction/get-transaction.use-case.js';
-import type { TokenManager } from '../../../../domain/ports/token-manager.js';
+import type { AuthenticateUseCase } from '../../../../application/auth/authenticate.use-case.js';
 import type { Request, Response } from 'express';
 import { readTransactionSchema } from '../../../schemas/transaction.schemas.js';
 import type { ApiSuccess } from '@shared/api/api-response.js';
 import { ForbiddenError } from '../../errors/forbidden.error.js';
 import { TransactionNotFoundError } from '../../errors/transaction-not-found.error.js';
+import { UnauthorizedError } from '../../errors/unauthorized.error.js';
 import { validateOrThrow } from '../../helpers/validate.js';
-import { authenticateOrThrow } from '../../helpers/authenticate.js';
 import type { TransactionDto } from '@shared/dto/transaction.dto.js';
 import { toTransactionDto } from '../../../mappers/transaction.mapper.js';
 
 type Deps = {
     getTransactionUseCase: GetTransactionUseCase;
-    tokenManager: TokenManager;
+    authenticateUseCase: AuthenticateUseCase;
 };
 
 export const readTransactionRoute = (router: Router, deps: Deps) => {
@@ -41,12 +41,14 @@ export const readTransactionRoute = (router: Router, deps: Deps) => {
     router.get('/transactions/:transactionId', readTransactionHandler(deps));
 };
 
-export const readTransactionHandler = ({ getTransactionUseCase, tokenManager }: Deps) => {
+export const readTransactionHandler = ({ getTransactionUseCase, authenticateUseCase }: Deps) => {
     return async (req: Request, res: Response) => {
         const { params, cookies } = validateOrThrow(req, readTransactionSchema);
-        const { userId } = authenticateOrThrow(tokenManager, cookies.accessToken);
 
-        const result = await getTransactionUseCase.execute({ transactionId: params.transactionId, userId });
+        const authResult = await authenticateUseCase.execute({ sessionToken: cookies.sessionToken ?? '' });
+        if (!authResult.success) throw new UnauthorizedError();
+
+        const result = await getTransactionUseCase.execute({ transactionId: params.transactionId, userId: authResult.data.userId });
         if (!result.success) {
             switch (result.error) {
                 case 'TRANSACTION_NOT_OWNED':

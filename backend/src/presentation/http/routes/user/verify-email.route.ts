@@ -26,9 +26,9 @@ export const verifyEmailRoute = (router: Router, deps: Deps) => {
      *           schema:
      *             type: object
      *             required:
-     *               - jwt
+     *               - token
      *             properties:
-     *               jwt:
+     *               token:
      *                 type: string
      *     responses:
      *       200:
@@ -47,12 +47,11 @@ export const verifyEmailHandler = ({ verifyEmailUseCase }: Deps) => {
     return async (req: Request, res: Response): Promise<void> => {
         const { body } = validateOrThrow(req, verifyEmailSchema);
 
-        const result = await verifyEmailUseCase.execute({ emailVerificationToken: body.emailVerificationToken });
+        const result = await verifyEmailUseCase.execute({ token: body.token });
         if (!result.success) {
             switch (result.error) {
-                case 'INACTIVE_TOKEN':
                 case 'INVALID_TOKEN':
-                case 'EXPIRED_TOKEN':
+                case 'TOKEN_EXPIRED':
                 case 'USER_NOT_FOUND':
                     throw new InvalidTokenError();
                 case 'EMAIL_ALREADY_VERIFIED':

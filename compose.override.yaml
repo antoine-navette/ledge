@@ -38,11 +38,6 @@ services:
       MONGO_INITDB_ROOT_USERNAME: ${MONGO_USER:-user}
       MONGO_INITDB_ROOT_PASSWORD: ${MONGO_PASSWORD:-password}
 
-  redis:
-    command: redis-server --requirepass "${REDIS_PASSWORD:-password}"
-    ports:
-      - "${REDIS_PORT:-6379}:6379"
-
   mailpit:
     image: axllent/mailpit:v1.27
     ports:

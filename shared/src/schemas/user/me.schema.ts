@@ -1,5 +1,5 @@
 export type MeSchema = {
     cookies: {
-        accessToken?: string | undefined;
+        sessionToken?: string | undefined;
     };
 };

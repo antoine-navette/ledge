@@ -3,13 +3,13 @@ import { verifyEmail } from '../api/users.ts';
 import { useParams } from 'react-router-dom';
 
 export default function VerifyEmail() {
-    const { emailVerificationToken } = useParams<{ emailVerificationToken: string }>();
+    const { token } = useParams<{ token: string }>();
 
     const [isVerifying, setIsVerifying] = useState(false);
     const [success, setSuccess] = useState<boolean | null>(null);
     const [message, setMessage] = useState<string | null>(null);
 
-    if (!emailVerificationToken) {
+    if (!token) {
         return <div className="text-center p-10 text-red-600">Lien invalide (token manquant).</div>;
     }
 
@@ -18,7 +18,7 @@ export default function VerifyEmail() {
         setMessage(null);
 
         setIsVerifying(true);
-        const response = await verifyEmail({ emailVerificationToken });
+        const response = await verifyEmail({ token });
         setIsVerifying(false);
 
         if (!response.success) {

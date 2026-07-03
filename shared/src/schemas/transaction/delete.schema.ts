@@ -3,6 +3,6 @@ export type DeleteTransactionSchema = {
         transactionId: string;
     };
     cookies: {
-        accessToken?: string | undefined;
+        sessionToken?: string | undefined;
     };
 };

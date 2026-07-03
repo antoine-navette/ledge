@@ -1,7 +1,7 @@
-export type RefreshToken = Readonly<{
+export type Session = Readonly<{
     id: string;
     userId: string;
-    value: string;
+    token: string;
     expiresAt: Date;
     createdAt: Date;
     updatedAt: Date;

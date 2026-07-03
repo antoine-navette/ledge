@@ -1,7 +1,7 @@
 import type { Router } from 'express';
 import type { RegisterUseCase } from '../../../../application/auth/register.use-case.js';
 import { registerSchema } from '../../../schemas/auth.schemas.js';
-import { setAuthCookies } from '../../helpers/cookies.js';
+import { setSessionCookie } from '../../helpers/cookies.js';
 import type { Request, Response } from 'express';
 import type { ApiSuccess } from '@shared/api/api-response.js';
 import { DuplicateEmailError } from '../../errors/duplicate-email.error.js';
@@ -62,9 +62,9 @@ export const registerHandler = ({ registerUseCase }: Deps) => {
                     throw new DuplicateEmailError();
             }
         }
-        const { user, accessToken, refreshToken } = result.data;
+        const { user, session } = result.data;
 
-        setAuthCookies(res, accessToken, refreshToken, false);
+        setSessionCookie(res, session, false);
 
         const response: ApiSuccess<UserDto> = {
             success: true,

@@ -1,11 +1,10 @@
 import type { Router } from 'express';
+import type { AuthenticateUseCase } from '../../../application/auth/authenticate.use-case.js';
 import type { RegisterUseCase } from '../../../application/auth/register.use-case.js';
 import type { LoginUseCase } from '../../../application/auth/login.use-case.js';
-import type { RefreshUseCase } from '../../../application/auth/refresh.use-case.js';
 import type { LogoutUseCase } from '../../../application/auth/logout.use-case.js';
 import { registerRoute } from './auth/register.route.js';
 import { loginRoute } from './auth/login.route.js';
-import { refreshRoute } from './auth/refresh.route.js';
 import { logoutRoute } from './auth/logout.route.js';
 import { createTransactionRoute } from './transaction/create.route.js';
 import type { CreateTransactionUseCase } from '../../../application/transaction/create-transaction.use-case.js';
@@ -14,8 +13,6 @@ import type { GetTransactionUseCase } from '../../../application/transaction/get
 import type { UpdateTransactionUseCase } from '../../../application/transaction/update-transaction.use-case.js';
 import type { DeleteTransactionUseCase } from '../../../application/transaction/delete-transaction.use-case.js';
 import { readAllTransactionRoute } from './transaction/read-all.route.js';
-import type { TokenManager } from '../../../domain/ports/token-manager.js';
-import type { IdManager } from '../../../domain/ports/id-manager.js';
 import { readTransactionRoute } from './transaction/read.route.js';
 import { updateTransactionRoute } from './transaction/update.route.js';
 import { deleteTransactionRoute } from './transaction/delete.route.js';
@@ -28,12 +25,9 @@ import { meRoute } from './user/me.route.js';
 import { docsRoute } from './docs/docs.route.js';
 
 type Deps = {
-    tokenManager: TokenManager;
-    idManager: IdManager;
-
+    authenticateUseCase: AuthenticateUseCase;
     registerUseCase: RegisterUseCase;
     loginUseCase: LoginUseCase;
-    refreshUseCase: RefreshUseCase;
     logoutUseCase: LogoutUseCase;
 
     createTransactionUseCase: CreateTransactionUseCase;
@@ -50,12 +44,9 @@ type Deps = {
 export const routes = (
     router: Router,
     {
-        tokenManager,
-        idManager,
-
+        authenticateUseCase,
         registerUseCase,
         loginUseCase,
-        refreshUseCase,
         logoutUseCase,
 
         createTransactionUseCase,
@@ -71,20 +62,19 @@ export const routes = (
 ) => {
     registerRoute(router, { registerUseCase });
     loginRoute(router, { loginUseCase });
-    refreshRoute(router, { refreshUseCase });
-    logoutRoute(router, { logoutUseCase });
+    logoutRoute(router, { authenticateUseCase, logoutUseCase });
 
     docsRoute(router);
 
-    createTransactionRoute(router, { createTransactionUseCase, tokenManager });
-    readAllTransactionRoute(router, { getUserTransactionsUseCase, tokenManager });
-    readTransactionRoute(router, { getTransactionUseCase, tokenManager });
-    updateTransactionRoute(router, { updateTransactionUseCase, tokenManager });
-    deleteTransactionRoute(router, { deleteTransactionUseCase, tokenManager });
+    createTransactionRoute(router, { createTransactionUseCase, authenticateUseCase });
+    readAllTransactionRoute(router, { getUserTransactionsUseCase, authenticateUseCase });
+    readTransactionRoute(router, { getTransactionUseCase, authenticateUseCase });
+    updateTransactionRoute(router, { updateTransactionUseCase, authenticateUseCase });
+    deleteTransactionRoute(router, { deleteTransactionUseCase, authenticateUseCase });
 
-    requestEmailVerificationRoute(router, { requestEmailVerificationUseCase, tokenManager });
+    requestEmailVerificationRoute(router, { requestEmailVerificationUseCase, authenticateUseCase });
     verifyEmailRoute(router, { verifyEmailUseCase });
-    meRoute(router, { getCurrentUserUseCase, tokenManager });
+    meRoute(router, { getCurrentUserUseCase, authenticateUseCase });
 
     return router;
 };

@@ -3,11 +3,9 @@ import cookieParser from 'cookie-parser';
 import { corsMiddleware } from './middlewares/cors.middleware.js';
 import { rateLimiterMiddleware } from './middlewares/rate-limiter.middleware.js';
 import { errorHandlerMiddleware } from './middlewares/error-handler.middleware.js';
-import type { TokenManager } from '../../domain/ports/token-manager.js';
-import type { IdManager } from '../../domain/ports/id-manager.js';
+import type { AuthenticateUseCase } from '../../application/auth/authenticate.use-case.js';
 import type { RegisterUseCase } from '../../application/auth/register.use-case.js';
 import type { LoginUseCase } from '../../application/auth/login.use-case.js';
-import type { RefreshUseCase } from '../../application/auth/refresh.use-case.js';
 import type { LogoutUseCase } from '../../application/auth/logout.use-case.js';
 import type { CreateTransactionUseCase } from '../../application/transaction/create-transaction.use-case.js';
 import type { GetUserTransactionsUseCase } from '../../application/transaction/get-user-transactions.use-case.js';
@@ -26,12 +24,10 @@ import httpErrors from 'http-errors';
 
 type Input = {
     logger: Logger;
-    tokenManager: TokenManager;
-    idManager: IdManager;
     tokenGenerator: TokenGenerator;
+    authenticateUseCase: AuthenticateUseCase;
     registerUseCase: RegisterUseCase;
     loginUseCase: LoginUseCase;
-    refreshUseCase: RefreshUseCase;
     logoutUseCase: LogoutUseCase;
     createTransactionUseCase: CreateTransactionUseCase;
     getUserTransactionsUseCase: GetUserTransactionsUseCase;
@@ -46,12 +42,10 @@ type Input = {
 
 export const createHttpApp = ({
     logger,
-    tokenManager,
-    idManager,
     tokenGenerator,
+    authenticateUseCase,
     registerUseCase,
     loginUseCase,
-    refreshUseCase,
     logoutUseCase,
     createTransactionUseCase,
     getUserTransactionsUseCase,
@@ -82,11 +76,9 @@ export const createHttpApp = ({
     const router = express.Router();
     app.use(
         routes(router, {
-            tokenManager,
-            idManager,
+            authenticateUseCase,
             registerUseCase,
             loginUseCase,
-            refreshUseCase,
             logoutUseCase,
             createTransactionUseCase,
             getUserTransactionsUseCase,

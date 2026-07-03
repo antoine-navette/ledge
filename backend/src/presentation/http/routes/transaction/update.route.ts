@@ -1,19 +1,19 @@
 import type { Router } from 'express';
 import type { UpdateTransactionUseCase } from '../../../../application/transaction/update-transaction.use-case.js';
-import type { TokenManager } from '../../../../domain/ports/token-manager.js';
+import type { AuthenticateUseCase } from '../../../../application/auth/authenticate.use-case.js';
 import type { Request, Response } from 'express';
 import { updateTransactionSchema } from '../../../schemas/transaction.schemas.js';
 import type { ApiSuccess } from '@shared/api/api-response.js';
 import { ForbiddenError } from '../../errors/forbidden.error.js';
 import { TransactionNotFoundError } from '../../errors/transaction-not-found.error.js';
+import { UnauthorizedError } from '../../errors/unauthorized.error.js';
 import { validateOrThrow } from '../../helpers/validate.js';
-import { authenticateOrThrow } from '../../helpers/authenticate.js';
 import type { TransactionDto } from '@shared/dto/transaction.dto.js';
 import { toTransactionDto } from '../../../mappers/transaction.mapper.js';
 
 type Deps = {
     updateTransactionUseCase: UpdateTransactionUseCase;
-    tokenManager: TokenManager;
+    authenticateUseCase: AuthenticateUseCase;
 };
 
 export const updateTransactionRoute = (router: Router, deps: Deps) => {
@@ -59,14 +59,16 @@ export const updateTransactionRoute = (router: Router, deps: Deps) => {
     router.put('/transactions/:transactionId', updateTransactionHandler(deps));
 };
 
-export const updateTransactionHandler = ({ updateTransactionUseCase, tokenManager }: Deps) => {
+export const updateTransactionHandler = ({ updateTransactionUseCase, authenticateUseCase }: Deps) => {
     return async (req: Request, res: Response) => {
         const { body, params, cookies } = validateOrThrow(req, updateTransactionSchema);
-        const { userId } = authenticateOrThrow(tokenManager, cookies.accessToken);
+
+        const authResult = await authenticateUseCase.execute({ sessionToken: cookies.sessionToken ?? '' });
+        if (!authResult.success) throw new UnauthorizedError();
 
         const result = await updateTransactionUseCase.execute({
             transactionId: params.transactionId,
-            userId,
+            userId: authResult.data.userId,
             name: body.name,
             value: body.value,
             ...(body.type === 'expense'

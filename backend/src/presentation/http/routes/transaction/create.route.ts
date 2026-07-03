@@ -1,17 +1,17 @@
 import type { Router } from 'express';
 import type { CreateTransactionUseCase } from '../../../../application/transaction/create-transaction.use-case.js';
+import type { AuthenticateUseCase } from '../../../../application/auth/authenticate.use-case.js';
 import type { Request, Response } from 'express';
-import type { TokenManager } from '../../../../domain/ports/token-manager.js';
 import { createTransactionSchema } from '../../../schemas/transaction.schemas.js';
 import type { ApiSuccess } from '@shared/api/api-response.js';
+import { UnauthorizedError } from '../../errors/unauthorized.error.js';
 import { validateOrThrow } from '../../helpers/validate.js';
-import { authenticateOrThrow } from '../../helpers/authenticate.js';
 import type { TransactionDto } from '@shared/dto/transaction.dto.js';
 import { toTransactionDto } from '../../../mappers/transaction.mapper.js';
 
 type Deps = {
     createTransactionUseCase: CreateTransactionUseCase;
-    tokenManager: TokenManager;
+    authenticateUseCase: AuthenticateUseCase;
 };
 
 export const createTransactionRoute = (router: Router, deps: Deps) => {
@@ -56,13 +56,15 @@ export const createTransactionRoute = (router: Router, deps: Deps) => {
     router.post('/transactions', createTransactionHandler(deps));
 };
 
-export const createTransactionHandler = ({ createTransactionUseCase, tokenManager }: Deps) => {
+export const createTransactionHandler = ({ createTransactionUseCase, authenticateUseCase }: Deps) => {
     return async (req: Request, res: Response) => {
         const { body, cookies } = validateOrThrow(req, createTransactionSchema);
-        const { userId } = authenticateOrThrow(tokenManager, cookies.accessToken);
+
+        const authResult = await authenticateUseCase.execute({ sessionToken: cookies.sessionToken ?? '' });
+        if (!authResult.success) throw new UnauthorizedError();
 
         const { transaction } = await createTransactionUseCase.execute({
-            userId,
+            userId: authResult.data.userId,
             month: body.month,
             name: body.name,
             value: body.value,

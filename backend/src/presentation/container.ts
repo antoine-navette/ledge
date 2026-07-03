@@ -1,14 +1,15 @@
-import type { TokenManager } from '../domain/ports/token-manager.js';
 import type { Hasher } from '../domain/ports/hasher.js';
 import type { EmailSender } from '../domain/ports/email-sender.js';
-import type { CacheStore } from '../domain/ports/cache-store.js';
 import type { UserRepository } from '../domain/repositories/user.repository.js';
+import type { SessionRepository } from '../domain/repositories/session.repository.js';
+import type { EmailVerificationRepository } from '../domain/repositories/email-verification.repository.js';
 import type { TransactionRepository } from '../domain/repositories/transaction.repository.js';
-import type { RefreshTokenRepository } from '../domain/repositories/refresh-token.repository.js';
-import { RegisterUseCase } from '../application/auth/register.use-case.js';
 import type { IdManager } from '../domain/ports/id-manager.js';
+import type { TokenGenerator } from '../domain/ports/token-generator.js';
+import type { Env } from '../infrastructure/config/env.js';
+import { AuthenticateUseCase } from '../application/auth/authenticate.use-case.js';
+import { RegisterUseCase } from '../application/auth/register.use-case.js';
 import { LoginUseCase } from '../application/auth/login.use-case.js';
-import { RefreshUseCase } from '../application/auth/refresh.use-case.js';
 import { LogoutUseCase } from '../application/auth/logout.use-case.js';
 import { CreateTransactionUseCase } from '../application/transaction/create-transaction.use-case.js';
 import { GetUserTransactionsUseCase } from '../application/transaction/get-user-transactions.use-case.js';
@@ -18,55 +19,37 @@ import { DeleteTransactionUseCase } from '../application/transaction/delete-tran
 import { RequestEmailVerificationUseCase } from '../application/user/request-email-verification.use-case.js';
 import { VerifyEmailUseCase } from '../application/user/verify-email.use-case.js';
 import { GetCurrentUserUseCase } from '../application/user/get-current-user.use-case.js';
-import type { TokenGenerator } from '../domain/ports/token-generator.js';
-import type { Env } from '../infrastructure/config/env.js';
 
 type Input = {
-    tokenManager: TokenManager;
     hasher: Hasher;
     emailSender: EmailSender;
-    cacheStore: CacheStore;
     idManager: IdManager;
     tokenGenerator: TokenGenerator;
     userRepository: UserRepository;
+    sessionRepository: SessionRepository;
+    emailVerificationRepository: EmailVerificationRepository;
     transactionRepository: TransactionRepository;
-    refreshTokenRepository: RefreshTokenRepository;
     emailFrom: Env['emailFrom'];
     webUrl: Env['webUrl'];
 };
 
 export const buildContainer = ({
-    tokenManager,
     hasher,
     emailSender,
-    cacheStore,
     idManager,
     tokenGenerator,
     userRepository,
+    sessionRepository,
+    emailVerificationRepository,
     transactionRepository,
-    refreshTokenRepository,
     emailFrom,
     webUrl,
 }: Input) => {
     return {
-        registerUseCase: new RegisterUseCase(
-            userRepository,
-            refreshTokenRepository,
-            hasher,
-            tokenManager,
-            idManager,
-            tokenGenerator,
-        ),
-        loginUseCase: new LoginUseCase(
-            userRepository,
-            refreshTokenRepository,
-            hasher,
-            tokenManager,
-            idManager,
-            tokenGenerator,
-        ),
-        refreshUseCase: new RefreshUseCase(refreshTokenRepository, tokenManager, tokenGenerator),
-        logoutUseCase: new LogoutUseCase(refreshTokenRepository),
+        authenticateUseCase: new AuthenticateUseCase(sessionRepository),
+        registerUseCase: new RegisterUseCase(userRepository, sessionRepository, hasher, idManager, tokenGenerator),
+        loginUseCase: new LoginUseCase(userRepository, sessionRepository, hasher, idManager, tokenGenerator),
+        logoutUseCase: new LogoutUseCase(sessionRepository),
 
         createTransactionUseCase: new CreateTransactionUseCase(transactionRepository, idManager),
         getUserTransactionsUseCase: new GetUserTransactionsUseCase(transactionRepository),
@@ -76,13 +59,14 @@ export const buildContainer = ({
 
         requestEmailVerificationUseCase: new RequestEmailVerificationUseCase(
             userRepository,
+            emailVerificationRepository,
             emailSender,
-            tokenManager,
-            cacheStore,
+            idManager,
+            tokenGenerator,
             emailFrom,
             webUrl,
         ),
-        verifyEmailUseCase: new VerifyEmailUseCase(userRepository, tokenManager),
+        verifyEmailUseCase: new VerifyEmailUseCase(userRepository, emailVerificationRepository),
         getCurrentUserUseCase: new GetCurrentUserUseCase(userRepository),
     };
 };
