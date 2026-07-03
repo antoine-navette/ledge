@@ -10,5 +10,5 @@ export const toTransactionDto = (transaction: Transaction): TransactionDto => ({
     type: transaction.type,
     expenseCategory: transaction.expenseCategory,
     createdAt: transaction.createdAt.toISOString(),
-    updatedAt: transaction.createdAt.toISOString(),
+    updatedAt: transaction.updatedAt.toISOString(),
 });
