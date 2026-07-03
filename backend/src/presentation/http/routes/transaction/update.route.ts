@@ -71,9 +71,8 @@ export const updateTransactionHandler = ({ updateTransactionUseCase, authenticat
             userId: authResult.data.userId,
             name: body.name,
             value: body.value,
-            ...(body.type === 'expense'
-                ? { type: 'expense', expenseCategory: body.expenseCategory }
-                : { type: 'income', expenseCategory: null }),
+            type: body.type,
+            expenseCategory: body.expenseCategory,
         });
         if (!result.success) {
             switch (result.error) {

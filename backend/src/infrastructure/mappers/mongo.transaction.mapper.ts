@@ -20,9 +20,8 @@ export const toTransaction = (document: TransactionDocument): Transaction => ({
     month: document.month,
     name: document.name,
     value: document.value,
-    ...(document.type === 'expense'
-        ? { type: 'expense', expenseCategory: document.expenseCategory ?? null }
-        : { type: 'income', expenseCategory: null }),
+    type: document.type,
+    expenseCategory: document.expenseCategory ?? null,
     createdAt: document.createdAt,
     updatedAt: document.updatedAt,
 });

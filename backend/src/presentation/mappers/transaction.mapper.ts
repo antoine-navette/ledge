@@ -7,9 +7,8 @@ export const toTransactionDto = (transaction: Transaction): TransactionDto => ({
     month: transaction.month,
     name: transaction.name,
     value: transaction.value,
-    ...(transaction.type === 'expense'
-        ? { type: 'expense', expenseCategory: transaction.expenseCategory ?? null }
-        : { type: 'income', expenseCategory: null }),
+    type: transaction.type,
+    expenseCategory: transaction.expenseCategory,
     createdAt: transaction.createdAt.toISOString(),
     updatedAt: transaction.createdAt.toISOString(),
 });

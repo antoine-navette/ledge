@@ -68,9 +68,8 @@ export const createTransactionHandler = ({ createTransactionUseCase, authenticat
             month: body.month,
             name: body.name,
             value: body.value,
-            ...(body.type === 'expense'
-                ? { type: 'expense', expenseCategory: body.expenseCategory }
-                : { type: 'income', expenseCategory: null }),
+            type: body.type,
+            expenseCategory: body.expenseCategory,
         });
 
         const response: ApiSuccess<TransactionDto> = {

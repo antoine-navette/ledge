@@ -2,10 +2,14 @@ import type { TransactionRepository } from '../../domain/repositories/transactio
 import type { Transaction } from '../../domain/entities/transaction.js';
 import { fail, ok, type Result } from '../../core/result.js';
 
-type UpdateTransactionInput = { transactionId: string; userId: string; name: string; value: number } & (
-    | { type: 'expense'; expenseCategory: 'need' | 'want' | 'investment' | null }
-    | { type: 'income'; expenseCategory: null }
-);
+type UpdateTransactionInput = {
+    transactionId: string;
+    userId: string;
+    name: string;
+    value: number;
+    type: 'expense' | 'income';
+    expenseCategory: 'need' | 'want' | 'investment' | null;
+};
 
 type UpdateTransactionResult = Result<{ transaction: Transaction }, 'TRANSACTION_NOT_FOUND' | 'TRANSACTION_NOT_OWNED'>;
 
@@ -23,9 +27,8 @@ export class UpdateTransactionUseCase {
             month: transaction.month,
             name: input.name,
             value: input.value,
-            ...(input.type === 'expense'
-                ? { type: 'expense', expenseCategory: input.expenseCategory }
-                : { type: 'income', expenseCategory: null }),
+            type: input.type,
+            expenseCategory: input.expenseCategory,
             createdAt: transaction.createdAt,
             updatedAt: new Date(),
         };
