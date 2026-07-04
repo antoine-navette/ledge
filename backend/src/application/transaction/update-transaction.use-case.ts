@@ -19,19 +19,9 @@ export class UpdateTransactionUseCase {
         if (!transaction) return fail('TRANSACTION_NOT_FOUND');
         if (transaction.userId !== userId) return fail('TRANSACTION_NOT_OWNED');
 
-        const updatedTransaction: Transaction = {
-            id: transaction.id,
-            userId: transaction.userId,
-            month: transaction.month,
-            name,
-            value,
-            type,
-            expenseCategory,
-            createdAt: transaction.createdAt,
-            updatedAt: new Date(),
-        };
-        await this.transactionRepository.save(updatedTransaction);
+        const updated: Transaction = { ...transaction, name, value, type, expenseCategory, updatedAt: new Date() };
+        await this.transactionRepository.save(updated);
 
-        return ok({ transaction: updatedTransaction });
+        return ok({ transaction: updated });
     };
 }

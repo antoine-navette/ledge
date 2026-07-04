@@ -46,9 +46,12 @@ export class RequestEmailVerificationUseCase {
         };
         await this.emailVerificationRepository.create(emailVerification);
 
-        const subject = 'Please verify your email address';
-        const html = `Click here to verify your email address: <a href="${this.webUrl}/verify-email/${emailVerification.token}">verify email</a>. This link will expire in 1 hour.`;
-        await this.emailSender.send(this.emailFrom, user.email, subject, html);
+        await this.emailSender.send(
+            this.emailFrom,
+            user.email,
+            'Please verify your email address',
+            `Click here to verify your email address: <a href="${this.webUrl}/verify-email/${emailVerification.token}">verify email</a>. This link will expire in 1 hour.`,
+        );
 
         return ok(undefined);
     };
