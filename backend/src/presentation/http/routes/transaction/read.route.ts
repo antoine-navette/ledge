@@ -45,10 +45,10 @@ export const readTransactionHandler = ({ getTransactionUseCase, authenticateUseC
     return async (req: Request, res: Response) => {
         const { params, cookies } = validateOrThrow(req, readTransactionSchema);
 
-        const authResult = await authenticateUseCase.execute({ sessionToken: cookies.sessionToken ?? '' });
+        const authResult = await authenticateUseCase.execute(cookies.sessionToken ?? '');
         if (!authResult.success) throw new UnauthorizedError();
 
-        const result = await getTransactionUseCase.execute({ transactionId: params.transactionId, userId: authResult.data.userId });
+        const result = await getTransactionUseCase.execute(params.transactionId, authResult.data.userId);
         if (!result.success) {
             switch (result.error) {
                 case 'TRANSACTION_NOT_OWNED':

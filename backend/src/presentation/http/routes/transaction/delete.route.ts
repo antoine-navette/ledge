@@ -45,10 +45,10 @@ export const deleteTransactionHandler = ({ deleteTransactionUseCase, authenticat
     return async (req: Request, res: Response) => {
         const { params, cookies } = validateOrThrow(req, deleteTransactionSchema);
 
-        const authResult = await authenticateUseCase.execute({ sessionToken: cookies.sessionToken ?? '' });
+        const authResult = await authenticateUseCase.execute(cookies.sessionToken ?? '');
         if (!authResult.success) throw new UnauthorizedError();
 
-        const result = await deleteTransactionUseCase.execute({ transactionId: params.transactionId, userId: authResult.data.userId });
+        const result = await deleteTransactionUseCase.execute(params.transactionId, authResult.data.userId);
         if (!result.success) {
             switch (result.error) {
                 case 'TRANSACTION_NOT_OWNED':

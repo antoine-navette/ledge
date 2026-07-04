@@ -37,10 +37,10 @@ export const meHandler = ({ getCurrentUserUseCase, authenticateUseCase }: Deps) 
     return async (req: Request, res: Response): Promise<void> => {
         const { cookies } = validateOrThrow(req, meSchema);
 
-        const authResult = await authenticateUseCase.execute({ sessionToken: cookies.sessionToken ?? '' });
+        const authResult = await authenticateUseCase.execute(cookies.sessionToken ?? '');
         if (!authResult.success) throw new UnauthorizedError();
 
-        const result = await getCurrentUserUseCase.execute({ userId: authResult.data.userId });
+        const result = await getCurrentUserUseCase.execute(authResult.data.userId);
         if (!result.success) {
             switch (result.error) {
                 case 'USER_NOT_FOUND':

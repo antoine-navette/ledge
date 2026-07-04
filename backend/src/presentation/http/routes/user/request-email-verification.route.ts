@@ -41,10 +41,10 @@ export const requestEmailVerificationHandler = ({ requestEmailVerificationUseCas
     return async (req: Request, res: Response): Promise<void> => {
         const { cookies } = validateOrThrow(req, requestEmailVerificationSchema);
 
-        const authResult = await authenticateUseCase.execute({ sessionToken: cookies.sessionToken ?? '' });
+        const authResult = await authenticateUseCase.execute(cookies.sessionToken ?? '');
         if (!authResult.success) throw new UnauthorizedError();
 
-        const result = await requestEmailVerificationUseCase.execute({ userId: authResult.data.userId });
+        const result = await requestEmailVerificationUseCase.execute(authResult.data.userId);
         if (!result.success) {
             switch (result.error) {
                 case 'USER_NOT_FOUND':

@@ -2,33 +2,31 @@ import type { TransactionRepository } from '../../domain/repositories/transactio
 import type { Transaction } from '../../domain/entities/transaction.js';
 import { fail, ok, type Result } from '../../core/result.js';
 
-type UpdateTransactionInput = {
-    transactionId: string;
-    userId: string;
-    name: string;
-    value: number;
-    type: 'expense' | 'income';
-    expenseCategory: 'need' | 'want' | 'investment' | null;
-};
-
 type UpdateTransactionResult = Result<{ transaction: Transaction }, 'TRANSACTION_NOT_FOUND' | 'TRANSACTION_NOT_OWNED'>;
 
 export class UpdateTransactionUseCase {
     constructor(private transactionRepository: TransactionRepository) {}
 
-    execute = async (input: UpdateTransactionInput): Promise<UpdateTransactionResult> => {
-        const transaction = await this.transactionRepository.findById(input.transactionId);
+    execute = async (
+        transactionId: string,
+        userId: string,
+        name: string,
+        value: number,
+        type: 'expense' | 'income',
+        expenseCategory: 'need' | 'want' | 'investment' | null,
+    ): Promise<UpdateTransactionResult> => {
+        const transaction = await this.transactionRepository.findById(transactionId);
         if (!transaction) return fail('TRANSACTION_NOT_FOUND');
-        if (transaction.userId !== input.userId) return fail('TRANSACTION_NOT_OWNED');
+        if (transaction.userId !== userId) return fail('TRANSACTION_NOT_OWNED');
 
         const updatedTransaction: Transaction = {
             id: transaction.id,
             userId: transaction.userId,
             month: transaction.month,
-            name: input.name,
-            value: input.value,
-            type: input.type,
-            expenseCategory: input.expenseCategory,
+            name,
+            value,
+            type,
+            expenseCategory,
             createdAt: transaction.createdAt,
             updatedAt: new Date(),
         };

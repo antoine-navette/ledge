@@ -63,17 +63,17 @@ export const updateTransactionHandler = ({ updateTransactionUseCase, authenticat
     return async (req: Request, res: Response) => {
         const { body, params, cookies } = validateOrThrow(req, updateTransactionSchema);
 
-        const authResult = await authenticateUseCase.execute({ sessionToken: cookies.sessionToken ?? '' });
+        const authResult = await authenticateUseCase.execute(cookies.sessionToken ?? '');
         if (!authResult.success) throw new UnauthorizedError();
 
-        const result = await updateTransactionUseCase.execute({
-            transactionId: params.transactionId,
-            userId: authResult.data.userId,
-            name: body.name,
-            value: body.value,
-            type: body.type,
-            expenseCategory: body.expenseCategory,
-        });
+        const result = await updateTransactionUseCase.execute(
+            params.transactionId,
+            authResult.data.userId,
+            body.name,
+            body.value,
+            body.type,
+            body.expenseCategory,
+        );
         if (!result.success) {
             switch (result.error) {
                 case 'TRANSACTION_NOT_OWNED':

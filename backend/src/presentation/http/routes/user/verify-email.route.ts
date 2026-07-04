@@ -47,7 +47,7 @@ export const verifyEmailHandler = ({ verifyEmailUseCase }: Deps) => {
     return async (req: Request, res: Response): Promise<void> => {
         const { body } = validateOrThrow(req, verifyEmailSchema);
 
-        const result = await verifyEmailUseCase.execute({ token: body.token });
+        const result = await verifyEmailUseCase.execute(body.token);
         if (!result.success) {
             switch (result.error) {
                 case 'INVALID_TOKEN':

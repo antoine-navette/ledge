@@ -2,15 +2,6 @@ import type { TransactionRepository } from '../../domain/repositories/transactio
 import type { Transaction } from '../../domain/entities/transaction.js';
 import type { IdManager } from '../../domain/ports/id-manager.js';
 
-type CreateTransactionInput = {
-    userId: string;
-    month: string;
-    name: string;
-    value: number;
-    type: 'expense' | 'income';
-    expenseCategory: 'need' | 'want' | 'investment' | null;
-};
-
 type CreateTransactionOutput = { transaction: Transaction };
 
 export class CreateTransactionUseCase {
@@ -19,12 +10,24 @@ export class CreateTransactionUseCase {
         private idManager: IdManager,
     ) {}
 
-    execute = async (input: CreateTransactionInput): Promise<CreateTransactionOutput> => {
+    execute = async (
+        userId: string,
+        month: string,
+        name: string,
+        value: number,
+        type: 'expense' | 'income',
+        expenseCategory: 'need' | 'want' | 'investment' | null,
+    ): Promise<CreateTransactionOutput> => {
         const now = new Date();
 
         const transaction: Transaction = {
             id: this.idManager.generate(),
-            ...input,
+            userId,
+            month,
+            name,
+            value,
+            type,
+            expenseCategory,
             createdAt: now,
             updatedAt: now,
         };

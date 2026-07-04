@@ -3,8 +3,6 @@ import type { EmailVerificationRepository } from '../../domain/repositories/emai
 import type { User } from '../../domain/entities/user.js';
 import { fail, ok, type Result } from '../../core/result.js';
 
-type VerifyEmailInput = { token: string };
-
 type VerifyEmailResult = Result<void, 'INVALID_TOKEN' | 'TOKEN_EXPIRED' | 'USER_NOT_FOUND' | 'EMAIL_ALREADY_VERIFIED'>;
 
 export class VerifyEmailUseCase {
@@ -13,10 +11,10 @@ export class VerifyEmailUseCase {
         private emailVerificationRepository: EmailVerificationRepository,
     ) {}
 
-    execute = async (input: VerifyEmailInput): Promise<VerifyEmailResult> => {
+    execute = async (token: string): Promise<VerifyEmailResult> => {
         const now = new Date();
 
-        const emailVerification = await this.emailVerificationRepository.findByToken(input.token);
+        const emailVerification = await this.emailVerificationRepository.findByToken(token);
         if (!emailVerification) return fail('INVALID_TOKEN');
         if (emailVerification.expiresAt < now) return fail('TOKEN_EXPIRED');
 

@@ -7,8 +7,6 @@ import type { User } from '../../domain/entities/user.js';
 import type { Session } from '../../domain/entities/session.js';
 import { fail, ok, type Result } from '../../core/result.js';
 
-type LoginInput = { email: string; password: string };
-
 type LoginResult = Result<{ user: User; session: Session }, 'USER_NOT_FOUND' | 'INVALID_PASSWORD'>;
 
 export class LoginUseCase {
@@ -22,13 +20,13 @@ export class LoginUseCase {
         private tokenGenerator: TokenGenerator,
     ) {}
 
-    execute = async (input: LoginInput): Promise<LoginResult> => {
+    execute = async (email: string, password: string): Promise<LoginResult> => {
         const now = new Date();
 
-        const user = await this.userRepository.findByEmail(input.email);
+        const user = await this.userRepository.findByEmail(email);
         if (!user) return fail('USER_NOT_FOUND');
 
-        const isPasswordValid = await this.hasher.compare(input.password, user.passwordHash);
+        const isPasswordValid = await this.hasher.compare(password, user.passwordHash);
         if (!isPasswordValid) return fail('INVALID_PASSWORD');
 
         const session: Session = {

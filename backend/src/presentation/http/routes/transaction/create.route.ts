@@ -60,17 +60,17 @@ export const createTransactionHandler = ({ createTransactionUseCase, authenticat
     return async (req: Request, res: Response) => {
         const { body, cookies } = validateOrThrow(req, createTransactionSchema);
 
-        const authResult = await authenticateUseCase.execute({ sessionToken: cookies.sessionToken ?? '' });
+        const authResult = await authenticateUseCase.execute(cookies.sessionToken ?? '');
         if (!authResult.success) throw new UnauthorizedError();
 
-        const { transaction } = await createTransactionUseCase.execute({
-            userId: authResult.data.userId,
-            month: body.month,
-            name: body.name,
-            value: body.value,
-            type: body.type,
-            expenseCategory: body.expenseCategory,
-        });
+        const { transaction } = await createTransactionUseCase.execute(
+            authResult.data.userId,
+            body.month,
+            body.name,
+            body.value,
+            body.type,
+            body.expenseCategory,
+        );
 
         const response: ApiSuccess<TransactionDto> = {
             success: true,

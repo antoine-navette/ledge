@@ -6,8 +6,6 @@ import type { TokenGenerator } from '../../domain/ports/token-generator.js';
 import type { EmailVerification } from '../../domain/entities/email-verification.js';
 import { fail, ok, type Result } from '../../core/result.js';
 
-type RequestEmailVerificationInput = { userId: string };
-
 type RequestEmailVerificationResult = Result<void, 'USER_NOT_FOUND' | 'EMAIL_ALREADY_VERIFIED' | 'ACTIVE_COOLDOWN'>;
 
 export class RequestEmailVerificationUseCase {
@@ -24,10 +22,10 @@ export class RequestEmailVerificationUseCase {
         private webUrl: string,
     ) {}
 
-    execute = async (input: RequestEmailVerificationInput): Promise<RequestEmailVerificationResult> => {
+    execute = async (userId: string): Promise<RequestEmailVerificationResult> => {
         const now = new Date();
 
-        const user = await this.userRepository.findById(input.userId);
+        const user = await this.userRepository.findById(userId);
         if (!user) return fail('USER_NOT_FOUND');
         if (user.isEmailVerified) return fail('EMAIL_ALREADY_VERIFIED');
 

@@ -36,11 +36,11 @@ export const logoutHandler = ({ authenticateUseCase, logoutUseCase }: Deps) => {
     return async (req: Request, res: Response) => {
         const { cookies } = validateOrThrow(req, logoutSchema);
 
-        const authResult = await authenticateUseCase.execute({ sessionToken: cookies.sessionToken ?? '' });
+        const authResult = await authenticateUseCase.execute(cookies.sessionToken ?? '');
         if (!authResult.success) throw new UnauthorizedError();
 
         clearSessionCookie(res);
-        await logoutUseCase.execute({ session: authResult.data });
+        await logoutUseCase.execute(authResult.data);
 
         const response: ApiSuccess = {
             success: true,

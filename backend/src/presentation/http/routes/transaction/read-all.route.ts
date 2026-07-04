@@ -37,10 +37,10 @@ export const readAllTransactionsHandler = ({ getUserTransactionsUseCase, authent
     return async (req: Request, res: Response) => {
         const { cookies } = validateOrThrow(req, readAllTransactionsSchema);
 
-        const authResult = await authenticateUseCase.execute({ sessionToken: cookies.sessionToken ?? '' });
+        const authResult = await authenticateUseCase.execute(cookies.sessionToken ?? '');
         if (!authResult.success) throw new UnauthorizedError();
 
-        const { transactions } = await getUserTransactionsUseCase.execute({ userId: authResult.data.userId });
+        const { transactions } = await getUserTransactionsUseCase.execute(authResult.data.userId);
 
         const response: ApiSuccess<TransactionDto[]> = {
             success: true,

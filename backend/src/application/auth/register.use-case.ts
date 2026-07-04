@@ -7,8 +7,6 @@ import type { User } from '../../domain/entities/user.js';
 import type { Session } from '../../domain/entities/session.js';
 import { fail, ok, type Result } from '../../core/result.js';
 
-type RegisterInput = { email: string; password: string };
-
 type RegisterResult = Result<{ user: User; session: Session }, 'DUPLICATE_EMAIL'>;
 
 export class RegisterUseCase {
@@ -22,16 +20,16 @@ export class RegisterUseCase {
         private tokenGenerator: TokenGenerator,
     ) {}
 
-    execute = async (input: RegisterInput): Promise<RegisterResult> => {
+    execute = async (email: string, password: string): Promise<RegisterResult> => {
         const now = new Date();
 
-        const existingUser = await this.userRepository.findByEmail(input.email);
+        const existingUser = await this.userRepository.findByEmail(email);
         if (existingUser) return fail('DUPLICATE_EMAIL');
 
         const user: User = {
             id: this.idManager.generate(),
-            email: input.email,
-            passwordHash: await this.hasher.hash(input.password),
+            email,
+            passwordHash: await this.hasher.hash(password),
             isEmailVerified: false,
             createdAt: now,
             updatedAt: now,
