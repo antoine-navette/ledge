@@ -16,8 +16,8 @@ import { GetUserTransactionsUseCase } from '../application/transaction/get-user-
 import { GetTransactionUseCase } from '../application/transaction/get-transaction.use-case.js';
 import { UpdateTransactionUseCase } from '../application/transaction/update-transaction.use-case.js';
 import { DeleteTransactionUseCase } from '../application/transaction/delete-transaction.use-case.js';
-import { RequestEmailVerificationUseCase } from '../application/user/request-email-verification.use-case.js';
-import { VerifyEmailUseCase } from '../application/user/verify-email.use-case.js';
+import { RequestEmailVerificationUseCase } from '../application/email-verification/request-email-verification.use-case.js';
+import { VerifyEmailUseCase } from '../application/email-verification/verify-email.use-case.js';
 import { GetCurrentUserUseCase } from '../application/user/get-current-user.use-case.js';
 
 type Input = {

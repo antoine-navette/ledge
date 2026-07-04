@@ -8,14 +8,14 @@ export class UpdateTransactionUseCase {
     constructor(private transactionRepository: TransactionRepository) {}
 
     execute = async (
-        transactionId: string,
+        id: string,
         userId: string,
         name: string,
         value: number,
         type: 'expense' | 'income',
         expenseCategory: 'need' | 'want' | 'investment' | null,
     ): Promise<UpdateTransactionResult> => {
-        const transaction = await this.transactionRepository.findById(transactionId);
+        const transaction = await this.transactionRepository.findById(id);
         if (!transaction) return fail('TRANSACTION_NOT_FOUND');
         if (transaction.userId !== userId) return fail('TRANSACTION_NOT_OWNED');
 

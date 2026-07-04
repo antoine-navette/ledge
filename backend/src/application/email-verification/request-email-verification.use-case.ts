@@ -10,7 +10,7 @@ type RequestEmailVerificationResult = Result<void, 'USER_NOT_FOUND' | 'EMAIL_ALR
 
 export class RequestEmailVerificationUseCase {
     private readonly COOLDOWN_DURATION = 5 * 60 * 1000;
-    private readonly TOKEN_DURATION = 60 * 60 * 1000;
+    private readonly EMAIL_VERIFICATION_DURATION = 60 * 60 * 1000;
 
     constructor(
         private userRepository: UserRepository,
@@ -41,7 +41,7 @@ export class RequestEmailVerificationUseCase {
             id: this.idManager.generate(),
             userId: user.id,
             token: this.tokenGenerator.generate(),
-            expiresAt: new Date(now.getTime() + this.TOKEN_DURATION),
+            expiresAt: new Date(now.getTime() + this.EMAIL_VERIFICATION_DURATION),
             createdAt: now,
         };
         await this.emailVerificationRepository.create(emailVerification);

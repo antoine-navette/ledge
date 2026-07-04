@@ -7,8 +7,8 @@ type AuthenticateResult = Result<Session, 'SESSION_NOT_FOUND' | 'SESSION_EXPIRED
 export class AuthenticateUseCase {
     constructor(private sessionRepository: SessionRepository) {}
 
-    execute = async (sessionToken: string): Promise<AuthenticateResult> => {
-        const session = await this.sessionRepository.findByToken(sessionToken);
+    execute = async (token: string): Promise<AuthenticateResult> => {
+        const session = await this.sessionRepository.findByToken(token);
         if (!session) return fail('SESSION_NOT_FOUND');
         if (session.expiresAt < new Date()) return fail('SESSION_EXPIRED');
 

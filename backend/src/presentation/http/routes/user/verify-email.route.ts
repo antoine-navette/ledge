@@ -1,5 +1,5 @@
 import type { Router } from 'express';
-import type { VerifyEmailUseCase } from '../../../../application/user/verify-email.use-case.js';
+import type { VerifyEmailUseCase } from '../../../../application/email-verification/verify-email.use-case.js';
 import type { Request, Response } from 'express';
 import { verifyEmailSchema } from '../../../schemas/user.schemas.js';
 import type { ApiSuccess } from '@shared/api/api-response.js';

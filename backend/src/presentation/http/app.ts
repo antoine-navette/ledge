@@ -12,8 +12,8 @@ import type { GetUserTransactionsUseCase } from '../../application/transaction/g
 import type { GetTransactionUseCase } from '../../application/transaction/get-transaction.use-case.js';
 import type { UpdateTransactionUseCase } from '../../application/transaction/update-transaction.use-case.js';
 import type { DeleteTransactionUseCase } from '../../application/transaction/delete-transaction.use-case.js';
-import type { RequestEmailVerificationUseCase } from '../../application/user/request-email-verification.use-case.js';
-import type { VerifyEmailUseCase } from '../../application/user/verify-email.use-case.js';
+import type { RequestEmailVerificationUseCase } from '../../application/email-verification/request-email-verification.use-case.js';
+import type { VerifyEmailUseCase } from '../../application/email-verification/verify-email.use-case.js';
 import type { GetCurrentUserUseCase } from '../../application/user/get-current-user.use-case.js';
 import type { Logger } from 'pino';
 import { requestLoggerMiddleware } from './middlewares/request-logger.middleware.js';

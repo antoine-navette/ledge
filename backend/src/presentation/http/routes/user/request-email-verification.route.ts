@@ -1,5 +1,5 @@
 import type { Router } from 'express';
-import type { RequestEmailVerificationUseCase } from '../../../../application/user/request-email-verification.use-case.js';
+import type { RequestEmailVerificationUseCase } from '../../../../application/email-verification/request-email-verification.use-case.js';
 import type { AuthenticateUseCase } from '../../../../application/auth/authenticate.use-case.js';
 import type { Request, Response } from 'express';
 import { requestEmailVerificationSchema } from '../../../schemas/user.schemas.js';
