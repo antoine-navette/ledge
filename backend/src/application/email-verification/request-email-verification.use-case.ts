@@ -22,11 +22,12 @@ export class RequestEmailVerificationUseCase {
     execute = async (userId: string) => {
         const now = new Date();
 
-        const user = await this.userRepository.findById(userId);
+        const [user, existing] = await Promise.all([
+            this.userRepository.findById(userId),
+            this.emailVerificationRepository.findByUserId(userId),
+        ]);
         if (!user) return { success: false, error: 'USER_NOT_FOUND' } as const;
         if (user.isEmailVerified) return { success: false, error: 'EMAIL_ALREADY_VERIFIED' } as const;
-
-        const existing = await this.emailVerificationRepository.findByUserId(user.id);
         if (existing) {
             if (now.getTime() - existing.createdAt.getTime() < this.COOLDOWN_DURATION) {
                 return { success: false, error: 'ACTIVE_COOLDOWN' } as const;
