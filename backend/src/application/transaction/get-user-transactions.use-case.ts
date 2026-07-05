@@ -1,14 +1,9 @@
 import type { TransactionRepository } from '../../domain/repositories/transaction.repository.js';
-import type { Transaction } from '../../domain/entities/transaction.js';
-
-type GetUserTransactionsOutput = { transactions: Transaction[] };
 
 export class GetUserTransactionsUseCase {
     constructor(private transactionRepository: TransactionRepository) {}
 
-    execute = async (userId: string): Promise<GetUserTransactionsOutput> => {
-        const transactions = await this.transactionRepository.findManyByUserId(userId);
-
-        return { transactions };
+    execute = async (userId: string) => {
+        return await this.transactionRepository.findManyByUserId(userId);
     };
 }

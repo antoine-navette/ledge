@@ -62,7 +62,7 @@ export const registerHandler = ({ registerUseCase }: Deps) => {
                     throw new DuplicateEmailError();
             }
         }
-        const { user, session } = result.data;
+        const { user, ...session } = result.data;
 
         setSessionCookie(res, session, false);
 

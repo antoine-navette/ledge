@@ -1,9 +1,6 @@
 import type { UserRepository } from '../../domain/repositories/user.repository.js';
 import type { EmailVerificationRepository } from '../../domain/repositories/email-verification.repository.js';
 import type { User } from '../../domain/entities/user.js';
-import { fail, ok, type Result } from '../../core/result.js';
-
-type VerifyEmailResult = Result<void, 'INVALID_TOKEN' | 'TOKEN_EXPIRED' | 'USER_NOT_FOUND' | 'EMAIL_ALREADY_VERIFIED'>;
 
 export class VerifyEmailUseCase {
     constructor(
@@ -11,21 +8,22 @@ export class VerifyEmailUseCase {
         private emailVerificationRepository: EmailVerificationRepository,
     ) {}
 
-    execute = async (token: string): Promise<VerifyEmailResult> => {
+    execute = async (token: string) => {
         const now = new Date();
 
         const emailVerification = await this.emailVerificationRepository.findByToken(token);
-        if (!emailVerification) return fail('INVALID_TOKEN');
-        if (emailVerification.expiresAt < now) return fail('TOKEN_EXPIRED');
+        if (!emailVerification) return { success: false, error: 'INVALID_TOKEN' } as const;
+        if (emailVerification.expiresAt < now) return { success: false, error: 'TOKEN_EXPIRED' } as const;
 
         const user = await this.userRepository.findById(emailVerification.userId);
-        if (!user) return fail('USER_NOT_FOUND');
-        if (user.isEmailVerified) return fail('EMAIL_ALREADY_VERIFIED');
+        if (!user) return { success: false, error: 'USER_NOT_FOUND' } as const;
+        if (user.isEmailVerified) return { success: false, error: 'EMAIL_ALREADY_VERIFIED' } as const;
 
         const updated: User = { ...user, isEmailVerified: true, updatedAt: now };
         await this.userRepository.save(updated);
+
         await this.emailVerificationRepository.delete(emailVerification);
 
-        return ok(undefined);
+        return { success: true } as const;
     };
 }

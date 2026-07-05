@@ -47,7 +47,7 @@ export const meHandler = ({ getCurrentUserUseCase, authenticateUseCase }: Deps) 
                     throw new UnauthorizedError();
             }
         }
-        const { user } = result.data;
+        const user = result.data;
 
         const response: ApiSuccess<UserDto> = {
             success: true,

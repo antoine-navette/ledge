@@ -5,9 +5,6 @@ import type { IdManager } from '../../domain/ports/id-manager.js';
 import type { TokenGenerator } from '../../domain/ports/token-generator.js';
 import type { User } from '../../domain/entities/user.js';
 import type { Session } from '../../domain/entities/session.js';
-import { fail, ok, type Result } from '../../core/result.js';
-
-type RegisterResult = Result<{ user: User; session: Session }, 'DUPLICATE_EMAIL'>;
 
 export class RegisterUseCase {
     private readonly SESSION_DURATION = 30 * 24 * 60 * 60 * 1000;
@@ -20,11 +17,11 @@ export class RegisterUseCase {
         private tokenGenerator: TokenGenerator,
     ) {}
 
-    execute = async (email: string, password: string): Promise<RegisterResult> => {
+    execute = async (email: string, password: string) => {
         const now = new Date();
 
         const existing = await this.userRepository.findByEmail(email);
-        if (existing) return fail('DUPLICATE_EMAIL');
+        if (existing) return { success: false, error: 'DUPLICATE_EMAIL' } as const;
 
         const user: User = {
             id: this.idManager.generate(),
@@ -46,6 +43,6 @@ export class RegisterUseCase {
         };
         await this.sessionRepository.create(session);
 
-        return ok({ user, session });
+        return { success: true, data: { ...session, user } } as const;
     };
 }

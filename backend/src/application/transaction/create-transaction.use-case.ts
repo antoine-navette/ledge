@@ -2,8 +2,6 @@ import type { TransactionRepository } from '../../domain/repositories/transactio
 import type { Transaction } from '../../domain/entities/transaction.js';
 import type { IdManager } from '../../domain/ports/id-manager.js';
 
-type CreateTransactionOutput = { transaction: Transaction };
-
 export class CreateTransactionUseCase {
     constructor(
         private transactionRepository: TransactionRepository,
@@ -17,7 +15,7 @@ export class CreateTransactionUseCase {
         value: number,
         type: 'expense' | 'income',
         expenseCategory: 'need' | 'want' | 'investment' | null,
-    ): Promise<CreateTransactionOutput> => {
+    ) => {
         const now = new Date();
 
         const transaction: Transaction = {
@@ -33,6 +31,6 @@ export class CreateTransactionUseCase {
         };
         await this.transactionRepository.create(transaction);
 
-        return { transaction };
+        return transaction;
     };
 }

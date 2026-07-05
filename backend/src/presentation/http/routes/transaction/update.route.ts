@@ -82,7 +82,7 @@ export const updateTransactionHandler = ({ updateTransactionUseCase, authenticat
                     throw new TransactionNotFoundError();
             }
         }
-        const { transaction } = result.data;
+        const transaction = result.data;
 
         const response: ApiSuccess<TransactionDto> = {
             success: true,

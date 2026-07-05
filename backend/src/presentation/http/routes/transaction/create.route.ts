@@ -63,7 +63,7 @@ export const createTransactionHandler = ({ createTransactionUseCase, authenticat
         const authResult = await authenticateUseCase.execute(cookies.sessionToken ?? '');
         if (!authResult.success) throw new UnauthorizedError();
 
-        const { transaction } = await createTransactionUseCase.execute(
+        const transaction = await createTransactionUseCase.execute(
             authResult.data.userId,
             body.month,
             body.name,

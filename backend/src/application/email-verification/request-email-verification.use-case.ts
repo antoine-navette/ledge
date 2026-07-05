@@ -4,9 +4,6 @@ import type { EmailVerificationRepository } from '../../domain/repositories/emai
 import type { IdManager } from '../../domain/ports/id-manager.js';
 import type { TokenGenerator } from '../../domain/ports/token-generator.js';
 import type { EmailVerification } from '../../domain/entities/email-verification.js';
-import { fail, ok, type Result } from '../../core/result.js';
-
-type RequestEmailVerificationResult = Result<void, 'USER_NOT_FOUND' | 'EMAIL_ALREADY_VERIFIED' | 'ACTIVE_COOLDOWN'>;
 
 export class RequestEmailVerificationUseCase {
     private readonly COOLDOWN_DURATION = 5 * 60 * 1000;
@@ -22,18 +19,19 @@ export class RequestEmailVerificationUseCase {
         private webUrl: string,
     ) {}
 
-    execute = async (userId: string): Promise<RequestEmailVerificationResult> => {
+    execute = async (userId: string) => {
         const now = new Date();
 
         const user = await this.userRepository.findById(userId);
-        if (!user) return fail('USER_NOT_FOUND');
-        if (user.isEmailVerified) return fail('EMAIL_ALREADY_VERIFIED');
+        if (!user) return { success: false, error: 'USER_NOT_FOUND' } as const;
+        if (user.isEmailVerified) return { success: false, error: 'EMAIL_ALREADY_VERIFIED' } as const;
 
         const existing = await this.emailVerificationRepository.findByUserId(user.id);
         if (existing) {
             if (now.getTime() - existing.createdAt.getTime() < this.COOLDOWN_DURATION) {
-                return fail('ACTIVE_COOLDOWN');
+                return { success: false, error: 'ACTIVE_COOLDOWN' } as const;
             }
+
             await this.emailVerificationRepository.delete(existing);
         }
 
@@ -53,6 +51,6 @@ export class RequestEmailVerificationUseCase {
             `Click here to verify your email address: <a href="${this.webUrl}/verify-email/${emailVerification.token}">verify email</a>. This link will expire in 1 hour.`,
         );
 
-        return ok(undefined);
+        return { success: true } as const;
     };
 }

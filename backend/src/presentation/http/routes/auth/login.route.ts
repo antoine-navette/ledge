@@ -63,7 +63,7 @@ export const loginHandler = ({ loginUseCase }: Deps) => {
                     throw new InvalidCredentialsError();
             }
         }
-        const { user, session } = result.data;
+        const { user, ...session } = result.data;
 
         setSessionCookie(res, session, body.rememberMe);
 

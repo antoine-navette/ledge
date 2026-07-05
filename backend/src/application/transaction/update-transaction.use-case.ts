@@ -1,8 +1,5 @@
 import type { TransactionRepository } from '../../domain/repositories/transaction.repository.js';
 import type { Transaction } from '../../domain/entities/transaction.js';
-import { fail, ok, type Result } from '../../core/result.js';
-
-type UpdateTransactionResult = Result<{ transaction: Transaction }, 'TRANSACTION_NOT_FOUND' | 'TRANSACTION_NOT_OWNED'>;
 
 export class UpdateTransactionUseCase {
     constructor(private transactionRepository: TransactionRepository) {}
@@ -14,14 +11,14 @@ export class UpdateTransactionUseCase {
         value: number,
         type: 'expense' | 'income',
         expenseCategory: 'need' | 'want' | 'investment' | null,
-    ): Promise<UpdateTransactionResult> => {
+    ) => {
         const transaction = await this.transactionRepository.findById(id);
-        if (!transaction) return fail('TRANSACTION_NOT_FOUND');
-        if (transaction.userId !== userId) return fail('TRANSACTION_NOT_OWNED');
+        if (!transaction) return { success: false, error: 'TRANSACTION_NOT_FOUND' } as const;
+        if (transaction.userId !== userId) return { success: false, error: 'TRANSACTION_NOT_OWNED' } as const;
 
         const updated: Transaction = { ...transaction, name, value, type, expenseCategory, updatedAt: new Date() };
         await this.transactionRepository.save(updated);
 
-        return ok({ transaction: updated });
+        return { success: true, data: updated } as const;
     };
 }

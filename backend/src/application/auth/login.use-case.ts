@@ -3,11 +3,7 @@ import type { SessionRepository } from '../../domain/repositories/session.reposi
 import type { Hasher } from '../../domain/ports/hasher.js';
 import type { IdManager } from '../../domain/ports/id-manager.js';
 import type { TokenGenerator } from '../../domain/ports/token-generator.js';
-import type { User } from '../../domain/entities/user.js';
 import type { Session } from '../../domain/entities/session.js';
-import { fail, ok, type Result } from '../../core/result.js';
-
-type LoginResult = Result<{ user: User; session: Session }, 'USER_NOT_FOUND' | 'INVALID_PASSWORD'>;
 
 export class LoginUseCase {
     private readonly SESSION_DURATION = 30 * 24 * 60 * 60 * 1000;
@@ -20,14 +16,14 @@ export class LoginUseCase {
         private tokenGenerator: TokenGenerator,
     ) {}
 
-    execute = async (email: string, password: string): Promise<LoginResult> => {
+    execute = async (email: string, password: string) => {
         const now = new Date();
 
         const user = await this.userRepository.findByEmail(email);
-        if (!user) return fail('USER_NOT_FOUND');
+        if (!user) return { success: false, error: 'USER_NOT_FOUND' } as const;
 
         const isPasswordValid = await this.hasher.compare(password, user.passwordHash);
-        if (!isPasswordValid) return fail('INVALID_PASSWORD');
+        if (!isPasswordValid) return { success: false, error: 'INVALID_PASSWORD' } as const;
 
         const session: Session = {
             id: this.idManager.generate(),
@@ -39,6 +35,6 @@ export class LoginUseCase {
         };
         await this.sessionRepository.create(session);
 
-        return ok({ user, session });
+        return { success: true, data: { ...session, user } } as const;
     };
 }
