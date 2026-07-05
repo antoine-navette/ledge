@@ -11,34 +11,41 @@ export type Context = { mongo: { db: Db } };
 // .env is not verified yet, but we need a logger now
 const pino = createPino(process.env.NODE_ENV as Env['nodeEnv'], process.env.LOKI_URL as Env['lokiUrl']);
 
-try {
-    const { mongoUrl } = loadEnv();
-    pino.logger.info('Environment loaded');
+// Wrapped in an async function (not awaited at the top level) so the pino transport's
+// unref'd worker thread can't make Node think the module has nothing left to settle and
+// force-exit with "Detected unsettled top-level await" (exit code 13) before flush() resolves.
+const main = async () => {
+    try {
+        const { mongoUrl } = loadEnv();
+        pino.logger.info('Environment loaded');
 
-    const mongo = await connectToMongo(mongoUrl);
-    pino.logger.info('Mongo connected');
+        const mongo = await connectToMongo(mongoUrl);
+        pino.logger.info('Mongo connected');
 
-    const __filename = fileURLToPath(import.meta.url);
-    const __dirname = path.dirname(__filename);
-    const umzug = new Umzug<Context>({
-        migrations: {
-            glob: [path.join(__dirname, '../migrations', '*.{js,ts}'), { ignore: '**/*.d.ts' }],
-        },
-        context: { mongo },
-        storage: new MongoDBStorage({ connection: mongo.db }),
-        logger: pino.logger,
-    });
-    await umzug.up();
-    pino.logger.info('Migrations applied successfully');
+        const __filename = fileURLToPath(import.meta.url);
+        const __dirname = path.dirname(__filename);
+        const umzug = new Umzug<Context>({
+            migrations: {
+                glob: [path.join(__dirname, '../migrations', '*.{js,ts}'), { ignore: '**/*.d.ts' }],
+            },
+            context: { mongo },
+            storage: new MongoDBStorage({ connection: mongo.db }),
+            logger: pino.logger,
+        });
+        await umzug.up();
+        pino.logger.info('Migrations applied successfully');
 
-    await mongo.client.close();
-    pino.logger.info('Mongo disconnected');
+        await mongo.client.close();
+        pino.logger.info('Mongo disconnected');
 
-    await pino.flush();
-    process.exit(0);
-} catch (err) {
-    pino.logger.fatal({ err }, err instanceof Error ? err.message : 'Unknown error');
+        await pino.flush();
+        process.exit(0);
+    } catch (err) {
+        pino.logger.fatal({ err }, err instanceof Error ? err.message : 'Unknown error');
 
-    await pino.flush();
-    process.exit(1);
-}
+        await pino.flush();
+        process.exit(1);
+    }
+};
+
+void main();
