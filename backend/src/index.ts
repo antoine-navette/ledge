@@ -1,7 +1,7 @@
 import { loadEnv, type Env } from './infrastructure/config/env.js';
 import { createPino } from './infrastructure/config/pino.js';
 import { connectToMongo } from './infrastructure/config/mongo.js';
-import { BcryptHasher } from './infrastructure/adapters/bcrypt.hasher.js';
+import { BcryptPasswordHasher } from './infrastructure/adapters/bcrypt.password-hasher.js';
 import { NodemailerEmailSender } from './infrastructure/adapters/nodemailer.email-sender.js';
 import { connectToSmtp } from './infrastructure/config/nodemailer.js';
 import { MongoUserRepository } from './infrastructure/repositories/mongo.user.repository.js';
@@ -11,7 +11,7 @@ import { MongoEmailVerificationRepository } from './infrastructure/repositories/
 import { createHttpApp } from './presentation/http/app.js';
 import { buildContainer } from './presentation/container.js';
 import { startServer } from './presentation/server.js';
-import { MongoIdManager } from './infrastructure/adapters/mongo.id-manager.js';
+import { MongoIdGenerator } from './infrastructure/adapters/mongo.id-generator.js';
 import { CryptoTokenGenerator } from './infrastructure/adapters/crypto.token-generator.js';
 
 const pino = createPino(process.env.NODE_ENV as Env['nodeEnv'], process.env.LOKI_URL as Env['lokiUrl']);
@@ -26,13 +26,13 @@ try {
     const smtp = connectToSmtp(smtpUrl);
     pino.logger.info('SMTP connected');
 
-    const idManager = new MongoIdManager();
+    const idGenerator = new MongoIdGenerator();
     const tokenGenerator = new CryptoTokenGenerator();
 
     const container = buildContainer({
-        hasher: new BcryptHasher(),
+        passwordHasher: new BcryptPasswordHasher(),
         emailSender: new NodemailerEmailSender(smtp.transporter),
-        idManager,
+        idGenerator,
         tokenGenerator,
         userRepository: new MongoUserRepository(mongo.db.collection('users')),
         transactionRepository: new MongoTransactionRepository(mongo.db.collection('transactions')),

@@ -1,10 +1,10 @@
-import type { Hasher } from '../domain/ports/hasher.js';
+import type { PasswordHasher } from '../domain/ports/password-hasher.js';
 import type { EmailSender } from '../domain/ports/email-sender.js';
 import type { UserRepository } from '../domain/repositories/user.repository.js';
 import type { SessionRepository } from '../domain/repositories/session.repository.js';
 import type { EmailVerificationRepository } from '../domain/repositories/email-verification.repository.js';
 import type { TransactionRepository } from '../domain/repositories/transaction.repository.js';
-import type { IdManager } from '../domain/ports/id-manager.js';
+import type { IdGenerator } from '../domain/ports/id-generator.js';
 import type { TokenGenerator } from '../domain/ports/token-generator.js';
 import type { Env } from '../infrastructure/config/env.js';
 import { AuthenticateUseCase } from '../application/auth/authenticate.use-case.js';
@@ -21,9 +21,9 @@ import { VerifyEmailUseCase } from '../application/email-verification/verify-ema
 import { GetCurrentUserUseCase } from '../application/user/get-current-user.use-case.js';
 
 type Input = {
-    hasher: Hasher;
+    passwordHasher: PasswordHasher;
     emailSender: EmailSender;
-    idManager: IdManager;
+    idGenerator: IdGenerator;
     tokenGenerator: TokenGenerator;
     userRepository: UserRepository;
     sessionRepository: SessionRepository;
@@ -34,9 +34,9 @@ type Input = {
 };
 
 export const buildContainer = ({
-    hasher,
+    passwordHasher,
     emailSender,
-    idManager,
+    idGenerator,
     tokenGenerator,
     userRepository,
     sessionRepository,
@@ -47,11 +47,11 @@ export const buildContainer = ({
 }: Input) => {
     return {
         authenticateUseCase: new AuthenticateUseCase(sessionRepository),
-        registerUseCase: new RegisterUseCase(userRepository, sessionRepository, hasher, idManager, tokenGenerator),
-        loginUseCase: new LoginUseCase(userRepository, sessionRepository, hasher, idManager, tokenGenerator),
+        registerUseCase: new RegisterUseCase(userRepository, sessionRepository, passwordHasher, idGenerator, tokenGenerator),
+        loginUseCase: new LoginUseCase(userRepository, sessionRepository, passwordHasher, idGenerator, tokenGenerator),
         logoutUseCase: new LogoutUseCase(sessionRepository),
 
-        createTransactionUseCase: new CreateTransactionUseCase(transactionRepository, idManager),
+        createTransactionUseCase: new CreateTransactionUseCase(transactionRepository, idGenerator),
         getUserTransactionsUseCase: new GetUserTransactionsUseCase(transactionRepository),
         getTransactionUseCase: new GetTransactionUseCase(transactionRepository),
         updateTransactionUseCase: new UpdateTransactionUseCase(transactionRepository),
@@ -61,7 +61,7 @@ export const buildContainer = ({
             userRepository,
             emailVerificationRepository,
             emailSender,
-            idManager,
+            idGenerator,
             tokenGenerator,
             emailFrom,
             webUrl,
