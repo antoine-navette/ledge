@@ -3,8 +3,8 @@ import type { UserRepository } from '../../domain/repositories/user.repository.j
 export class GetCurrentUserUseCase {
     constructor(private userRepository: UserRepository) {}
 
-    execute = async (userId: string) => {
-        const user = await this.userRepository.findById(userId);
+    execute = async (id: string) => {
+        const user = await this.userRepository.findById(id);
         if (!user) return { success: false, error: 'USER_NOT_FOUND' } as const;
 
         return { success: true, data: user } as const;
