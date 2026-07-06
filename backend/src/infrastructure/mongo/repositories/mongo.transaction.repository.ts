@@ -1,14 +1,14 @@
 import { Collection, ObjectId } from 'mongodb';
-import type { TransactionRepository } from '../../domain/repositories/transaction.repository.js';
-import type { Transaction } from '../../domain/entities/transaction.js';
-import type { TransactionDocument } from '../types/mongo.transaction.document.js';
-import { toTransaction, toTransactionDocument } from '../mappers/mongo.transaction.mapper.js';
+import type { TransactionRepository } from '../../../domain/repositories/transaction.repository.js';
+import type { Transaction } from '../../../domain/entities/transaction.js';
+import type { MongoTransactionDocument } from '../documents/mongo.transaction.document.js';
+import { MongoTransactionMapper } from '../mappers/mongo.transaction.mapper.js';
 
 export class MongoTransactionRepository implements TransactionRepository {
-    constructor(private transactionCollection: Collection<TransactionDocument>) {}
+    constructor(private transactionCollection: Collection<MongoTransactionDocument>) {}
 
     create = async (transaction: Transaction): Promise<void> => {
-        const document = toTransactionDocument(transaction);
+        const document = MongoTransactionMapper.toDocument(transaction);
 
         await this.transactionCollection.insertOne(document);
     };
@@ -16,17 +16,17 @@ export class MongoTransactionRepository implements TransactionRepository {
     findById = async (id: string): Promise<Transaction | null> => {
         const document = await this.transactionCollection.findOne({ _id: new ObjectId(id) });
 
-        return document ? toTransaction(document) : null;
+        return document ? MongoTransactionMapper.toEntity(document) : null;
     };
 
     findByUserId = async (userId: string): Promise<Transaction[]> => {
         const documents = await this.transactionCollection.find({ userId: new ObjectId(userId) }).toArray();
 
-        return documents.map((document) => toTransaction(document));
+        return documents.map((document) => MongoTransactionMapper.toEntity(document));
     };
 
     save = async (transaction: Transaction): Promise<void> => {
-        const { _id, ...rest } = toTransactionDocument(transaction);
+        const { _id, ...rest } = MongoTransactionMapper.toDocument(transaction);
 
         await this.transactionCollection.updateOne(
             { _id },
@@ -40,7 +40,7 @@ export class MongoTransactionRepository implements TransactionRepository {
     };
 
     delete = async (transaction: Transaction): Promise<void> => {
-        const { _id } = toTransactionDocument(transaction);
+        const { _id } = MongoTransactionMapper.toDocument(transaction);
 
         await this.transactionCollection.deleteOne({ _id });
     };

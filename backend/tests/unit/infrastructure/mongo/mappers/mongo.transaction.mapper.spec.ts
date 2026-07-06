@@ -1,16 +1,13 @@
 import { describe, expect, it } from 'vitest';
-import { fakeTransaction } from '../../../fakes/transaction.js';
-import {
-    toTransaction,
-    toTransactionDocument,
-} from '../../../../src/infrastructure/mappers/mongo.transaction.mapper.js';
+import { fakeTransaction } from '../../../../fakes/transaction.js';
+import { MongoTransactionMapper } from '../../../../../src/infrastructure/mongo/mappers/mongo.transaction.mapper.js';
 import { ObjectId } from 'mongodb';
 
 describe('MongoTransactionMapper', () => {
-    describe('toTransactionDocument', () => {
+    describe('toDocument', () => {
         it('should map an EXPENSE transaction to a document correctly', () => {
             const expense = fakeTransaction({ type: 'expense', expenseCategory: 'need' });
-            const document = toTransactionDocument(expense);
+            const document = MongoTransactionMapper.toDocument(expense);
 
             expect(document._id).toBeInstanceOf(ObjectId);
             expect(document._id.toString()).toBe(expense.id);
@@ -24,7 +21,7 @@ describe('MongoTransactionMapper', () => {
         it('should map an INCOME transaction to a document correctly', () => {
             const income = fakeTransaction({ id: '607f1f77bcf86cd799439012', type: 'income', expenseCategory: null });
 
-            const document = toTransactionDocument(income);
+            const document = MongoTransactionMapper.toDocument(income);
 
             expect(document._id.toString()).toBe(income.id);
             expect(document.type).toBe('income');
@@ -34,16 +31,16 @@ describe('MongoTransactionMapper', () => {
 
         it('should throw an error when providing an invalid ID format', () => {
             const transaction = fakeTransaction({ id: 'invalid-id' });
-            expect(() => toTransactionDocument(transaction)).toThrow();
+            expect(() => MongoTransactionMapper.toDocument(transaction)).toThrow();
         });
     });
 
-    describe('toTransaction', () => {
+    describe('toEntity', () => {
         it('should map an EXPENSE document back to a domain entity (Round-trip)', () => {
             const originalExpense = fakeTransaction({ type: 'expense', expenseCategory: 'need' });
-            const document = toTransactionDocument(originalExpense);
+            const document = MongoTransactionMapper.toDocument(originalExpense);
 
-            const result = toTransaction(document);
+            const result = MongoTransactionMapper.toEntity(document);
 
             expect(result).toEqual(originalExpense);
         });
@@ -54,9 +51,9 @@ describe('MongoTransactionMapper', () => {
                 type: 'income',
                 expenseCategory: null,
             });
-            const document = toTransactionDocument(originalIncome);
+            const document = MongoTransactionMapper.toDocument(originalIncome);
 
-            const result = toTransaction(document);
+            const result = MongoTransactionMapper.toEntity(document);
 
             expect(result).toEqual(originalIncome);
             expect(result.expenseCategory).toBeNull();
@@ -64,11 +61,11 @@ describe('MongoTransactionMapper', () => {
 
         it('should map an EXPENSE document without category back to null (handling optional field)', () => {
             const expenseWithNullCategory = fakeTransaction({ type: 'expense', expenseCategory: null });
-            const document = toTransactionDocument(expenseWithNullCategory);
+            const document = MongoTransactionMapper.toDocument(expenseWithNullCategory);
 
             expect(document).not.toHaveProperty('expenseCategory');
 
-            const result = toTransaction(document);
+            const result = MongoTransactionMapper.toEntity(document);
 
             expect(result.type).toBe('expense');
             expect(result.expenseCategory).toBeNull();
