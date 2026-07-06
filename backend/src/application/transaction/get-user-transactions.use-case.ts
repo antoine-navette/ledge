@@ -4,6 +4,6 @@ export class GetUserTransactionsUseCase {
     constructor(private transactionRepository: TransactionRepository) {}
 
     execute = async (userId: string) => {
-        return await this.transactionRepository.findManyByUserId(userId);
+        return await this.transactionRepository.findByUserId(userId);
     };
 }
