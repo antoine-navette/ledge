@@ -1,14 +1,16 @@
 import type { Transaction } from '../../domain/entities/transaction.js';
-import type { TransactionDto } from '@shared/dto/transaction.dto.js';
+import type { TransactionSchema } from '../schemas/transaction.schema.js';
 
-export const toTransactionDto = (transaction: Transaction): TransactionDto => ({
-    id: transaction.id,
-    userId: transaction.userId,
-    month: transaction.month,
-    name: transaction.name,
-    value: transaction.value,
-    type: transaction.type,
-    expenseCategory: transaction.expenseCategory,
-    createdAt: transaction.createdAt.toISOString(),
-    updatedAt: transaction.updatedAt.toISOString(),
-});
+export const TransactionMapper = {
+    toSchema: (transaction: Transaction): TransactionSchema => ({
+        id: transaction.id,
+        userId: transaction.userId,
+        month: transaction.month,
+        name: transaction.name,
+        value: transaction.value,
+        type: transaction.type,
+        expenseCategory: transaction.expenseCategory,
+        createdAt: transaction.createdAt,
+        updatedAt: transaction.updatedAt,
+    }),
+};

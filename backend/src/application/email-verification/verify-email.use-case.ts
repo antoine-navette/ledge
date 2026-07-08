@@ -12,7 +12,7 @@ export class VerifyEmailUseCase {
         const now = new Date();
 
         const emailVerification = await this.emailVerificationRepository.findByToken(token);
-        if (!emailVerification) return { success: false, error: 'INVALID_TOKEN' } as const;
+        if (!emailVerification) return { success: false, error: 'EMAIL_VERIFICATION_NOT_FOUND' } as const;
         if (emailVerification.expiresAt < now) return { success: false, error: 'TOKEN_EXPIRED' } as const;
 
         const user = await this.userRepository.findById(emailVerification.userId);
