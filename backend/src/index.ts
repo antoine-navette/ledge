@@ -28,7 +28,7 @@ import { DeleteTransactionUseCase } from './application/transaction/delete-trans
 const pino = createPino(process.env.NODE_ENV as Env['nodeEnv'], process.env.LOKI_URL as Env['lokiUrl']);
 
 try {
-    const { mongoUrl, smtpUrl, allowedOrigins, port, emailFrom, webUrl } = loadEnv();
+    const { nodeEnv, mongoUrl, smtpUrl, allowedOrigins, port, emailFrom, webUrl } = loadEnv();
     pino.logger.info('Environment loaded');
 
     const mongo = await connectToMongo(mongoUrl);
@@ -76,6 +76,7 @@ try {
 
     const app = createApp(
         pino.logger,
+        nodeEnv,
         allowedOrigins,
         authenticateUseCase,
         logoutUseCase,

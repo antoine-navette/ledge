@@ -1,3 +1,4 @@
+import { writeFile } from 'node:fs/promises';
 import Fastify from 'fastify';
 import fastifyCors from '@fastify/cors';
 import fastifyCookie from '@fastify/cookie';
@@ -43,6 +44,7 @@ import type { InternalServerErrorSchema } from './schemas/internal-server-error.
 
 export const createApp = (
     logger: Logger,
+    nodeEnv: Env['nodeEnv'],
     allowedOrigins: Env['allowedOrigins'],
     authenticateUseCase: AuthenticateUseCase,
     logoutUseCase: LogoutUseCase,
@@ -60,7 +62,7 @@ export const createApp = (
     const app = Fastify({
         loggerInstance: logger,
         disableRequestLogging: true,
-        trustProxy: 1,
+        trustProxy: true,
         bodyLimit: 100 * 1024,
     });
 
@@ -86,7 +88,7 @@ export const createApp = (
     // Parsing
     app.register(fastifyCookie);
 
-    // OpenAPI (validation, serialization, docs)
+    // OpenAPI (validation, serialization — needed in every env)
     app.setValidatorCompiler(validatorCompiler);
     app.setSerializerCompiler(serializerCompiler);
     app.register(fastifyZodOpenApiPlugin);
@@ -103,6 +105,14 @@ export const createApp = (
     app.register(fastifySwaggerUi, {
         routePrefix: '/docs',
     });
+
+    // Dev-only: regenerate the OpenAPI spec file for frontend codegen.
+    // Skipped in production — the prod container has no write access there anyway, and there's no use for it.
+    if (nodeEnv === 'development') {
+        app.addHook('onListen', async () => {
+            await writeFile('./openapi.json', JSON.stringify(app.swagger(), null, 4));
+        });
+    }
 
     // Routes
     app.register(registerRoute, { registerUseCase });
@@ -145,9 +155,7 @@ export const createApp = (
         }
 
         request.log.error({ err }, err instanceof Error ? err.message : 'Unknown error');
-        return reply
-            .status(500)
-            .send({ code: 'INTERNAL_SERVER_ERROR' } satisfies InternalServerErrorSchema);
+        return reply.status(500).send({ code: 'INTERNAL_SERVER_ERROR' } satisfies InternalServerErrorSchema);
     });
 
     return app;

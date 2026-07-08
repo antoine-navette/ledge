@@ -1,0 +1,1987 @@
+{
+    "openapi": "3.1.0",
+    "info": {
+        "title": "Ledge API",
+        "version": "1.0.0"
+    },
+    "components": {
+        "schemas": {}
+    },
+    "paths": {
+        "/auth/register": {
+            "post": {
+                "tags": [
+                    "Auth"
+                ],
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "type": "object",
+                                "properties": {
+                                    "email": {
+                                        "type": "string",
+                                        "format": "email",
+                                        "pattern": "^(?!\\.)(?!.*\\.\\.)([A-Za-z0-9_'+\\-\\.]*)[A-Za-z0-9_+-]@([A-Za-z0-9][A-Za-z0-9\\-]*\\.)+[A-Za-z]{2,}$"
+                                    },
+                                    "password": {
+                                        "type": "string",
+                                        "minLength": 8,
+                                        "allOf": [
+                                            {
+                                                "pattern": "[A-Z]"
+                                            },
+                                            {
+                                                "pattern": "[a-z]"
+                                            },
+                                            {
+                                                "pattern": "\\d"
+                                            },
+                                            {
+                                                "pattern": "[!@#$%^&*(),.?\":{}|<>]"
+                                            }
+                                        ]
+                                    }
+                                },
+                                "required": [
+                                    "email",
+                                    "password"
+                                ]
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "201": {
+                        "description": "Default Response",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "id": {
+                                            "type": "string"
+                                        },
+                                        "email": {
+                                            "type": "string"
+                                        },
+                                        "isEmailVerified": {
+                                            "type": "boolean"
+                                        },
+                                        "createdAt": {
+                                            "type": "string"
+                                        },
+                                        "updatedAt": {
+                                            "type": "string"
+                                        }
+                                    },
+                                    "required": [
+                                        "id",
+                                        "email",
+                                        "isEmailVerified",
+                                        "createdAt",
+                                        "updatedAt"
+                                    ],
+                                    "additionalProperties": false
+                                }
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "Default Response",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "code": {
+                                            "type": "string",
+                                            "const": "BAD_REQUEST"
+                                        }
+                                    },
+                                    "required": [
+                                        "code"
+                                    ],
+                                    "additionalProperties": false
+                                }
+                            }
+                        }
+                    },
+                    "409": {
+                        "description": "Default Response",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "code": {
+                                            "type": "string",
+                                            "const": "DUPLICATE_EMAIL"
+                                        }
+                                    },
+                                    "required": [
+                                        "code"
+                                    ],
+                                    "additionalProperties": false
+                                }
+                            }
+                        }
+                    },
+                    "413": {
+                        "description": "Default Response",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "code": {
+                                            "type": "string",
+                                            "const": "PAYLOAD_TOO_LARGE"
+                                        }
+                                    },
+                                    "required": [
+                                        "code"
+                                    ],
+                                    "additionalProperties": false
+                                }
+                            }
+                        }
+                    },
+                    "429": {
+                        "description": "Default Response",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "code": {
+                                            "type": "string",
+                                            "const": "TOO_MANY_REQUESTS"
+                                        }
+                                    },
+                                    "required": [
+                                        "code"
+                                    ],
+                                    "additionalProperties": false
+                                }
+                            }
+                        }
+                    },
+                    "500": {
+                        "description": "Default Response",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "code": {
+                                            "type": "string",
+                                            "const": "INTERNAL_SERVER_ERROR"
+                                        }
+                                    },
+                                    "required": [
+                                        "code"
+                                    ],
+                                    "additionalProperties": false
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/auth/login": {
+            "post": {
+                "tags": [
+                    "Auth"
+                ],
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "type": "object",
+                                "properties": {
+                                    "email": {
+                                        "type": "string",
+                                        "format": "email",
+                                        "pattern": "^(?!\\.)(?!.*\\.\\.)([A-Za-z0-9_'+\\-\\.]*)[A-Za-z0-9_+-]@([A-Za-z0-9][A-Za-z0-9\\-]*\\.)+[A-Za-z]{2,}$"
+                                    },
+                                    "password": {
+                                        "type": "string",
+                                        "minLength": 1
+                                    }
+                                },
+                                "required": [
+                                    "email",
+                                    "password"
+                                ]
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "Default Response",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "id": {
+                                            "type": "string"
+                                        },
+                                        "email": {
+                                            "type": "string"
+                                        },
+                                        "isEmailVerified": {
+                                            "type": "boolean"
+                                        },
+                                        "createdAt": {
+                                            "type": "string"
+                                        },
+                                        "updatedAt": {
+                                            "type": "string"
+                                        }
+                                    },
+                                    "required": [
+                                        "id",
+                                        "email",
+                                        "isEmailVerified",
+                                        "createdAt",
+                                        "updatedAt"
+                                    ],
+                                    "additionalProperties": false
+                                }
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "Default Response",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "code": {
+                                            "type": "string",
+                                            "const": "BAD_REQUEST"
+                                        }
+                                    },
+                                    "required": [
+                                        "code"
+                                    ],
+                                    "additionalProperties": false
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "description": "Default Response",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "code": {
+                                            "type": "string",
+                                            "const": "INVALID_CREDENTIALS"
+                                        }
+                                    },
+                                    "required": [
+                                        "code"
+                                    ],
+                                    "additionalProperties": false
+                                }
+                            }
+                        }
+                    },
+                    "413": {
+                        "description": "Default Response",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "code": {
+                                            "type": "string",
+                                            "const": "PAYLOAD_TOO_LARGE"
+                                        }
+                                    },
+                                    "required": [
+                                        "code"
+                                    ],
+                                    "additionalProperties": false
+                                }
+                            }
+                        }
+                    },
+                    "429": {
+                        "description": "Default Response",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "code": {
+                                            "type": "string",
+                                            "const": "TOO_MANY_REQUESTS"
+                                        }
+                                    },
+                                    "required": [
+                                        "code"
+                                    ],
+                                    "additionalProperties": false
+                                }
+                            }
+                        }
+                    },
+                    "500": {
+                        "description": "Default Response",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "code": {
+                                            "type": "string",
+                                            "const": "INTERNAL_SERVER_ERROR"
+                                        }
+                                    },
+                                    "required": [
+                                        "code"
+                                    ],
+                                    "additionalProperties": false
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/auth/logout": {
+            "post": {
+                "tags": [
+                    "Auth"
+                ],
+                "responses": {
+                    "204": {
+                        "description": "User logged out successfully"
+                    },
+                    "400": {
+                        "description": "Default Response",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "code": {
+                                            "type": "string",
+                                            "const": "BAD_REQUEST"
+                                        }
+                                    },
+                                    "required": [
+                                        "code"
+                                    ],
+                                    "additionalProperties": false
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "description": "Default Response",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "code": {
+                                            "type": "string",
+                                            "const": "UNAUTHORIZED"
+                                        }
+                                    },
+                                    "required": [
+                                        "code"
+                                    ],
+                                    "additionalProperties": false
+                                }
+                            }
+                        }
+                    },
+                    "413": {
+                        "description": "Default Response",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "code": {
+                                            "type": "string",
+                                            "const": "PAYLOAD_TOO_LARGE"
+                                        }
+                                    },
+                                    "required": [
+                                        "code"
+                                    ],
+                                    "additionalProperties": false
+                                }
+                            }
+                        }
+                    },
+                    "429": {
+                        "description": "Default Response",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "code": {
+                                            "type": "string",
+                                            "const": "TOO_MANY_REQUESTS"
+                                        }
+                                    },
+                                    "required": [
+                                        "code"
+                                    ],
+                                    "additionalProperties": false
+                                }
+                            }
+                        }
+                    },
+                    "500": {
+                        "description": "Default Response",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "code": {
+                                            "type": "string",
+                                            "const": "INTERNAL_SERVER_ERROR"
+                                        }
+                                    },
+                                    "required": [
+                                        "code"
+                                    ],
+                                    "additionalProperties": false
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/users/me": {
+            "get": {
+                "tags": [
+                    "User"
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Default Response",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "id": {
+                                            "type": "string"
+                                        },
+                                        "email": {
+                                            "type": "string"
+                                        },
+                                        "isEmailVerified": {
+                                            "type": "boolean"
+                                        },
+                                        "createdAt": {
+                                            "type": "string"
+                                        },
+                                        "updatedAt": {
+                                            "type": "string"
+                                        }
+                                    },
+                                    "required": [
+                                        "id",
+                                        "email",
+                                        "isEmailVerified",
+                                        "createdAt",
+                                        "updatedAt"
+                                    ],
+                                    "additionalProperties": false
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "description": "Default Response",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "code": {
+                                            "type": "string",
+                                            "const": "UNAUTHORIZED"
+                                        }
+                                    },
+                                    "required": [
+                                        "code"
+                                    ],
+                                    "additionalProperties": false
+                                }
+                            }
+                        }
+                    },
+                    "429": {
+                        "description": "Default Response",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "code": {
+                                            "type": "string",
+                                            "const": "TOO_MANY_REQUESTS"
+                                        }
+                                    },
+                                    "required": [
+                                        "code"
+                                    ],
+                                    "additionalProperties": false
+                                }
+                            }
+                        }
+                    },
+                    "500": {
+                        "description": "Default Response",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "code": {
+                                            "type": "string",
+                                            "const": "INTERNAL_SERVER_ERROR"
+                                        }
+                                    },
+                                    "required": [
+                                        "code"
+                                    ],
+                                    "additionalProperties": false
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/email-verifications": {
+            "post": {
+                "tags": [
+                    "EmailVerification"
+                ],
+                "responses": {
+                    "201": {
+                        "description": "Verification email sent successfully"
+                    },
+                    "400": {
+                        "description": "Default Response",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "code": {
+                                            "type": "string",
+                                            "const": "BAD_REQUEST"
+                                        }
+                                    },
+                                    "required": [
+                                        "code"
+                                    ],
+                                    "additionalProperties": false
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "description": "Default Response",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "code": {
+                                            "type": "string",
+                                            "const": "UNAUTHORIZED"
+                                        }
+                                    },
+                                    "required": [
+                                        "code"
+                                    ],
+                                    "additionalProperties": false
+                                }
+                            }
+                        }
+                    },
+                    "409": {
+                        "description": "Default Response",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "anyOf": [
+                                        {
+                                            "type": "object",
+                                            "properties": {
+                                                "code": {
+                                                    "type": "string",
+                                                    "const": "ACTIVE_COOLDOWN"
+                                                }
+                                            },
+                                            "required": [
+                                                "code"
+                                            ],
+                                            "additionalProperties": false
+                                        },
+                                        {
+                                            "type": "object",
+                                            "properties": {
+                                                "code": {
+                                                    "type": "string",
+                                                    "const": "EMAIL_ALREADY_VERIFIED"
+                                                }
+                                            },
+                                            "required": [
+                                                "code"
+                                            ],
+                                            "additionalProperties": false
+                                        }
+                                    ]
+                                }
+                            }
+                        }
+                    },
+                    "413": {
+                        "description": "Default Response",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "code": {
+                                            "type": "string",
+                                            "const": "PAYLOAD_TOO_LARGE"
+                                        }
+                                    },
+                                    "required": [
+                                        "code"
+                                    ],
+                                    "additionalProperties": false
+                                }
+                            }
+                        }
+                    },
+                    "429": {
+                        "description": "Default Response",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "code": {
+                                            "type": "string",
+                                            "const": "TOO_MANY_REQUESTS"
+                                        }
+                                    },
+                                    "required": [
+                                        "code"
+                                    ],
+                                    "additionalProperties": false
+                                }
+                            }
+                        }
+                    },
+                    "500": {
+                        "description": "Default Response",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "code": {
+                                            "type": "string",
+                                            "const": "INTERNAL_SERVER_ERROR"
+                                        }
+                                    },
+                                    "required": [
+                                        "code"
+                                    ],
+                                    "additionalProperties": false
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/email-verifications/{token}": {
+            "delete": {
+                "tags": [
+                    "EmailVerification"
+                ],
+                "parameters": [
+                    {
+                        "schema": {
+                            "type": "string"
+                        },
+                        "in": "path",
+                        "name": "token",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "204": {
+                        "description": "Email verified successfully"
+                    },
+                    "400": {
+                        "description": "Default Response",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "code": {
+                                            "type": "string",
+                                            "const": "BAD_REQUEST"
+                                        }
+                                    },
+                                    "required": [
+                                        "code"
+                                    ],
+                                    "additionalProperties": false
+                                }
+                            }
+                        }
+                    },
+                    "404": {
+                        "description": "Default Response",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "anyOf": [
+                                        {
+                                            "type": "object",
+                                            "properties": {
+                                                "code": {
+                                                    "type": "string",
+                                                    "const": "EMAIL_VERIFICATION_NOT_FOUND"
+                                                }
+                                            },
+                                            "required": [
+                                                "code"
+                                            ],
+                                            "additionalProperties": false
+                                        },
+                                        {
+                                            "type": "object",
+                                            "properties": {
+                                                "code": {
+                                                    "type": "string",
+                                                    "const": "USER_NOT_FOUND"
+                                                }
+                                            },
+                                            "required": [
+                                                "code"
+                                            ],
+                                            "additionalProperties": false
+                                        }
+                                    ]
+                                }
+                            }
+                        }
+                    },
+                    "409": {
+                        "description": "Default Response",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "code": {
+                                            "type": "string",
+                                            "const": "EMAIL_ALREADY_VERIFIED"
+                                        }
+                                    },
+                                    "required": [
+                                        "code"
+                                    ],
+                                    "additionalProperties": false
+                                }
+                            }
+                        }
+                    },
+                    "410": {
+                        "description": "Default Response",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "code": {
+                                            "type": "string",
+                                            "const": "TOKEN_EXPIRED"
+                                        }
+                                    },
+                                    "required": [
+                                        "code"
+                                    ],
+                                    "additionalProperties": false
+                                }
+                            }
+                        }
+                    },
+                    "413": {
+                        "description": "Default Response",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "code": {
+                                            "type": "string",
+                                            "const": "PAYLOAD_TOO_LARGE"
+                                        }
+                                    },
+                                    "required": [
+                                        "code"
+                                    ],
+                                    "additionalProperties": false
+                                }
+                            }
+                        }
+                    },
+                    "429": {
+                        "description": "Default Response",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "code": {
+                                            "type": "string",
+                                            "const": "TOO_MANY_REQUESTS"
+                                        }
+                                    },
+                                    "required": [
+                                        "code"
+                                    ],
+                                    "additionalProperties": false
+                                }
+                            }
+                        }
+                    },
+                    "500": {
+                        "description": "Default Response",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "code": {
+                                            "type": "string",
+                                            "const": "INTERNAL_SERVER_ERROR"
+                                        }
+                                    },
+                                    "required": [
+                                        "code"
+                                    ],
+                                    "additionalProperties": false
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/transactions": {
+            "post": {
+                "tags": [
+                    "Transaction"
+                ],
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "oneOf": [
+                                    {
+                                        "type": "object",
+                                        "properties": {
+                                            "month": {
+                                                "type": "string",
+                                                "pattern": "^\\d{4}-(0[1-9]|1[0-2])$"
+                                            },
+                                            "name": {
+                                                "type": "string",
+                                                "minLength": 1,
+                                                "maxLength": 99
+                                            },
+                                            "value": {
+                                                "type": "number",
+                                                "minimum": 0.01,
+                                                "maximum": 999999999.99
+                                            },
+                                            "type": {
+                                                "type": "string",
+                                                "const": "expense"
+                                            },
+                                            "expenseCategory": {
+                                                "anyOf": [
+                                                    {
+                                                        "type": "string",
+                                                        "enum": [
+                                                            "need",
+                                                            "want",
+                                                            "investment"
+                                                        ]
+                                                    },
+                                                    {
+                                                        "type": "null"
+                                                    }
+                                                ]
+                                            }
+                                        },
+                                        "required": [
+                                            "month",
+                                            "name",
+                                            "value",
+                                            "type",
+                                            "expenseCategory"
+                                        ]
+                                    },
+                                    {
+                                        "type": "object",
+                                        "properties": {
+                                            "month": {
+                                                "type": "string",
+                                                "pattern": "^\\d{4}-(0[1-9]|1[0-2])$"
+                                            },
+                                            "name": {
+                                                "type": "string",
+                                                "minLength": 1,
+                                                "maxLength": 99
+                                            },
+                                            "value": {
+                                                "type": "number",
+                                                "minimum": 0.01,
+                                                "maximum": 999999999.99
+                                            },
+                                            "type": {
+                                                "type": "string",
+                                                "const": "income"
+                                            },
+                                            "expenseCategory": {
+                                                "type": "null"
+                                            }
+                                        },
+                                        "required": [
+                                            "month",
+                                            "name",
+                                            "value",
+                                            "type",
+                                            "expenseCategory"
+                                        ]
+                                    }
+                                ],
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "201": {
+                        "description": "Default Response",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "id": {
+                                            "type": "string"
+                                        },
+                                        "userId": {
+                                            "type": "string"
+                                        },
+                                        "month": {
+                                            "type": "string"
+                                        },
+                                        "name": {
+                                            "type": "string"
+                                        },
+                                        "value": {
+                                            "type": "number"
+                                        },
+                                        "type": {
+                                            "type": "string",
+                                            "enum": [
+                                                "expense",
+                                                "income"
+                                            ]
+                                        },
+                                        "expenseCategory": {
+                                            "anyOf": [
+                                                {
+                                                    "type": "string",
+                                                    "enum": [
+                                                        "need",
+                                                        "want",
+                                                        "investment"
+                                                    ]
+                                                },
+                                                {
+                                                    "type": "null"
+                                                }
+                                            ]
+                                        },
+                                        "createdAt": {
+                                            "type": "string"
+                                        },
+                                        "updatedAt": {
+                                            "type": "string"
+                                        }
+                                    },
+                                    "required": [
+                                        "id",
+                                        "userId",
+                                        "month",
+                                        "name",
+                                        "value",
+                                        "type",
+                                        "expenseCategory",
+                                        "createdAt",
+                                        "updatedAt"
+                                    ],
+                                    "additionalProperties": false
+                                }
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "Default Response",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "code": {
+                                            "type": "string",
+                                            "const": "BAD_REQUEST"
+                                        }
+                                    },
+                                    "required": [
+                                        "code"
+                                    ],
+                                    "additionalProperties": false
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "description": "Default Response",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "code": {
+                                            "type": "string",
+                                            "const": "UNAUTHORIZED"
+                                        }
+                                    },
+                                    "required": [
+                                        "code"
+                                    ],
+                                    "additionalProperties": false
+                                }
+                            }
+                        }
+                    },
+                    "413": {
+                        "description": "Default Response",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "code": {
+                                            "type": "string",
+                                            "const": "PAYLOAD_TOO_LARGE"
+                                        }
+                                    },
+                                    "required": [
+                                        "code"
+                                    ],
+                                    "additionalProperties": false
+                                }
+                            }
+                        }
+                    },
+                    "429": {
+                        "description": "Default Response",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "code": {
+                                            "type": "string",
+                                            "const": "TOO_MANY_REQUESTS"
+                                        }
+                                    },
+                                    "required": [
+                                        "code"
+                                    ],
+                                    "additionalProperties": false
+                                }
+                            }
+                        }
+                    },
+                    "500": {
+                        "description": "Default Response",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "code": {
+                                            "type": "string",
+                                            "const": "INTERNAL_SERVER_ERROR"
+                                        }
+                                    },
+                                    "required": [
+                                        "code"
+                                    ],
+                                    "additionalProperties": false
+                                }
+                            }
+                        }
+                    }
+                }
+            },
+            "get": {
+                "tags": [
+                    "Transaction"
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Default Response",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "array",
+                                    "items": {
+                                        "type": "object",
+                                        "properties": {
+                                            "id": {
+                                                "type": "string"
+                                            },
+                                            "userId": {
+                                                "type": "string"
+                                            },
+                                            "month": {
+                                                "type": "string"
+                                            },
+                                            "name": {
+                                                "type": "string"
+                                            },
+                                            "value": {
+                                                "type": "number"
+                                            },
+                                            "type": {
+                                                "type": "string",
+                                                "enum": [
+                                                    "expense",
+                                                    "income"
+                                                ]
+                                            },
+                                            "expenseCategory": {
+                                                "anyOf": [
+                                                    {
+                                                        "type": "string",
+                                                        "enum": [
+                                                            "need",
+                                                            "want",
+                                                            "investment"
+                                                        ]
+                                                    },
+                                                    {
+                                                        "type": "null"
+                                                    }
+                                                ]
+                                            },
+                                            "createdAt": {
+                                                "type": "string"
+                                            },
+                                            "updatedAt": {
+                                                "type": "string"
+                                            }
+                                        },
+                                        "required": [
+                                            "id",
+                                            "userId",
+                                            "month",
+                                            "name",
+                                            "value",
+                                            "type",
+                                            "expenseCategory",
+                                            "createdAt",
+                                            "updatedAt"
+                                        ],
+                                        "additionalProperties": false
+                                    }
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "description": "Default Response",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "code": {
+                                            "type": "string",
+                                            "const": "UNAUTHORIZED"
+                                        }
+                                    },
+                                    "required": [
+                                        "code"
+                                    ],
+                                    "additionalProperties": false
+                                }
+                            }
+                        }
+                    },
+                    "429": {
+                        "description": "Default Response",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "code": {
+                                            "type": "string",
+                                            "const": "TOO_MANY_REQUESTS"
+                                        }
+                                    },
+                                    "required": [
+                                        "code"
+                                    ],
+                                    "additionalProperties": false
+                                }
+                            }
+                        }
+                    },
+                    "500": {
+                        "description": "Default Response",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "code": {
+                                            "type": "string",
+                                            "const": "INTERNAL_SERVER_ERROR"
+                                        }
+                                    },
+                                    "required": [
+                                        "code"
+                                    ],
+                                    "additionalProperties": false
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/transactions/{id}": {
+            "get": {
+                "tags": [
+                    "Transaction"
+                ],
+                "parameters": [
+                    {
+                        "schema": {
+                            "type": "string",
+                            "minLength": 24,
+                            "maxLength": 24
+                        },
+                        "in": "path",
+                        "name": "id",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Default Response",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "id": {
+                                            "type": "string"
+                                        },
+                                        "userId": {
+                                            "type": "string"
+                                        },
+                                        "month": {
+                                            "type": "string"
+                                        },
+                                        "name": {
+                                            "type": "string"
+                                        },
+                                        "value": {
+                                            "type": "number"
+                                        },
+                                        "type": {
+                                            "type": "string",
+                                            "enum": [
+                                                "expense",
+                                                "income"
+                                            ]
+                                        },
+                                        "expenseCategory": {
+                                            "anyOf": [
+                                                {
+                                                    "type": "string",
+                                                    "enum": [
+                                                        "need",
+                                                        "want",
+                                                        "investment"
+                                                    ]
+                                                },
+                                                {
+                                                    "type": "null"
+                                                }
+                                            ]
+                                        },
+                                        "createdAt": {
+                                            "type": "string"
+                                        },
+                                        "updatedAt": {
+                                            "type": "string"
+                                        }
+                                    },
+                                    "required": [
+                                        "id",
+                                        "userId",
+                                        "month",
+                                        "name",
+                                        "value",
+                                        "type",
+                                        "expenseCategory",
+                                        "createdAt",
+                                        "updatedAt"
+                                    ],
+                                    "additionalProperties": false
+                                }
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "Default Response",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "code": {
+                                            "type": "string",
+                                            "const": "BAD_REQUEST"
+                                        }
+                                    },
+                                    "required": [
+                                        "code"
+                                    ],
+                                    "additionalProperties": false
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "description": "Default Response",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "code": {
+                                            "type": "string",
+                                            "const": "UNAUTHORIZED"
+                                        }
+                                    },
+                                    "required": [
+                                        "code"
+                                    ],
+                                    "additionalProperties": false
+                                }
+                            }
+                        }
+                    },
+                    "403": {
+                        "description": "Default Response",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "code": {
+                                            "type": "string",
+                                            "const": "FORBIDDEN"
+                                        }
+                                    },
+                                    "required": [
+                                        "code"
+                                    ],
+                                    "additionalProperties": false
+                                }
+                            }
+                        }
+                    },
+                    "404": {
+                        "description": "Default Response",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "code": {
+                                            "type": "string",
+                                            "const": "TRANSACTION_NOT_FOUND"
+                                        }
+                                    },
+                                    "required": [
+                                        "code"
+                                    ],
+                                    "additionalProperties": false
+                                }
+                            }
+                        }
+                    },
+                    "429": {
+                        "description": "Default Response",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "code": {
+                                            "type": "string",
+                                            "const": "TOO_MANY_REQUESTS"
+                                        }
+                                    },
+                                    "required": [
+                                        "code"
+                                    ],
+                                    "additionalProperties": false
+                                }
+                            }
+                        }
+                    },
+                    "500": {
+                        "description": "Default Response",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "code": {
+                                            "type": "string",
+                                            "const": "INTERNAL_SERVER_ERROR"
+                                        }
+                                    },
+                                    "required": [
+                                        "code"
+                                    ],
+                                    "additionalProperties": false
+                                }
+                            }
+                        }
+                    }
+                }
+            },
+            "put": {
+                "tags": [
+                    "Transaction"
+                ],
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "oneOf": [
+                                    {
+                                        "type": "object",
+                                        "properties": {
+                                            "name": {
+                                                "type": "string",
+                                                "minLength": 1,
+                                                "maxLength": 99
+                                            },
+                                            "value": {
+                                                "type": "number",
+                                                "minimum": 0.01,
+                                                "maximum": 999999999.99
+                                            },
+                                            "type": {
+                                                "type": "string",
+                                                "const": "expense"
+                                            },
+                                            "expenseCategory": {
+                                                "anyOf": [
+                                                    {
+                                                        "type": "string",
+                                                        "enum": [
+                                                            "need",
+                                                            "want",
+                                                            "investment"
+                                                        ]
+                                                    },
+                                                    {
+                                                        "type": "null"
+                                                    }
+                                                ]
+                                            }
+                                        },
+                                        "required": [
+                                            "name",
+                                            "value",
+                                            "type",
+                                            "expenseCategory"
+                                        ]
+                                    },
+                                    {
+                                        "type": "object",
+                                        "properties": {
+                                            "name": {
+                                                "type": "string",
+                                                "minLength": 1,
+                                                "maxLength": 99
+                                            },
+                                            "value": {
+                                                "type": "number",
+                                                "minimum": 0.01,
+                                                "maximum": 999999999.99
+                                            },
+                                            "type": {
+                                                "type": "string",
+                                                "const": "income"
+                                            },
+                                            "expenseCategory": {
+                                                "type": "null"
+                                            }
+                                        },
+                                        "required": [
+                                            "name",
+                                            "value",
+                                            "type",
+                                            "expenseCategory"
+                                        ]
+                                    }
+                                ],
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "parameters": [
+                    {
+                        "schema": {
+                            "type": "string",
+                            "minLength": 24,
+                            "maxLength": 24
+                        },
+                        "in": "path",
+                        "name": "id",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Default Response",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "id": {
+                                            "type": "string"
+                                        },
+                                        "userId": {
+                                            "type": "string"
+                                        },
+                                        "month": {
+                                            "type": "string"
+                                        },
+                                        "name": {
+                                            "type": "string"
+                                        },
+                                        "value": {
+                                            "type": "number"
+                                        },
+                                        "type": {
+                                            "type": "string",
+                                            "enum": [
+                                                "expense",
+                                                "income"
+                                            ]
+                                        },
+                                        "expenseCategory": {
+                                            "anyOf": [
+                                                {
+                                                    "type": "string",
+                                                    "enum": [
+                                                        "need",
+                                                        "want",
+                                                        "investment"
+                                                    ]
+                                                },
+                                                {
+                                                    "type": "null"
+                                                }
+                                            ]
+                                        },
+                                        "createdAt": {
+                                            "type": "string"
+                                        },
+                                        "updatedAt": {
+                                            "type": "string"
+                                        }
+                                    },
+                                    "required": [
+                                        "id",
+                                        "userId",
+                                        "month",
+                                        "name",
+                                        "value",
+                                        "type",
+                                        "expenseCategory",
+                                        "createdAt",
+                                        "updatedAt"
+                                    ],
+                                    "additionalProperties": false
+                                }
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "Default Response",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "code": {
+                                            "type": "string",
+                                            "const": "BAD_REQUEST"
+                                        }
+                                    },
+                                    "required": [
+                                        "code"
+                                    ],
+                                    "additionalProperties": false
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "description": "Default Response",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "code": {
+                                            "type": "string",
+                                            "const": "UNAUTHORIZED"
+                                        }
+                                    },
+                                    "required": [
+                                        "code"
+                                    ],
+                                    "additionalProperties": false
+                                }
+                            }
+                        }
+                    },
+                    "403": {
+                        "description": "Default Response",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "code": {
+                                            "type": "string",
+                                            "const": "FORBIDDEN"
+                                        }
+                                    },
+                                    "required": [
+                                        "code"
+                                    ],
+                                    "additionalProperties": false
+                                }
+                            }
+                        }
+                    },
+                    "404": {
+                        "description": "Default Response",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "code": {
+                                            "type": "string",
+                                            "const": "TRANSACTION_NOT_FOUND"
+                                        }
+                                    },
+                                    "required": [
+                                        "code"
+                                    ],
+                                    "additionalProperties": false
+                                }
+                            }
+                        }
+                    },
+                    "413": {
+                        "description": "Default Response",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "code": {
+                                            "type": "string",
+                                            "const": "PAYLOAD_TOO_LARGE"
+                                        }
+                                    },
+                                    "required": [
+                                        "code"
+                                    ],
+                                    "additionalProperties": false
+                                }
+                            }
+                        }
+                    },
+                    "429": {
+                        "description": "Default Response",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "code": {
+                                            "type": "string",
+                                            "const": "TOO_MANY_REQUESTS"
+                                        }
+                                    },
+                                    "required": [
+                                        "code"
+                                    ],
+                                    "additionalProperties": false
+                                }
+                            }
+                        }
+                    },
+                    "500": {
+                        "description": "Default Response",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "code": {
+                                            "type": "string",
+                                            "const": "INTERNAL_SERVER_ERROR"
+                                        }
+                                    },
+                                    "required": [
+                                        "code"
+                                    ],
+                                    "additionalProperties": false
+                                }
+                            }
+                        }
+                    }
+                }
+            },
+            "delete": {
+                "tags": [
+                    "Transaction"
+                ],
+                "parameters": [
+                    {
+                        "schema": {
+                            "type": "string",
+                            "minLength": 24,
+                            "maxLength": 24
+                        },
+                        "in": "path",
+                        "name": "id",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "204": {
+                        "description": "Transaction deleted successfully"
+                    },
+                    "400": {
+                        "description": "Default Response",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "code": {
+                                            "type": "string",
+                                            "const": "BAD_REQUEST"
+                                        }
+                                    },
+                                    "required": [
+                                        "code"
+                                    ],
+                                    "additionalProperties": false
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "description": "Default Response",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "code": {
+                                            "type": "string",
+                                            "const": "UNAUTHORIZED"
+                                        }
+                                    },
+                                    "required": [
+                                        "code"
+                                    ],
+                                    "additionalProperties": false
+                                }
+                            }
+                        }
+                    },
+                    "403": {
+                        "description": "Default Response",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "code": {
+                                            "type": "string",
+                                            "const": "FORBIDDEN"
+                                        }
+                                    },
+                                    "required": [
+                                        "code"
+                                    ],
+                                    "additionalProperties": false
+                                }
+                            }
+                        }
+                    },
+                    "404": {
+                        "description": "Default Response",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "code": {
+                                            "type": "string",
+                                            "const": "TRANSACTION_NOT_FOUND"
+                                        }
+                                    },
+                                    "required": [
+                                        "code"
+                                    ],
+                                    "additionalProperties": false
+                                }
+                            }
+                        }
+                    },
+                    "413": {
+                        "description": "Default Response",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "code": {
+                                            "type": "string",
+                                            "const": "PAYLOAD_TOO_LARGE"
+                                        }
+                                    },
+                                    "required": [
+                                        "code"
+                                    ],
+                                    "additionalProperties": false
+                                }
+                            }
+                        }
+                    },
+                    "429": {
+                        "description": "Default Response",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "code": {
+                                            "type": "string",
+                                            "const": "TOO_MANY_REQUESTS"
+                                        }
+                                    },
+                                    "required": [
+                                        "code"
+                                    ],
+                                    "additionalProperties": false
+                                }
+                            }
+                        }
+                    },
+                    "500": {
+                        "description": "Default Response",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "code": {
+                                            "type": "string",
+                                            "const": "INTERNAL_SERVER_ERROR"
+                                        }
+                                    },
+                                    "required": [
+                                        "code"
+                                    ],
+                                    "additionalProperties": false
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    }
+}
