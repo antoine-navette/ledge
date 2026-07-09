@@ -36,13 +36,7 @@ export interface paths {
                         [name: string]: unknown;
                     };
                     content: {
-                        "application/json": {
-                            id: string;
-                            email: string;
-                            isEmailVerified: boolean;
-                            createdAt: string;
-                            updatedAt: string;
-                        };
+                        "application/json": components["schemas"]["User"];
                     };
                 };
                 /** @description Default Response */
@@ -51,10 +45,7 @@ export interface paths {
                         [name: string]: unknown;
                     };
                     content: {
-                        "application/json": {
-                            /** @constant */
-                            code: "BAD_REQUEST";
-                        };
+                        "application/json": components["schemas"]["BadRequest"];
                     };
                 };
                 /** @description Default Response */
@@ -63,10 +54,7 @@ export interface paths {
                         [name: string]: unknown;
                     };
                     content: {
-                        "application/json": {
-                            /** @constant */
-                            code: "DUPLICATE_EMAIL";
-                        };
+                        "application/json": components["schemas"]["DuplicateEmail"];
                     };
                 };
                 /** @description Default Response */
@@ -75,10 +63,7 @@ export interface paths {
                         [name: string]: unknown;
                     };
                     content: {
-                        "application/json": {
-                            /** @constant */
-                            code: "PAYLOAD_TOO_LARGE";
-                        };
+                        "application/json": components["schemas"]["PayloadTooLarge"];
                     };
                 };
                 /** @description Default Response */
@@ -87,10 +72,7 @@ export interface paths {
                         [name: string]: unknown;
                     };
                     content: {
-                        "application/json": {
-                            /** @constant */
-                            code: "TOO_MANY_REQUESTS";
-                        };
+                        "application/json": components["schemas"]["TooManyRequests"];
                     };
                 };
                 /** @description Default Response */
@@ -99,10 +81,7 @@ export interface paths {
                         [name: string]: unknown;
                     };
                     content: {
-                        "application/json": {
-                            /** @constant */
-                            code: "INTERNAL_SERVER_ERROR";
-                        };
+                        "application/json": components["schemas"]["InternalServerError"];
                     };
                 };
             };
@@ -145,13 +124,7 @@ export interface paths {
                         [name: string]: unknown;
                     };
                     content: {
-                        "application/json": {
-                            id: string;
-                            email: string;
-                            isEmailVerified: boolean;
-                            createdAt: string;
-                            updatedAt: string;
-                        };
+                        "application/json": components["schemas"]["User"];
                     };
                 };
                 /** @description Default Response */
@@ -160,10 +133,7 @@ export interface paths {
                         [name: string]: unknown;
                     };
                     content: {
-                        "application/json": {
-                            /** @constant */
-                            code: "BAD_REQUEST";
-                        };
+                        "application/json": components["schemas"]["BadRequest"];
                     };
                 };
                 /** @description Default Response */
@@ -172,10 +142,7 @@ export interface paths {
                         [name: string]: unknown;
                     };
                     content: {
-                        "application/json": {
-                            /** @constant */
-                            code: "INVALID_CREDENTIALS";
-                        };
+                        "application/json": components["schemas"]["InvalidCredentials"];
                     };
                 };
                 /** @description Default Response */
@@ -184,10 +151,7 @@ export interface paths {
                         [name: string]: unknown;
                     };
                     content: {
-                        "application/json": {
-                            /** @constant */
-                            code: "PAYLOAD_TOO_LARGE";
-                        };
+                        "application/json": components["schemas"]["PayloadTooLarge"];
                     };
                 };
                 /** @description Default Response */
@@ -196,10 +160,7 @@ export interface paths {
                         [name: string]: unknown;
                     };
                     content: {
-                        "application/json": {
-                            /** @constant */
-                            code: "TOO_MANY_REQUESTS";
-                        };
+                        "application/json": components["schemas"]["TooManyRequests"];
                     };
                 };
                 /** @description Default Response */
@@ -208,10 +169,7 @@ export interface paths {
                         [name: string]: unknown;
                     };
                     content: {
-                        "application/json": {
-                            /** @constant */
-                            code: "INTERNAL_SERVER_ERROR";
-                        };
+                        "application/json": components["schemas"]["InternalServerError"];
                     };
                 };
             };
@@ -253,10 +211,7 @@ export interface paths {
                         [name: string]: unknown;
                     };
                     content: {
-                        "application/json": {
-                            /** @constant */
-                            code: "BAD_REQUEST";
-                        };
+                        "application/json": components["schemas"]["BadRequest"];
                     };
                 };
                 /** @description Default Response */
@@ -265,10 +220,7 @@ export interface paths {
                         [name: string]: unknown;
                     };
                     content: {
-                        "application/json": {
-                            /** @constant */
-                            code: "UNAUTHORIZED";
-                        };
+                        "application/json": components["schemas"]["Unauthorized"];
                     };
                 };
                 /** @description Default Response */
@@ -277,10 +229,7 @@ export interface paths {
                         [name: string]: unknown;
                     };
                     content: {
-                        "application/json": {
-                            /** @constant */
-                            code: "PAYLOAD_TOO_LARGE";
-                        };
+                        "application/json": components["schemas"]["PayloadTooLarge"];
                     };
                 };
                 /** @description Default Response */
@@ -289,10 +238,7 @@ export interface paths {
                         [name: string]: unknown;
                     };
                     content: {
-                        "application/json": {
-                            /** @constant */
-                            code: "TOO_MANY_REQUESTS";
-                        };
+                        "application/json": components["schemas"]["TooManyRequests"];
                     };
                 };
                 /** @description Default Response */
@@ -301,10 +247,7 @@ export interface paths {
                         [name: string]: unknown;
                     };
                     content: {
-                        "application/json": {
-                            /** @constant */
-                            code: "INTERNAL_SERVER_ERROR";
-                        };
+                        "application/json": components["schemas"]["InternalServerError"];
                     };
                 };
             };
@@ -337,13 +280,7 @@ export interface paths {
                         [name: string]: unknown;
                     };
                     content: {
-                        "application/json": {
-                            id: string;
-                            email: string;
-                            isEmailVerified: boolean;
-                            createdAt: string;
-                            updatedAt: string;
-                        };
+                        "application/json": components["schemas"]["User"];
                     };
                 };
                 /** @description Default Response */
@@ -352,10 +289,7 @@ export interface paths {
                         [name: string]: unknown;
                     };
                     content: {
-                        "application/json": {
-                            /** @constant */
-                            code: "UNAUTHORIZED";
-                        };
+                        "application/json": components["schemas"]["Unauthorized"];
                     };
                 };
                 /** @description Default Response */
@@ -364,10 +298,7 @@ export interface paths {
                         [name: string]: unknown;
                     };
                     content: {
-                        "application/json": {
-                            /** @constant */
-                            code: "TOO_MANY_REQUESTS";
-                        };
+                        "application/json": components["schemas"]["TooManyRequests"];
                     };
                 };
                 /** @description Default Response */
@@ -376,10 +307,7 @@ export interface paths {
                         [name: string]: unknown;
                     };
                     content: {
-                        "application/json": {
-                            /** @constant */
-                            code: "INTERNAL_SERVER_ERROR";
-                        };
+                        "application/json": components["schemas"]["InternalServerError"];
                     };
                 };
             };
@@ -423,10 +351,7 @@ export interface paths {
                         [name: string]: unknown;
                     };
                     content: {
-                        "application/json": {
-                            /** @constant */
-                            code: "BAD_REQUEST";
-                        };
+                        "application/json": components["schemas"]["BadRequest"];
                     };
                 };
                 /** @description Default Response */
@@ -435,10 +360,7 @@ export interface paths {
                         [name: string]: unknown;
                     };
                     content: {
-                        "application/json": {
-                            /** @constant */
-                            code: "UNAUTHORIZED";
-                        };
+                        "application/json": components["schemas"]["Unauthorized"];
                     };
                 };
                 /** @description Default Response */
@@ -447,13 +369,7 @@ export interface paths {
                         [name: string]: unknown;
                     };
                     content: {
-                        "application/json": {
-                            /** @constant */
-                            code: "ACTIVE_COOLDOWN";
-                        } | {
-                            /** @constant */
-                            code: "EMAIL_ALREADY_VERIFIED";
-                        };
+                        "application/json": components["schemas"]["ActiveCooldown"] | components["schemas"]["EmailAlreadyVerified"];
                     };
                 };
                 /** @description Default Response */
@@ -462,10 +378,7 @@ export interface paths {
                         [name: string]: unknown;
                     };
                     content: {
-                        "application/json": {
-                            /** @constant */
-                            code: "PAYLOAD_TOO_LARGE";
-                        };
+                        "application/json": components["schemas"]["PayloadTooLarge"];
                     };
                 };
                 /** @description Default Response */
@@ -474,10 +387,7 @@ export interface paths {
                         [name: string]: unknown;
                     };
                     content: {
-                        "application/json": {
-                            /** @constant */
-                            code: "TOO_MANY_REQUESTS";
-                        };
+                        "application/json": components["schemas"]["TooManyRequests"];
                     };
                 };
                 /** @description Default Response */
@@ -486,10 +396,7 @@ export interface paths {
                         [name: string]: unknown;
                     };
                     content: {
-                        "application/json": {
-                            /** @constant */
-                            code: "INTERNAL_SERVER_ERROR";
-                        };
+                        "application/json": components["schemas"]["InternalServerError"];
                     };
                 };
             };
@@ -534,10 +441,7 @@ export interface paths {
                         [name: string]: unknown;
                     };
                     content: {
-                        "application/json": {
-                            /** @constant */
-                            code: "BAD_REQUEST";
-                        };
+                        "application/json": components["schemas"]["BadRequest"];
                     };
                 };
                 /** @description Default Response */
@@ -546,13 +450,7 @@ export interface paths {
                         [name: string]: unknown;
                     };
                     content: {
-                        "application/json": {
-                            /** @constant */
-                            code: "EMAIL_VERIFICATION_NOT_FOUND";
-                        } | {
-                            /** @constant */
-                            code: "USER_NOT_FOUND";
-                        };
+                        "application/json": components["schemas"]["EmailVerificationNotFound"] | components["schemas"]["UserNotFound"];
                     };
                 };
                 /** @description Default Response */
@@ -561,10 +459,7 @@ export interface paths {
                         [name: string]: unknown;
                     };
                     content: {
-                        "application/json": {
-                            /** @constant */
-                            code: "EMAIL_ALREADY_VERIFIED";
-                        };
+                        "application/json": components["schemas"]["EmailAlreadyVerified"];
                     };
                 };
                 /** @description Default Response */
@@ -573,10 +468,7 @@ export interface paths {
                         [name: string]: unknown;
                     };
                     content: {
-                        "application/json": {
-                            /** @constant */
-                            code: "TOKEN_EXPIRED";
-                        };
+                        "application/json": components["schemas"]["TokenExpired"];
                     };
                 };
                 /** @description Default Response */
@@ -585,10 +477,7 @@ export interface paths {
                         [name: string]: unknown;
                     };
                     content: {
-                        "application/json": {
-                            /** @constant */
-                            code: "PAYLOAD_TOO_LARGE";
-                        };
+                        "application/json": components["schemas"]["PayloadTooLarge"];
                     };
                 };
                 /** @description Default Response */
@@ -597,10 +486,7 @@ export interface paths {
                         [name: string]: unknown;
                     };
                     content: {
-                        "application/json": {
-                            /** @constant */
-                            code: "TOO_MANY_REQUESTS";
-                        };
+                        "application/json": components["schemas"]["TooManyRequests"];
                     };
                 };
                 /** @description Default Response */
@@ -609,10 +495,7 @@ export interface paths {
                         [name: string]: unknown;
                     };
                     content: {
-                        "application/json": {
-                            /** @constant */
-                            code: "INTERNAL_SERVER_ERROR";
-                        };
+                        "application/json": components["schemas"]["InternalServerError"];
                     };
                 };
             };
@@ -644,18 +527,7 @@ export interface paths {
                         [name: string]: unknown;
                     };
                     content: {
-                        "application/json": {
-                            id: string;
-                            userId: string;
-                            month: string;
-                            name: string;
-                            value: number;
-                            /** @enum {string} */
-                            type: "expense" | "income";
-                            expenseCategory: ("need" | "want" | "investment") | null;
-                            createdAt: string;
-                            updatedAt: string;
-                        }[];
+                        "application/json": components["schemas"]["Transaction"][];
                     };
                 };
                 /** @description Default Response */
@@ -664,10 +536,7 @@ export interface paths {
                         [name: string]: unknown;
                     };
                     content: {
-                        "application/json": {
-                            /** @constant */
-                            code: "UNAUTHORIZED";
-                        };
+                        "application/json": components["schemas"]["Unauthorized"];
                     };
                 };
                 /** @description Default Response */
@@ -676,10 +545,7 @@ export interface paths {
                         [name: string]: unknown;
                     };
                     content: {
-                        "application/json": {
-                            /** @constant */
-                            code: "TOO_MANY_REQUESTS";
-                        };
+                        "application/json": components["schemas"]["TooManyRequests"];
                     };
                 };
                 /** @description Default Response */
@@ -688,10 +554,7 @@ export interface paths {
                         [name: string]: unknown;
                     };
                     content: {
-                        "application/json": {
-                            /** @constant */
-                            code: "INTERNAL_SERVER_ERROR";
-                        };
+                        "application/json": components["schemas"]["InternalServerError"];
                     };
                 };
             };
@@ -730,18 +593,7 @@ export interface paths {
                         [name: string]: unknown;
                     };
                     content: {
-                        "application/json": {
-                            id: string;
-                            userId: string;
-                            month: string;
-                            name: string;
-                            value: number;
-                            /** @enum {string} */
-                            type: "expense" | "income";
-                            expenseCategory: ("need" | "want" | "investment") | null;
-                            createdAt: string;
-                            updatedAt: string;
-                        };
+                        "application/json": components["schemas"]["Transaction"];
                     };
                 };
                 /** @description Default Response */
@@ -750,10 +602,7 @@ export interface paths {
                         [name: string]: unknown;
                     };
                     content: {
-                        "application/json": {
-                            /** @constant */
-                            code: "BAD_REQUEST";
-                        };
+                        "application/json": components["schemas"]["BadRequest"];
                     };
                 };
                 /** @description Default Response */
@@ -762,10 +611,7 @@ export interface paths {
                         [name: string]: unknown;
                     };
                     content: {
-                        "application/json": {
-                            /** @constant */
-                            code: "UNAUTHORIZED";
-                        };
+                        "application/json": components["schemas"]["Unauthorized"];
                     };
                 };
                 /** @description Default Response */
@@ -774,10 +620,7 @@ export interface paths {
                         [name: string]: unknown;
                     };
                     content: {
-                        "application/json": {
-                            /** @constant */
-                            code: "PAYLOAD_TOO_LARGE";
-                        };
+                        "application/json": components["schemas"]["PayloadTooLarge"];
                     };
                 };
                 /** @description Default Response */
@@ -786,10 +629,7 @@ export interface paths {
                         [name: string]: unknown;
                     };
                     content: {
-                        "application/json": {
-                            /** @constant */
-                            code: "TOO_MANY_REQUESTS";
-                        };
+                        "application/json": components["schemas"]["TooManyRequests"];
                     };
                 };
                 /** @description Default Response */
@@ -798,10 +638,7 @@ export interface paths {
                         [name: string]: unknown;
                     };
                     content: {
-                        "application/json": {
-                            /** @constant */
-                            code: "INTERNAL_SERVER_ERROR";
-                        };
+                        "application/json": components["schemas"]["InternalServerError"];
                     };
                 };
             };
@@ -836,18 +673,7 @@ export interface paths {
                         [name: string]: unknown;
                     };
                     content: {
-                        "application/json": {
-                            id: string;
-                            userId: string;
-                            month: string;
-                            name: string;
-                            value: number;
-                            /** @enum {string} */
-                            type: "expense" | "income";
-                            expenseCategory: ("need" | "want" | "investment") | null;
-                            createdAt: string;
-                            updatedAt: string;
-                        };
+                        "application/json": components["schemas"]["Transaction"];
                     };
                 };
                 /** @description Default Response */
@@ -856,10 +682,7 @@ export interface paths {
                         [name: string]: unknown;
                     };
                     content: {
-                        "application/json": {
-                            /** @constant */
-                            code: "BAD_REQUEST";
-                        };
+                        "application/json": components["schemas"]["BadRequest"];
                     };
                 };
                 /** @description Default Response */
@@ -868,10 +691,7 @@ export interface paths {
                         [name: string]: unknown;
                     };
                     content: {
-                        "application/json": {
-                            /** @constant */
-                            code: "UNAUTHORIZED";
-                        };
+                        "application/json": components["schemas"]["Unauthorized"];
                     };
                 };
                 /** @description Default Response */
@@ -880,10 +700,7 @@ export interface paths {
                         [name: string]: unknown;
                     };
                     content: {
-                        "application/json": {
-                            /** @constant */
-                            code: "FORBIDDEN";
-                        };
+                        "application/json": components["schemas"]["Forbidden"];
                     };
                 };
                 /** @description Default Response */
@@ -892,10 +709,7 @@ export interface paths {
                         [name: string]: unknown;
                     };
                     content: {
-                        "application/json": {
-                            /** @constant */
-                            code: "TRANSACTION_NOT_FOUND";
-                        };
+                        "application/json": components["schemas"]["TransactionNotFound"];
                     };
                 };
                 /** @description Default Response */
@@ -904,10 +718,7 @@ export interface paths {
                         [name: string]: unknown;
                     };
                     content: {
-                        "application/json": {
-                            /** @constant */
-                            code: "TOO_MANY_REQUESTS";
-                        };
+                        "application/json": components["schemas"]["TooManyRequests"];
                     };
                 };
                 /** @description Default Response */
@@ -916,10 +727,7 @@ export interface paths {
                         [name: string]: unknown;
                     };
                     content: {
-                        "application/json": {
-                            /** @constant */
-                            code: "INTERNAL_SERVER_ERROR";
-                        };
+                        "application/json": components["schemas"]["InternalServerError"];
                     };
                 };
             };
@@ -957,18 +765,7 @@ export interface paths {
                         [name: string]: unknown;
                     };
                     content: {
-                        "application/json": {
-                            id: string;
-                            userId: string;
-                            month: string;
-                            name: string;
-                            value: number;
-                            /** @enum {string} */
-                            type: "expense" | "income";
-                            expenseCategory: ("need" | "want" | "investment") | null;
-                            createdAt: string;
-                            updatedAt: string;
-                        };
+                        "application/json": components["schemas"]["Transaction"];
                     };
                 };
                 /** @description Default Response */
@@ -977,10 +774,7 @@ export interface paths {
                         [name: string]: unknown;
                     };
                     content: {
-                        "application/json": {
-                            /** @constant */
-                            code: "BAD_REQUEST";
-                        };
+                        "application/json": components["schemas"]["BadRequest"];
                     };
                 };
                 /** @description Default Response */
@@ -989,10 +783,7 @@ export interface paths {
                         [name: string]: unknown;
                     };
                     content: {
-                        "application/json": {
-                            /** @constant */
-                            code: "UNAUTHORIZED";
-                        };
+                        "application/json": components["schemas"]["Unauthorized"];
                     };
                 };
                 /** @description Default Response */
@@ -1001,10 +792,7 @@ export interface paths {
                         [name: string]: unknown;
                     };
                     content: {
-                        "application/json": {
-                            /** @constant */
-                            code: "FORBIDDEN";
-                        };
+                        "application/json": components["schemas"]["Forbidden"];
                     };
                 };
                 /** @description Default Response */
@@ -1013,10 +801,7 @@ export interface paths {
                         [name: string]: unknown;
                     };
                     content: {
-                        "application/json": {
-                            /** @constant */
-                            code: "TRANSACTION_NOT_FOUND";
-                        };
+                        "application/json": components["schemas"]["TransactionNotFound"];
                     };
                 };
                 /** @description Default Response */
@@ -1025,10 +810,7 @@ export interface paths {
                         [name: string]: unknown;
                     };
                     content: {
-                        "application/json": {
-                            /** @constant */
-                            code: "PAYLOAD_TOO_LARGE";
-                        };
+                        "application/json": components["schemas"]["PayloadTooLarge"];
                     };
                 };
                 /** @description Default Response */
@@ -1037,10 +819,7 @@ export interface paths {
                         [name: string]: unknown;
                     };
                     content: {
-                        "application/json": {
-                            /** @constant */
-                            code: "TOO_MANY_REQUESTS";
-                        };
+                        "application/json": components["schemas"]["TooManyRequests"];
                     };
                 };
                 /** @description Default Response */
@@ -1049,10 +828,7 @@ export interface paths {
                         [name: string]: unknown;
                     };
                     content: {
-                        "application/json": {
-                            /** @constant */
-                            code: "INTERNAL_SERVER_ERROR";
-                        };
+                        "application/json": components["schemas"]["InternalServerError"];
                     };
                 };
             };
@@ -1082,10 +858,7 @@ export interface paths {
                         [name: string]: unknown;
                     };
                     content: {
-                        "application/json": {
-                            /** @constant */
-                            code: "BAD_REQUEST";
-                        };
+                        "application/json": components["schemas"]["BadRequest"];
                     };
                 };
                 /** @description Default Response */
@@ -1094,10 +867,7 @@ export interface paths {
                         [name: string]: unknown;
                     };
                     content: {
-                        "application/json": {
-                            /** @constant */
-                            code: "UNAUTHORIZED";
-                        };
+                        "application/json": components["schemas"]["Unauthorized"];
                     };
                 };
                 /** @description Default Response */
@@ -1106,10 +876,7 @@ export interface paths {
                         [name: string]: unknown;
                     };
                     content: {
-                        "application/json": {
-                            /** @constant */
-                            code: "FORBIDDEN";
-                        };
+                        "application/json": components["schemas"]["Forbidden"];
                     };
                 };
                 /** @description Default Response */
@@ -1118,10 +885,7 @@ export interface paths {
                         [name: string]: unknown;
                     };
                     content: {
-                        "application/json": {
-                            /** @constant */
-                            code: "TRANSACTION_NOT_FOUND";
-                        };
+                        "application/json": components["schemas"]["TransactionNotFound"];
                     };
                 };
                 /** @description Default Response */
@@ -1130,10 +894,7 @@ export interface paths {
                         [name: string]: unknown;
                     };
                     content: {
-                        "application/json": {
-                            /** @constant */
-                            code: "PAYLOAD_TOO_LARGE";
-                        };
+                        "application/json": components["schemas"]["PayloadTooLarge"];
                     };
                 };
                 /** @description Default Response */
@@ -1142,10 +903,7 @@ export interface paths {
                         [name: string]: unknown;
                     };
                     content: {
-                        "application/json": {
-                            /** @constant */
-                            code: "TOO_MANY_REQUESTS";
-                        };
+                        "application/json": components["schemas"]["TooManyRequests"];
                     };
                 };
                 /** @description Default Response */
@@ -1154,10 +912,7 @@ export interface paths {
                         [name: string]: unknown;
                     };
                     content: {
-                        "application/json": {
-                            /** @constant */
-                            code: "INTERNAL_SERVER_ERROR";
-                        };
+                        "application/json": components["schemas"]["InternalServerError"];
                     };
                 };
             };
@@ -1170,7 +925,83 @@ export interface paths {
 }
 export type webhooks = Record<string, never>;
 export interface components {
-    schemas: never;
+    schemas: {
+        User: {
+            id: string;
+            email: string;
+            isEmailVerified: boolean;
+            createdAt: string;
+            updatedAt: string;
+        };
+        BadRequest: {
+            /** @constant */
+            code: "BAD_REQUEST";
+        };
+        DuplicateEmail: {
+            /** @constant */
+            code: "DUPLICATE_EMAIL";
+        };
+        PayloadTooLarge: {
+            /** @constant */
+            code: "PAYLOAD_TOO_LARGE";
+        };
+        TooManyRequests: {
+            /** @constant */
+            code: "TOO_MANY_REQUESTS";
+        };
+        InternalServerError: {
+            /** @constant */
+            code: "INTERNAL_SERVER_ERROR";
+        };
+        InvalidCredentials: {
+            /** @constant */
+            code: "INVALID_CREDENTIALS";
+        };
+        Unauthorized: {
+            /** @constant */
+            code: "UNAUTHORIZED";
+        };
+        ActiveCooldown: {
+            /** @constant */
+            code: "ACTIVE_COOLDOWN";
+        };
+        EmailAlreadyVerified: {
+            /** @constant */
+            code: "EMAIL_ALREADY_VERIFIED";
+        };
+        EmailVerificationNotFound: {
+            /** @constant */
+            code: "EMAIL_VERIFICATION_NOT_FOUND";
+        };
+        UserNotFound: {
+            /** @constant */
+            code: "USER_NOT_FOUND";
+        };
+        TokenExpired: {
+            /** @constant */
+            code: "TOKEN_EXPIRED";
+        };
+        Transaction: {
+            id: string;
+            userId: string;
+            month: string;
+            name: string;
+            value: number;
+            /** @enum {string} */
+            type: "expense" | "income";
+            expenseCategory: ("need" | "want" | "investment") | null;
+            createdAt: string;
+            updatedAt: string;
+        };
+        Forbidden: {
+            /** @constant */
+            code: "FORBIDDEN";
+        };
+        TransactionNotFound: {
+            /** @constant */
+            code: "TRANSACTION_NOT_FOUND";
+        };
+    };
     responses: never;
     parameters: never;
     requestBodies: never;

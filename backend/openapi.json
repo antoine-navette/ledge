@@ -5,7 +5,278 @@
         "version": "1.0.0"
     },
     "components": {
-        "schemas": {}
+        "schemas": {
+            "User": {
+                "type": "object",
+                "properties": {
+                    "id": {
+                        "type": "string"
+                    },
+                    "email": {
+                        "type": "string"
+                    },
+                    "isEmailVerified": {
+                        "type": "boolean"
+                    },
+                    "createdAt": {
+                        "type": "string"
+                    },
+                    "updatedAt": {
+                        "type": "string"
+                    }
+                },
+                "required": [
+                    "id",
+                    "email",
+                    "isEmailVerified",
+                    "createdAt",
+                    "updatedAt"
+                ],
+                "additionalProperties": false
+            },
+            "BadRequest": {
+                "type": "object",
+                "properties": {
+                    "code": {
+                        "type": "string",
+                        "const": "BAD_REQUEST"
+                    }
+                },
+                "required": [
+                    "code"
+                ],
+                "additionalProperties": false
+            },
+            "DuplicateEmail": {
+                "type": "object",
+                "properties": {
+                    "code": {
+                        "type": "string",
+                        "const": "DUPLICATE_EMAIL"
+                    }
+                },
+                "required": [
+                    "code"
+                ],
+                "additionalProperties": false
+            },
+            "PayloadTooLarge": {
+                "type": "object",
+                "properties": {
+                    "code": {
+                        "type": "string",
+                        "const": "PAYLOAD_TOO_LARGE"
+                    }
+                },
+                "required": [
+                    "code"
+                ],
+                "additionalProperties": false
+            },
+            "TooManyRequests": {
+                "type": "object",
+                "properties": {
+                    "code": {
+                        "type": "string",
+                        "const": "TOO_MANY_REQUESTS"
+                    }
+                },
+                "required": [
+                    "code"
+                ],
+                "additionalProperties": false
+            },
+            "InternalServerError": {
+                "type": "object",
+                "properties": {
+                    "code": {
+                        "type": "string",
+                        "const": "INTERNAL_SERVER_ERROR"
+                    }
+                },
+                "required": [
+                    "code"
+                ],
+                "additionalProperties": false
+            },
+            "InvalidCredentials": {
+                "type": "object",
+                "properties": {
+                    "code": {
+                        "type": "string",
+                        "const": "INVALID_CREDENTIALS"
+                    }
+                },
+                "required": [
+                    "code"
+                ],
+                "additionalProperties": false
+            },
+            "Unauthorized": {
+                "type": "object",
+                "properties": {
+                    "code": {
+                        "type": "string",
+                        "const": "UNAUTHORIZED"
+                    }
+                },
+                "required": [
+                    "code"
+                ],
+                "additionalProperties": false
+            },
+            "ActiveCooldown": {
+                "type": "object",
+                "properties": {
+                    "code": {
+                        "type": "string",
+                        "const": "ACTIVE_COOLDOWN"
+                    }
+                },
+                "required": [
+                    "code"
+                ],
+                "additionalProperties": false
+            },
+            "EmailAlreadyVerified": {
+                "type": "object",
+                "properties": {
+                    "code": {
+                        "type": "string",
+                        "const": "EMAIL_ALREADY_VERIFIED"
+                    }
+                },
+                "required": [
+                    "code"
+                ],
+                "additionalProperties": false
+            },
+            "EmailVerificationNotFound": {
+                "type": "object",
+                "properties": {
+                    "code": {
+                        "type": "string",
+                        "const": "EMAIL_VERIFICATION_NOT_FOUND"
+                    }
+                },
+                "required": [
+                    "code"
+                ],
+                "additionalProperties": false
+            },
+            "UserNotFound": {
+                "type": "object",
+                "properties": {
+                    "code": {
+                        "type": "string",
+                        "const": "USER_NOT_FOUND"
+                    }
+                },
+                "required": [
+                    "code"
+                ],
+                "additionalProperties": false
+            },
+            "TokenExpired": {
+                "type": "object",
+                "properties": {
+                    "code": {
+                        "type": "string",
+                        "const": "TOKEN_EXPIRED"
+                    }
+                },
+                "required": [
+                    "code"
+                ],
+                "additionalProperties": false
+            },
+            "Transaction": {
+                "type": "object",
+                "properties": {
+                    "id": {
+                        "type": "string"
+                    },
+                    "userId": {
+                        "type": "string"
+                    },
+                    "month": {
+                        "type": "string"
+                    },
+                    "name": {
+                        "type": "string"
+                    },
+                    "value": {
+                        "type": "number"
+                    },
+                    "type": {
+                        "type": "string",
+                        "enum": [
+                            "expense",
+                            "income"
+                        ]
+                    },
+                    "expenseCategory": {
+                        "anyOf": [
+                            {
+                                "type": "string",
+                                "enum": [
+                                    "need",
+                                    "want",
+                                    "investment"
+                                ]
+                            },
+                            {
+                                "type": "null"
+                            }
+                        ]
+                    },
+                    "createdAt": {
+                        "type": "string"
+                    },
+                    "updatedAt": {
+                        "type": "string"
+                    }
+                },
+                "required": [
+                    "id",
+                    "userId",
+                    "month",
+                    "name",
+                    "value",
+                    "type",
+                    "expenseCategory",
+                    "createdAt",
+                    "updatedAt"
+                ],
+                "additionalProperties": false
+            },
+            "Forbidden": {
+                "type": "object",
+                "properties": {
+                    "code": {
+                        "type": "string",
+                        "const": "FORBIDDEN"
+                    }
+                },
+                "required": [
+                    "code"
+                ],
+                "additionalProperties": false
+            },
+            "TransactionNotFound": {
+                "type": "object",
+                "properties": {
+                    "code": {
+                        "type": "string",
+                        "const": "TRANSACTION_NOT_FOUND"
+                    }
+                },
+                "required": [
+                    "code"
+                ],
+                "additionalProperties": false
+            }
+        }
     },
     "paths": {
         "/auth/register": {
@@ -58,32 +329,7 @@
                         "content": {
                             "application/json": {
                                 "schema": {
-                                    "type": "object",
-                                    "properties": {
-                                        "id": {
-                                            "type": "string"
-                                        },
-                                        "email": {
-                                            "type": "string"
-                                        },
-                                        "isEmailVerified": {
-                                            "type": "boolean"
-                                        },
-                                        "createdAt": {
-                                            "type": "string"
-                                        },
-                                        "updatedAt": {
-                                            "type": "string"
-                                        }
-                                    },
-                                    "required": [
-                                        "id",
-                                        "email",
-                                        "isEmailVerified",
-                                        "createdAt",
-                                        "updatedAt"
-                                    ],
-                                    "additionalProperties": false
+                                    "$ref": "#/components/schemas/User"
                                 }
                             }
                         }
@@ -93,17 +339,7 @@
                         "content": {
                             "application/json": {
                                 "schema": {
-                                    "type": "object",
-                                    "properties": {
-                                        "code": {
-                                            "type": "string",
-                                            "const": "BAD_REQUEST"
-                                        }
-                                    },
-                                    "required": [
-                                        "code"
-                                    ],
-                                    "additionalProperties": false
+                                    "$ref": "#/components/schemas/BadRequest"
                                 }
                             }
                         }
@@ -113,17 +349,7 @@
                         "content": {
                             "application/json": {
                                 "schema": {
-                                    "type": "object",
-                                    "properties": {
-                                        "code": {
-                                            "type": "string",
-                                            "const": "DUPLICATE_EMAIL"
-                                        }
-                                    },
-                                    "required": [
-                                        "code"
-                                    ],
-                                    "additionalProperties": false
+                                    "$ref": "#/components/schemas/DuplicateEmail"
                                 }
                             }
                         }
@@ -133,17 +359,7 @@
                         "content": {
                             "application/json": {
                                 "schema": {
-                                    "type": "object",
-                                    "properties": {
-                                        "code": {
-                                            "type": "string",
-                                            "const": "PAYLOAD_TOO_LARGE"
-                                        }
-                                    },
-                                    "required": [
-                                        "code"
-                                    ],
-                                    "additionalProperties": false
+                                    "$ref": "#/components/schemas/PayloadTooLarge"
                                 }
                             }
                         }
@@ -153,17 +369,7 @@
                         "content": {
                             "application/json": {
                                 "schema": {
-                                    "type": "object",
-                                    "properties": {
-                                        "code": {
-                                            "type": "string",
-                                            "const": "TOO_MANY_REQUESTS"
-                                        }
-                                    },
-                                    "required": [
-                                        "code"
-                                    ],
-                                    "additionalProperties": false
+                                    "$ref": "#/components/schemas/TooManyRequests"
                                 }
                             }
                         }
@@ -173,17 +379,7 @@
                         "content": {
                             "application/json": {
                                 "schema": {
-                                    "type": "object",
-                                    "properties": {
-                                        "code": {
-                                            "type": "string",
-                                            "const": "INTERNAL_SERVER_ERROR"
-                                        }
-                                    },
-                                    "required": [
-                                        "code"
-                                    ],
-                                    "additionalProperties": false
+                                    "$ref": "#/components/schemas/InternalServerError"
                                 }
                             }
                         }
@@ -227,32 +423,7 @@
                         "content": {
                             "application/json": {
                                 "schema": {
-                                    "type": "object",
-                                    "properties": {
-                                        "id": {
-                                            "type": "string"
-                                        },
-                                        "email": {
-                                            "type": "string"
-                                        },
-                                        "isEmailVerified": {
-                                            "type": "boolean"
-                                        },
-                                        "createdAt": {
-                                            "type": "string"
-                                        },
-                                        "updatedAt": {
-                                            "type": "string"
-                                        }
-                                    },
-                                    "required": [
-                                        "id",
-                                        "email",
-                                        "isEmailVerified",
-                                        "createdAt",
-                                        "updatedAt"
-                                    ],
-                                    "additionalProperties": false
+                                    "$ref": "#/components/schemas/User"
                                 }
                             }
                         }
@@ -262,17 +433,7 @@
                         "content": {
                             "application/json": {
                                 "schema": {
-                                    "type": "object",
-                                    "properties": {
-                                        "code": {
-                                            "type": "string",
-                                            "const": "BAD_REQUEST"
-                                        }
-                                    },
-                                    "required": [
-                                        "code"
-                                    ],
-                                    "additionalProperties": false
+                                    "$ref": "#/components/schemas/BadRequest"
                                 }
                             }
                         }
@@ -282,17 +443,7 @@
                         "content": {
                             "application/json": {
                                 "schema": {
-                                    "type": "object",
-                                    "properties": {
-                                        "code": {
-                                            "type": "string",
-                                            "const": "INVALID_CREDENTIALS"
-                                        }
-                                    },
-                                    "required": [
-                                        "code"
-                                    ],
-                                    "additionalProperties": false
+                                    "$ref": "#/components/schemas/InvalidCredentials"
                                 }
                             }
                         }
@@ -302,17 +453,7 @@
                         "content": {
                             "application/json": {
                                 "schema": {
-                                    "type": "object",
-                                    "properties": {
-                                        "code": {
-                                            "type": "string",
-                                            "const": "PAYLOAD_TOO_LARGE"
-                                        }
-                                    },
-                                    "required": [
-                                        "code"
-                                    ],
-                                    "additionalProperties": false
+                                    "$ref": "#/components/schemas/PayloadTooLarge"
                                 }
                             }
                         }
@@ -322,17 +463,7 @@
                         "content": {
                             "application/json": {
                                 "schema": {
-                                    "type": "object",
-                                    "properties": {
-                                        "code": {
-                                            "type": "string",
-                                            "const": "TOO_MANY_REQUESTS"
-                                        }
-                                    },
-                                    "required": [
-                                        "code"
-                                    ],
-                                    "additionalProperties": false
+                                    "$ref": "#/components/schemas/TooManyRequests"
                                 }
                             }
                         }
@@ -342,17 +473,7 @@
                         "content": {
                             "application/json": {
                                 "schema": {
-                                    "type": "object",
-                                    "properties": {
-                                        "code": {
-                                            "type": "string",
-                                            "const": "INTERNAL_SERVER_ERROR"
-                                        }
-                                    },
-                                    "required": [
-                                        "code"
-                                    ],
-                                    "additionalProperties": false
+                                    "$ref": "#/components/schemas/InternalServerError"
                                 }
                             }
                         }
@@ -374,17 +495,7 @@
                         "content": {
                             "application/json": {
                                 "schema": {
-                                    "type": "object",
-                                    "properties": {
-                                        "code": {
-                                            "type": "string",
-                                            "const": "BAD_REQUEST"
-                                        }
-                                    },
-                                    "required": [
-                                        "code"
-                                    ],
-                                    "additionalProperties": false
+                                    "$ref": "#/components/schemas/BadRequest"
                                 }
                             }
                         }
@@ -394,17 +505,7 @@
                         "content": {
                             "application/json": {
                                 "schema": {
-                                    "type": "object",
-                                    "properties": {
-                                        "code": {
-                                            "type": "string",
-                                            "const": "UNAUTHORIZED"
-                                        }
-                                    },
-                                    "required": [
-                                        "code"
-                                    ],
-                                    "additionalProperties": false
+                                    "$ref": "#/components/schemas/Unauthorized"
                                 }
                             }
                         }
@@ -414,17 +515,7 @@
                         "content": {
                             "application/json": {
                                 "schema": {
-                                    "type": "object",
-                                    "properties": {
-                                        "code": {
-                                            "type": "string",
-                                            "const": "PAYLOAD_TOO_LARGE"
-                                        }
-                                    },
-                                    "required": [
-                                        "code"
-                                    ],
-                                    "additionalProperties": false
+                                    "$ref": "#/components/schemas/PayloadTooLarge"
                                 }
                             }
                         }
@@ -434,17 +525,7 @@
                         "content": {
                             "application/json": {
                                 "schema": {
-                                    "type": "object",
-                                    "properties": {
-                                        "code": {
-                                            "type": "string",
-                                            "const": "TOO_MANY_REQUESTS"
-                                        }
-                                    },
-                                    "required": [
-                                        "code"
-                                    ],
-                                    "additionalProperties": false
+                                    "$ref": "#/components/schemas/TooManyRequests"
                                 }
                             }
                         }
@@ -454,17 +535,7 @@
                         "content": {
                             "application/json": {
                                 "schema": {
-                                    "type": "object",
-                                    "properties": {
-                                        "code": {
-                                            "type": "string",
-                                            "const": "INTERNAL_SERVER_ERROR"
-                                        }
-                                    },
-                                    "required": [
-                                        "code"
-                                    ],
-                                    "additionalProperties": false
+                                    "$ref": "#/components/schemas/InternalServerError"
                                 }
                             }
                         }
@@ -483,32 +554,7 @@
                         "content": {
                             "application/json": {
                                 "schema": {
-                                    "type": "object",
-                                    "properties": {
-                                        "id": {
-                                            "type": "string"
-                                        },
-                                        "email": {
-                                            "type": "string"
-                                        },
-                                        "isEmailVerified": {
-                                            "type": "boolean"
-                                        },
-                                        "createdAt": {
-                                            "type": "string"
-                                        },
-                                        "updatedAt": {
-                                            "type": "string"
-                                        }
-                                    },
-                                    "required": [
-                                        "id",
-                                        "email",
-                                        "isEmailVerified",
-                                        "createdAt",
-                                        "updatedAt"
-                                    ],
-                                    "additionalProperties": false
+                                    "$ref": "#/components/schemas/User"
                                 }
                             }
                         }
@@ -518,17 +564,7 @@
                         "content": {
                             "application/json": {
                                 "schema": {
-                                    "type": "object",
-                                    "properties": {
-                                        "code": {
-                                            "type": "string",
-                                            "const": "UNAUTHORIZED"
-                                        }
-                                    },
-                                    "required": [
-                                        "code"
-                                    ],
-                                    "additionalProperties": false
+                                    "$ref": "#/components/schemas/Unauthorized"
                                 }
                             }
                         }
@@ -538,17 +574,7 @@
                         "content": {
                             "application/json": {
                                 "schema": {
-                                    "type": "object",
-                                    "properties": {
-                                        "code": {
-                                            "type": "string",
-                                            "const": "TOO_MANY_REQUESTS"
-                                        }
-                                    },
-                                    "required": [
-                                        "code"
-                                    ],
-                                    "additionalProperties": false
+                                    "$ref": "#/components/schemas/TooManyRequests"
                                 }
                             }
                         }
@@ -558,17 +584,7 @@
                         "content": {
                             "application/json": {
                                 "schema": {
-                                    "type": "object",
-                                    "properties": {
-                                        "code": {
-                                            "type": "string",
-                                            "const": "INTERNAL_SERVER_ERROR"
-                                        }
-                                    },
-                                    "required": [
-                                        "code"
-                                    ],
-                                    "additionalProperties": false
+                                    "$ref": "#/components/schemas/InternalServerError"
                                 }
                             }
                         }
@@ -590,17 +606,7 @@
                         "content": {
                             "application/json": {
                                 "schema": {
-                                    "type": "object",
-                                    "properties": {
-                                        "code": {
-                                            "type": "string",
-                                            "const": "BAD_REQUEST"
-                                        }
-                                    },
-                                    "required": [
-                                        "code"
-                                    ],
-                                    "additionalProperties": false
+                                    "$ref": "#/components/schemas/BadRequest"
                                 }
                             }
                         }
@@ -610,17 +616,7 @@
                         "content": {
                             "application/json": {
                                 "schema": {
-                                    "type": "object",
-                                    "properties": {
-                                        "code": {
-                                            "type": "string",
-                                            "const": "UNAUTHORIZED"
-                                        }
-                                    },
-                                    "required": [
-                                        "code"
-                                    ],
-                                    "additionalProperties": false
+                                    "$ref": "#/components/schemas/Unauthorized"
                                 }
                             }
                         }
@@ -632,30 +628,10 @@
                                 "schema": {
                                     "anyOf": [
                                         {
-                                            "type": "object",
-                                            "properties": {
-                                                "code": {
-                                                    "type": "string",
-                                                    "const": "ACTIVE_COOLDOWN"
-                                                }
-                                            },
-                                            "required": [
-                                                "code"
-                                            ],
-                                            "additionalProperties": false
+                                            "$ref": "#/components/schemas/ActiveCooldown"
                                         },
                                         {
-                                            "type": "object",
-                                            "properties": {
-                                                "code": {
-                                                    "type": "string",
-                                                    "const": "EMAIL_ALREADY_VERIFIED"
-                                                }
-                                            },
-                                            "required": [
-                                                "code"
-                                            ],
-                                            "additionalProperties": false
+                                            "$ref": "#/components/schemas/EmailAlreadyVerified"
                                         }
                                     ]
                                 }
@@ -667,17 +643,7 @@
                         "content": {
                             "application/json": {
                                 "schema": {
-                                    "type": "object",
-                                    "properties": {
-                                        "code": {
-                                            "type": "string",
-                                            "const": "PAYLOAD_TOO_LARGE"
-                                        }
-                                    },
-                                    "required": [
-                                        "code"
-                                    ],
-                                    "additionalProperties": false
+                                    "$ref": "#/components/schemas/PayloadTooLarge"
                                 }
                             }
                         }
@@ -687,17 +653,7 @@
                         "content": {
                             "application/json": {
                                 "schema": {
-                                    "type": "object",
-                                    "properties": {
-                                        "code": {
-                                            "type": "string",
-                                            "const": "TOO_MANY_REQUESTS"
-                                        }
-                                    },
-                                    "required": [
-                                        "code"
-                                    ],
-                                    "additionalProperties": false
+                                    "$ref": "#/components/schemas/TooManyRequests"
                                 }
                             }
                         }
@@ -707,17 +663,7 @@
                         "content": {
                             "application/json": {
                                 "schema": {
-                                    "type": "object",
-                                    "properties": {
-                                        "code": {
-                                            "type": "string",
-                                            "const": "INTERNAL_SERVER_ERROR"
-                                        }
-                                    },
-                                    "required": [
-                                        "code"
-                                    ],
-                                    "additionalProperties": false
+                                    "$ref": "#/components/schemas/InternalServerError"
                                 }
                             }
                         }
@@ -749,17 +695,7 @@
                         "content": {
                             "application/json": {
                                 "schema": {
-                                    "type": "object",
-                                    "properties": {
-                                        "code": {
-                                            "type": "string",
-                                            "const": "BAD_REQUEST"
-                                        }
-                                    },
-                                    "required": [
-                                        "code"
-                                    ],
-                                    "additionalProperties": false
+                                    "$ref": "#/components/schemas/BadRequest"
                                 }
                             }
                         }
@@ -771,30 +707,10 @@
                                 "schema": {
                                     "anyOf": [
                                         {
-                                            "type": "object",
-                                            "properties": {
-                                                "code": {
-                                                    "type": "string",
-                                                    "const": "EMAIL_VERIFICATION_NOT_FOUND"
-                                                }
-                                            },
-                                            "required": [
-                                                "code"
-                                            ],
-                                            "additionalProperties": false
+                                            "$ref": "#/components/schemas/EmailVerificationNotFound"
                                         },
                                         {
-                                            "type": "object",
-                                            "properties": {
-                                                "code": {
-                                                    "type": "string",
-                                                    "const": "USER_NOT_FOUND"
-                                                }
-                                            },
-                                            "required": [
-                                                "code"
-                                            ],
-                                            "additionalProperties": false
+                                            "$ref": "#/components/schemas/UserNotFound"
                                         }
                                     ]
                                 }
@@ -806,17 +722,7 @@
                         "content": {
                             "application/json": {
                                 "schema": {
-                                    "type": "object",
-                                    "properties": {
-                                        "code": {
-                                            "type": "string",
-                                            "const": "EMAIL_ALREADY_VERIFIED"
-                                        }
-                                    },
-                                    "required": [
-                                        "code"
-                                    ],
-                                    "additionalProperties": false
+                                    "$ref": "#/components/schemas/EmailAlreadyVerified"
                                 }
                             }
                         }
@@ -826,17 +732,7 @@
                         "content": {
                             "application/json": {
                                 "schema": {
-                                    "type": "object",
-                                    "properties": {
-                                        "code": {
-                                            "type": "string",
-                                            "const": "TOKEN_EXPIRED"
-                                        }
-                                    },
-                                    "required": [
-                                        "code"
-                                    ],
-                                    "additionalProperties": false
+                                    "$ref": "#/components/schemas/TokenExpired"
                                 }
                             }
                         }
@@ -846,17 +742,7 @@
                         "content": {
                             "application/json": {
                                 "schema": {
-                                    "type": "object",
-                                    "properties": {
-                                        "code": {
-                                            "type": "string",
-                                            "const": "PAYLOAD_TOO_LARGE"
-                                        }
-                                    },
-                                    "required": [
-                                        "code"
-                                    ],
-                                    "additionalProperties": false
+                                    "$ref": "#/components/schemas/PayloadTooLarge"
                                 }
                             }
                         }
@@ -866,17 +752,7 @@
                         "content": {
                             "application/json": {
                                 "schema": {
-                                    "type": "object",
-                                    "properties": {
-                                        "code": {
-                                            "type": "string",
-                                            "const": "TOO_MANY_REQUESTS"
-                                        }
-                                    },
-                                    "required": [
-                                        "code"
-                                    ],
-                                    "additionalProperties": false
+                                    "$ref": "#/components/schemas/TooManyRequests"
                                 }
                             }
                         }
@@ -886,17 +762,7 @@
                         "content": {
                             "application/json": {
                                 "schema": {
-                                    "type": "object",
-                                    "properties": {
-                                        "code": {
-                                            "type": "string",
-                                            "const": "INTERNAL_SERVER_ERROR"
-                                        }
-                                    },
-                                    "required": [
-                                        "code"
-                                    ],
-                                    "additionalProperties": false
+                                    "$ref": "#/components/schemas/InternalServerError"
                                 }
                             }
                         }
@@ -1005,64 +871,7 @@
                         "content": {
                             "application/json": {
                                 "schema": {
-                                    "type": "object",
-                                    "properties": {
-                                        "id": {
-                                            "type": "string"
-                                        },
-                                        "userId": {
-                                            "type": "string"
-                                        },
-                                        "month": {
-                                            "type": "string"
-                                        },
-                                        "name": {
-                                            "type": "string"
-                                        },
-                                        "value": {
-                                            "type": "number"
-                                        },
-                                        "type": {
-                                            "type": "string",
-                                            "enum": [
-                                                "expense",
-                                                "income"
-                                            ]
-                                        },
-                                        "expenseCategory": {
-                                            "anyOf": [
-                                                {
-                                                    "type": "string",
-                                                    "enum": [
-                                                        "need",
-                                                        "want",
-                                                        "investment"
-                                                    ]
-                                                },
-                                                {
-                                                    "type": "null"
-                                                }
-                                            ]
-                                        },
-                                        "createdAt": {
-                                            "type": "string"
-                                        },
-                                        "updatedAt": {
-                                            "type": "string"
-                                        }
-                                    },
-                                    "required": [
-                                        "id",
-                                        "userId",
-                                        "month",
-                                        "name",
-                                        "value",
-                                        "type",
-                                        "expenseCategory",
-                                        "createdAt",
-                                        "updatedAt"
-                                    ],
-                                    "additionalProperties": false
+                                    "$ref": "#/components/schemas/Transaction"
                                 }
                             }
                         }
@@ -1072,17 +881,7 @@
                         "content": {
                             "application/json": {
                                 "schema": {
-                                    "type": "object",
-                                    "properties": {
-                                        "code": {
-                                            "type": "string",
-                                            "const": "BAD_REQUEST"
-                                        }
-                                    },
-                                    "required": [
-                                        "code"
-                                    ],
-                                    "additionalProperties": false
+                                    "$ref": "#/components/schemas/BadRequest"
                                 }
                             }
                         }
@@ -1092,17 +891,7 @@
                         "content": {
                             "application/json": {
                                 "schema": {
-                                    "type": "object",
-                                    "properties": {
-                                        "code": {
-                                            "type": "string",
-                                            "const": "UNAUTHORIZED"
-                                        }
-                                    },
-                                    "required": [
-                                        "code"
-                                    ],
-                                    "additionalProperties": false
+                                    "$ref": "#/components/schemas/Unauthorized"
                                 }
                             }
                         }
@@ -1112,17 +901,7 @@
                         "content": {
                             "application/json": {
                                 "schema": {
-                                    "type": "object",
-                                    "properties": {
-                                        "code": {
-                                            "type": "string",
-                                            "const": "PAYLOAD_TOO_LARGE"
-                                        }
-                                    },
-                                    "required": [
-                                        "code"
-                                    ],
-                                    "additionalProperties": false
+                                    "$ref": "#/components/schemas/PayloadTooLarge"
                                 }
                             }
                         }
@@ -1132,17 +911,7 @@
                         "content": {
                             "application/json": {
                                 "schema": {
-                                    "type": "object",
-                                    "properties": {
-                                        "code": {
-                                            "type": "string",
-                                            "const": "TOO_MANY_REQUESTS"
-                                        }
-                                    },
-                                    "required": [
-                                        "code"
-                                    ],
-                                    "additionalProperties": false
+                                    "$ref": "#/components/schemas/TooManyRequests"
                                 }
                             }
                         }
@@ -1152,17 +921,7 @@
                         "content": {
                             "application/json": {
                                 "schema": {
-                                    "type": "object",
-                                    "properties": {
-                                        "code": {
-                                            "type": "string",
-                                            "const": "INTERNAL_SERVER_ERROR"
-                                        }
-                                    },
-                                    "required": [
-                                        "code"
-                                    ],
-                                    "additionalProperties": false
+                                    "$ref": "#/components/schemas/InternalServerError"
                                 }
                             }
                         }
@@ -1181,64 +940,7 @@
                                 "schema": {
                                     "type": "array",
                                     "items": {
-                                        "type": "object",
-                                        "properties": {
-                                            "id": {
-                                                "type": "string"
-                                            },
-                                            "userId": {
-                                                "type": "string"
-                                            },
-                                            "month": {
-                                                "type": "string"
-                                            },
-                                            "name": {
-                                                "type": "string"
-                                            },
-                                            "value": {
-                                                "type": "number"
-                                            },
-                                            "type": {
-                                                "type": "string",
-                                                "enum": [
-                                                    "expense",
-                                                    "income"
-                                                ]
-                                            },
-                                            "expenseCategory": {
-                                                "anyOf": [
-                                                    {
-                                                        "type": "string",
-                                                        "enum": [
-                                                            "need",
-                                                            "want",
-                                                            "investment"
-                                                        ]
-                                                    },
-                                                    {
-                                                        "type": "null"
-                                                    }
-                                                ]
-                                            },
-                                            "createdAt": {
-                                                "type": "string"
-                                            },
-                                            "updatedAt": {
-                                                "type": "string"
-                                            }
-                                        },
-                                        "required": [
-                                            "id",
-                                            "userId",
-                                            "month",
-                                            "name",
-                                            "value",
-                                            "type",
-                                            "expenseCategory",
-                                            "createdAt",
-                                            "updatedAt"
-                                        ],
-                                        "additionalProperties": false
+                                        "$ref": "#/components/schemas/Transaction"
                                     }
                                 }
                             }
@@ -1249,17 +951,7 @@
                         "content": {
                             "application/json": {
                                 "schema": {
-                                    "type": "object",
-                                    "properties": {
-                                        "code": {
-                                            "type": "string",
-                                            "const": "UNAUTHORIZED"
-                                        }
-                                    },
-                                    "required": [
-                                        "code"
-                                    ],
-                                    "additionalProperties": false
+                                    "$ref": "#/components/schemas/Unauthorized"
                                 }
                             }
                         }
@@ -1269,17 +961,7 @@
                         "content": {
                             "application/json": {
                                 "schema": {
-                                    "type": "object",
-                                    "properties": {
-                                        "code": {
-                                            "type": "string",
-                                            "const": "TOO_MANY_REQUESTS"
-                                        }
-                                    },
-                                    "required": [
-                                        "code"
-                                    ],
-                                    "additionalProperties": false
+                                    "$ref": "#/components/schemas/TooManyRequests"
                                 }
                             }
                         }
@@ -1289,17 +971,7 @@
                         "content": {
                             "application/json": {
                                 "schema": {
-                                    "type": "object",
-                                    "properties": {
-                                        "code": {
-                                            "type": "string",
-                                            "const": "INTERNAL_SERVER_ERROR"
-                                        }
-                                    },
-                                    "required": [
-                                        "code"
-                                    ],
-                                    "additionalProperties": false
+                                    "$ref": "#/components/schemas/InternalServerError"
                                 }
                             }
                         }
@@ -1330,64 +1002,7 @@
                         "content": {
                             "application/json": {
                                 "schema": {
-                                    "type": "object",
-                                    "properties": {
-                                        "id": {
-                                            "type": "string"
-                                        },
-                                        "userId": {
-                                            "type": "string"
-                                        },
-                                        "month": {
-                                            "type": "string"
-                                        },
-                                        "name": {
-                                            "type": "string"
-                                        },
-                                        "value": {
-                                            "type": "number"
-                                        },
-                                        "type": {
-                                            "type": "string",
-                                            "enum": [
-                                                "expense",
-                                                "income"
-                                            ]
-                                        },
-                                        "expenseCategory": {
-                                            "anyOf": [
-                                                {
-                                                    "type": "string",
-                                                    "enum": [
-                                                        "need",
-                                                        "want",
-                                                        "investment"
-                                                    ]
-                                                },
-                                                {
-                                                    "type": "null"
-                                                }
-                                            ]
-                                        },
-                                        "createdAt": {
-                                            "type": "string"
-                                        },
-                                        "updatedAt": {
-                                            "type": "string"
-                                        }
-                                    },
-                                    "required": [
-                                        "id",
-                                        "userId",
-                                        "month",
-                                        "name",
-                                        "value",
-                                        "type",
-                                        "expenseCategory",
-                                        "createdAt",
-                                        "updatedAt"
-                                    ],
-                                    "additionalProperties": false
+                                    "$ref": "#/components/schemas/Transaction"
                                 }
                             }
                         }
@@ -1397,17 +1012,7 @@
                         "content": {
                             "application/json": {
                                 "schema": {
-                                    "type": "object",
-                                    "properties": {
-                                        "code": {
-                                            "type": "string",
-                                            "const": "BAD_REQUEST"
-                                        }
-                                    },
-                                    "required": [
-                                        "code"
-                                    ],
-                                    "additionalProperties": false
+                                    "$ref": "#/components/schemas/BadRequest"
                                 }
                             }
                         }
@@ -1417,17 +1022,7 @@
                         "content": {
                             "application/json": {
                                 "schema": {
-                                    "type": "object",
-                                    "properties": {
-                                        "code": {
-                                            "type": "string",
-                                            "const": "UNAUTHORIZED"
-                                        }
-                                    },
-                                    "required": [
-                                        "code"
-                                    ],
-                                    "additionalProperties": false
+                                    "$ref": "#/components/schemas/Unauthorized"
                                 }
                             }
                         }
@@ -1437,17 +1032,7 @@
                         "content": {
                             "application/json": {
                                 "schema": {
-                                    "type": "object",
-                                    "properties": {
-                                        "code": {
-                                            "type": "string",
-                                            "const": "FORBIDDEN"
-                                        }
-                                    },
-                                    "required": [
-                                        "code"
-                                    ],
-                                    "additionalProperties": false
+                                    "$ref": "#/components/schemas/Forbidden"
                                 }
                             }
                         }
@@ -1457,17 +1042,7 @@
                         "content": {
                             "application/json": {
                                 "schema": {
-                                    "type": "object",
-                                    "properties": {
-                                        "code": {
-                                            "type": "string",
-                                            "const": "TRANSACTION_NOT_FOUND"
-                                        }
-                                    },
-                                    "required": [
-                                        "code"
-                                    ],
-                                    "additionalProperties": false
+                                    "$ref": "#/components/schemas/TransactionNotFound"
                                 }
                             }
                         }
@@ -1477,17 +1052,7 @@
                         "content": {
                             "application/json": {
                                 "schema": {
-                                    "type": "object",
-                                    "properties": {
-                                        "code": {
-                                            "type": "string",
-                                            "const": "TOO_MANY_REQUESTS"
-                                        }
-                                    },
-                                    "required": [
-                                        "code"
-                                    ],
-                                    "additionalProperties": false
+                                    "$ref": "#/components/schemas/TooManyRequests"
                                 }
                             }
                         }
@@ -1497,17 +1062,7 @@
                         "content": {
                             "application/json": {
                                 "schema": {
-                                    "type": "object",
-                                    "properties": {
-                                        "code": {
-                                            "type": "string",
-                                            "const": "INTERNAL_SERVER_ERROR"
-                                        }
-                                    },
-                                    "required": [
-                                        "code"
-                                    ],
-                                    "additionalProperties": false
+                                    "$ref": "#/components/schemas/InternalServerError"
                                 }
                             }
                         }
@@ -1616,64 +1171,7 @@
                         "content": {
                             "application/json": {
                                 "schema": {
-                                    "type": "object",
-                                    "properties": {
-                                        "id": {
-                                            "type": "string"
-                                        },
-                                        "userId": {
-                                            "type": "string"
-                                        },
-                                        "month": {
-                                            "type": "string"
-                                        },
-                                        "name": {
-                                            "type": "string"
-                                        },
-                                        "value": {
-                                            "type": "number"
-                                        },
-                                        "type": {
-                                            "type": "string",
-                                            "enum": [
-                                                "expense",
-                                                "income"
-                                            ]
-                                        },
-                                        "expenseCategory": {
-                                            "anyOf": [
-                                                {
-                                                    "type": "string",
-                                                    "enum": [
-                                                        "need",
-                                                        "want",
-                                                        "investment"
-                                                    ]
-                                                },
-                                                {
-                                                    "type": "null"
-                                                }
-                                            ]
-                                        },
-                                        "createdAt": {
-                                            "type": "string"
-                                        },
-                                        "updatedAt": {
-                                            "type": "string"
-                                        }
-                                    },
-                                    "required": [
-                                        "id",
-                                        "userId",
-                                        "month",
-                                        "name",
-                                        "value",
-                                        "type",
-                                        "expenseCategory",
-                                        "createdAt",
-                                        "updatedAt"
-                                    ],
-                                    "additionalProperties": false
+                                    "$ref": "#/components/schemas/Transaction"
                                 }
                             }
                         }
@@ -1683,17 +1181,7 @@
                         "content": {
                             "application/json": {
                                 "schema": {
-                                    "type": "object",
-                                    "properties": {
-                                        "code": {
-                                            "type": "string",
-                                            "const": "BAD_REQUEST"
-                                        }
-                                    },
-                                    "required": [
-                                        "code"
-                                    ],
-                                    "additionalProperties": false
+                                    "$ref": "#/components/schemas/BadRequest"
                                 }
                             }
                         }
@@ -1703,17 +1191,7 @@
                         "content": {
                             "application/json": {
                                 "schema": {
-                                    "type": "object",
-                                    "properties": {
-                                        "code": {
-                                            "type": "string",
-                                            "const": "UNAUTHORIZED"
-                                        }
-                                    },
-                                    "required": [
-                                        "code"
-                                    ],
-                                    "additionalProperties": false
+                                    "$ref": "#/components/schemas/Unauthorized"
                                 }
                             }
                         }
@@ -1723,17 +1201,7 @@
                         "content": {
                             "application/json": {
                                 "schema": {
-                                    "type": "object",
-                                    "properties": {
-                                        "code": {
-                                            "type": "string",
-                                            "const": "FORBIDDEN"
-                                        }
-                                    },
-                                    "required": [
-                                        "code"
-                                    ],
-                                    "additionalProperties": false
+                                    "$ref": "#/components/schemas/Forbidden"
                                 }
                             }
                         }
@@ -1743,17 +1211,7 @@
                         "content": {
                             "application/json": {
                                 "schema": {
-                                    "type": "object",
-                                    "properties": {
-                                        "code": {
-                                            "type": "string",
-                                            "const": "TRANSACTION_NOT_FOUND"
-                                        }
-                                    },
-                                    "required": [
-                                        "code"
-                                    ],
-                                    "additionalProperties": false
+                                    "$ref": "#/components/schemas/TransactionNotFound"
                                 }
                             }
                         }
@@ -1763,17 +1221,7 @@
                         "content": {
                             "application/json": {
                                 "schema": {
-                                    "type": "object",
-                                    "properties": {
-                                        "code": {
-                                            "type": "string",
-                                            "const": "PAYLOAD_TOO_LARGE"
-                                        }
-                                    },
-                                    "required": [
-                                        "code"
-                                    ],
-                                    "additionalProperties": false
+                                    "$ref": "#/components/schemas/PayloadTooLarge"
                                 }
                             }
                         }
@@ -1783,17 +1231,7 @@
                         "content": {
                             "application/json": {
                                 "schema": {
-                                    "type": "object",
-                                    "properties": {
-                                        "code": {
-                                            "type": "string",
-                                            "const": "TOO_MANY_REQUESTS"
-                                        }
-                                    },
-                                    "required": [
-                                        "code"
-                                    ],
-                                    "additionalProperties": false
+                                    "$ref": "#/components/schemas/TooManyRequests"
                                 }
                             }
                         }
@@ -1803,17 +1241,7 @@
                         "content": {
                             "application/json": {
                                 "schema": {
-                                    "type": "object",
-                                    "properties": {
-                                        "code": {
-                                            "type": "string",
-                                            "const": "INTERNAL_SERVER_ERROR"
-                                        }
-                                    },
-                                    "required": [
-                                        "code"
-                                    ],
-                                    "additionalProperties": false
+                                    "$ref": "#/components/schemas/InternalServerError"
                                 }
                             }
                         }
@@ -1845,17 +1273,7 @@
                         "content": {
                             "application/json": {
                                 "schema": {
-                                    "type": "object",
-                                    "properties": {
-                                        "code": {
-                                            "type": "string",
-                                            "const": "BAD_REQUEST"
-                                        }
-                                    },
-                                    "required": [
-                                        "code"
-                                    ],
-                                    "additionalProperties": false
+                                    "$ref": "#/components/schemas/BadRequest"
                                 }
                             }
                         }
@@ -1865,17 +1283,7 @@
                         "content": {
                             "application/json": {
                                 "schema": {
-                                    "type": "object",
-                                    "properties": {
-                                        "code": {
-                                            "type": "string",
-                                            "const": "UNAUTHORIZED"
-                                        }
-                                    },
-                                    "required": [
-                                        "code"
-                                    ],
-                                    "additionalProperties": false
+                                    "$ref": "#/components/schemas/Unauthorized"
                                 }
                             }
                         }
@@ -1885,17 +1293,7 @@
                         "content": {
                             "application/json": {
                                 "schema": {
-                                    "type": "object",
-                                    "properties": {
-                                        "code": {
-                                            "type": "string",
-                                            "const": "FORBIDDEN"
-                                        }
-                                    },
-                                    "required": [
-                                        "code"
-                                    ],
-                                    "additionalProperties": false
+                                    "$ref": "#/components/schemas/Forbidden"
                                 }
                             }
                         }
@@ -1905,17 +1303,7 @@
                         "content": {
                             "application/json": {
                                 "schema": {
-                                    "type": "object",
-                                    "properties": {
-                                        "code": {
-                                            "type": "string",
-                                            "const": "TRANSACTION_NOT_FOUND"
-                                        }
-                                    },
-                                    "required": [
-                                        "code"
-                                    ],
-                                    "additionalProperties": false
+                                    "$ref": "#/components/schemas/TransactionNotFound"
                                 }
                             }
                         }
@@ -1925,17 +1313,7 @@
                         "content": {
                             "application/json": {
                                 "schema": {
-                                    "type": "object",
-                                    "properties": {
-                                        "code": {
-                                            "type": "string",
-                                            "const": "PAYLOAD_TOO_LARGE"
-                                        }
-                                    },
-                                    "required": [
-                                        "code"
-                                    ],
-                                    "additionalProperties": false
+                                    "$ref": "#/components/schemas/PayloadTooLarge"
                                 }
                             }
                         }
@@ -1945,17 +1323,7 @@
                         "content": {
                             "application/json": {
                                 "schema": {
-                                    "type": "object",
-                                    "properties": {
-                                        "code": {
-                                            "type": "string",
-                                            "const": "TOO_MANY_REQUESTS"
-                                        }
-                                    },
-                                    "required": [
-                                        "code"
-                                    ],
-                                    "additionalProperties": false
+                                    "$ref": "#/components/schemas/TooManyRequests"
                                 }
                             }
                         }
@@ -1965,17 +1333,7 @@
                         "content": {
                             "application/json": {
                                 "schema": {
-                                    "type": "object",
-                                    "properties": {
-                                        "code": {
-                                            "type": "string",
-                                            "const": "INTERNAL_SERVER_ERROR"
-                                        }
-                                    },
-                                    "required": [
-                                        "code"
-                                    ],
-                                    "additionalProperties": false
+                                    "$ref": "#/components/schemas/InternalServerError"
                                 }
                             }
                         }

@@ -1,7 +1,9 @@
 import z from 'zod';
 
-export const internalServerErrorSchema = z.object({
-    code: z.literal('INTERNAL_SERVER_ERROR'),
-});
+export const internalServerErrorSchema = z
+    .object({
+        code: z.literal('INTERNAL_SERVER_ERROR'),
+    })
+    .meta({ id: 'InternalServerError' });
 
 export type InternalServerErrorSchema = z.output<typeof internalServerErrorSchema>;
