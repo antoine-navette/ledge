@@ -573,16 +573,10 @@ export interface paths {
                         month: string;
                         name: string;
                         value: number;
-                        /** @constant */
-                        type: "expense";
-                        expenseCategory: ("need" | "want" | "investment") | null;
-                    } | {
-                        month: string;
-                        name: string;
-                        value: number;
-                        /** @constant */
-                        type: "income";
-                        expenseCategory: null;
+                        /** @enum {string} */
+                        type: "expense" | "income";
+                        /** @enum {string} */
+                        expenseCategory?: "need" | "want" | "investment";
                     };
                 };
             };
@@ -746,15 +740,10 @@ export interface paths {
                     "application/json": {
                         name: string;
                         value: number;
-                        /** @constant */
-                        type: "expense";
-                        expenseCategory: ("need" | "want" | "investment") | null;
-                    } | {
-                        name: string;
-                        value: number;
-                        /** @constant */
-                        type: "income";
-                        expenseCategory: null;
+                        /** @enum {string} */
+                        type: "expense" | "income";
+                        /** @enum {string} */
+                        expenseCategory?: "need" | "want" | "investment";
                     };
                 };
             };
@@ -989,7 +978,8 @@ export interface components {
             value: number;
             /** @enum {string} */
             type: "expense" | "income";
-            expenseCategory: ("need" | "want" | "investment") | null;
+            /** @enum {string} */
+            expenseCategory?: "need" | "want" | "investment";
             createdAt: string;
             updatedAt: string;
         };
