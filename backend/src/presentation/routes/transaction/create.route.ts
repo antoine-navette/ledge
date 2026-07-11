@@ -26,42 +26,23 @@ export const createTransactionRoute: FastifyPluginAsync<Options> = async (
         url: '/transactions',
         schema: {
             tags: ['Transaction'],
-            body: z.discriminatedUnion('type', [
-                z.object({
-                    month: z.string().regex(/^\d{4}-(0[1-9]|1[0-2])$/),
-                    name: z.string().min(1).max(99),
-                    value: z
-                        .number()
-                        .min(0.01)
-                        .refine((val) => {
-                            // We cannot return Number.isInteger(val * 100)
-                            // It doesn't work with some values (ex.: 542.42) due to binary conversions
-                            const str = val.toString();
-                            const decimals = str.split('.')[1];
-                            return !decimals || decimals.length <= 2;
-                        })
-                        .max(999999999.99),
-                    type: z.literal('expense'),
-                    expenseCategory: z.enum(['need', 'want', 'investment']).nullable(),
-                }),
-                z.object({
-                    month: z.string().regex(/^\d{4}-(0[1-9]|1[0-2])$/),
-                    name: z.string().min(1).max(99),
-                    value: z
-                        .number()
-                        .min(0.01)
-                        .refine((val) => {
-                            // We cannot return Number.isInteger(val * 100)
-                            // It doesn't work with some values (ex.: 542.42) due to binary conversions
-                            const str = val.toString();
-                            const decimals = str.split('.')[1];
-                            return !decimals || decimals.length <= 2;
-                        })
-                        .max(999999999.99),
-                    type: z.literal('income'),
-                    expenseCategory: z.null(),
-                }),
-            ]),
+            body: z.object({
+                month: z.string().regex(/^\d{4}-(0[1-9]|1[0-2])$/),
+                name: z.string().min(1).max(99),
+                value: z
+                    .number()
+                    .min(0.01)
+                    .refine((val) => {
+                        // We cannot return Number.isInteger(val * 100)
+                        // It doesn't work with some values (ex.: 542.42) due to binary conversions
+                        const str = val.toString();
+                        const decimals = str.split('.')[1];
+                        return !decimals || decimals.length <= 2;
+                    })
+                    .max(999999999.99),
+                type: z.enum(['expense', 'income']),
+                expenseCategory: z.enum(['need', 'want', 'investment']).optional(),
+            }),
             response: {
                 201: transactionSchema,
                 400: badRequestSchema,

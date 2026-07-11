@@ -5,7 +5,7 @@ export type Transaction = Readonly<{
     name: string;
     value: number;
     type: 'expense' | 'income';
-    expenseCategory: 'need' | 'want' | 'investment' | null;
+    expenseCategory?: 'need' | 'want' | 'investment';
     createdAt: Date;
     updatedAt: Date;
 }>;

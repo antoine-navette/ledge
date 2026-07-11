@@ -19,7 +19,7 @@ describe('MongoTransactionMapper', () => {
         });
 
         it('should map an INCOME transaction to a document correctly', () => {
-            const income = fakeTransaction({ id: '607f1f77bcf86cd799439012', type: 'income', expenseCategory: null });
+            const income = fakeTransaction({ id: '607f1f77bcf86cd799439012', type: 'income' });
 
             const document = MongoTransactionMapper.toDocument(income);
 
@@ -49,7 +49,6 @@ describe('MongoTransactionMapper', () => {
             const originalIncome = fakeTransaction({
                 id: '607f1f77bcf86cd799439012',
                 type: 'income',
-                expenseCategory: null,
             });
             const document = MongoTransactionMapper.toDocument(originalIncome);
 
@@ -60,7 +59,7 @@ describe('MongoTransactionMapper', () => {
         });
 
         it('should map an EXPENSE document without category back to null (handling optional field)', () => {
-            const expenseWithNullCategory = fakeTransaction({ type: 'expense', expenseCategory: null });
+            const expenseWithNullCategory = fakeTransaction({ type: 'expense' });
             const document = MongoTransactionMapper.toDocument(expenseWithNullCategory);
 
             expect(document).not.toHaveProperty('expenseCategory');

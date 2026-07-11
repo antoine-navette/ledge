@@ -19,7 +19,14 @@ export class VerifyEmailUseCase {
         if (!user) return { success: false, error: 'USER_NOT_FOUND' } as const;
         if (user.isEmailVerified) return { success: false, error: 'EMAIL_ALREADY_VERIFIED' } as const;
 
-        const updated: User = { ...user, isEmailVerified: true, updatedAt: now };
+        const updated: User = {
+            id: user.id,
+            email: user.email,
+            passwordHash: user.passwordHash,
+            isEmailVerified: true,
+            createdAt: user.createdAt,
+            updatedAt: now,
+        };
         await this.userRepository.save(updated);
 
         await this.emailVerificationRepository.delete(emailVerification);

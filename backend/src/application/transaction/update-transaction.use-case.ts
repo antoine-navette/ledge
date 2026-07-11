@@ -10,13 +10,23 @@ export class UpdateTransactionUseCase {
         name: string,
         value: number,
         type: 'expense' | 'income',
-        expenseCategory: 'need' | 'want' | 'investment' | null,
+        expenseCategory?: 'need' | 'want' | 'investment',
     ) => {
         const transaction = await this.transactionRepository.findById(id);
         if (!transaction) return { success: false, error: 'TRANSACTION_NOT_FOUND' } as const;
         if (transaction.userId !== userId) return { success: false, error: 'TRANSACTION_NOT_OWNED' } as const;
 
-        const updated: Transaction = { ...transaction, name, value, type, expenseCategory, updatedAt: new Date() };
+        const updated: Transaction = {
+            id: transaction.id,
+            userId: transaction.userId,
+            month: transaction.month,
+            name,
+            value,
+            type,
+            ...(type === 'expense' && expenseCategory ? { expenseCategory } : {}),
+            createdAt: transaction.createdAt,
+            updatedAt: new Date(),
+        };
         await this.transactionRepository.save(updated);
 
         return { success: true, data: updated } as const;
