@@ -1,63 +1,58 @@
-import type { Client } from 'openapi-fetch';
-import type { paths } from '../../types.gen';
+import { api } from '../config/api';
 
-export class TransactionService {
-    constructor(private readonly client: Client<paths>) {}
-
-    async create(
+export const TransactionService = {
+    create: async (
         month: string,
         name: string,
         value: number,
         type: 'expense' | 'income',
         expenseCategory?: 'need' | 'want' | 'investment',
-    ) {
+    ) => {
         try {
-            return await this.client.POST('/transactions', {
-                body: { month, name, value, type, expenseCategory },
-            });
+            return await api.client.POST('/transactions', { body: { month, name, value, type, expenseCategory } });
         } catch {
             return { error: { code: 'NETWORK_ERROR' as const } };
         }
-    }
+    },
 
-    async readAll() {
+    readAll: async () => {
         try {
-            return await this.client.GET('/transactions');
+            return await api.client.GET('/transactions');
         } catch {
             return { error: { code: 'NETWORK_ERROR' as const } };
         }
-    }
+    },
 
-    async read(id: string) {
+    read: async (id: string) => {
         try {
-            return await this.client.GET('/transactions/{id}', { params: { path: { id } } });
+            return await api.client.GET('/transactions/{id}', { params: { path: { id } } });
         } catch {
             return { error: { code: 'NETWORK_ERROR' as const } };
         }
-    }
+    },
 
-    async update(
+    update: async (
         id: string,
         name: string,
         value: number,
         type: 'expense' | 'income',
         expenseCategory?: 'need' | 'want' | 'investment',
-    ) {
+    ) => {
         try {
-            return await this.client.PUT('/transactions/{id}', {
+            return await api.client.PUT('/transactions/{id}', {
                 params: { path: { id } },
                 body: { name, value, type, expenseCategory },
             });
         } catch {
             return { error: { code: 'NETWORK_ERROR' as const } };
         }
-    }
+    },
 
-    async delete(id: string) {
+    delete: async (id: string) => {
         try {
-            return await this.client.DELETE('/transactions/{id}', { params: { path: { id } } });
+            return await api.client.DELETE('/transactions/{id}', { params: { path: { id } } });
         } catch {
             return { error: { code: 'NETWORK_ERROR' as const } };
         }
-    }
-}
+    },
+};

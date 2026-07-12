@@ -1,14 +1,11 @@
-import type { Client } from 'openapi-fetch';
-import type { paths } from '../../types.gen';
+import { api } from '../config/api';
 
-export class UserService {
-    constructor(private readonly client: Client<paths>) {}
-
-    async me() {
+export const UserService = {
+    me: async () => {
         try {
-            return await this.client.GET('/users/me');
+            return await api.client.GET('/users/me');
         } catch {
             return { error: { code: 'NETWORK_ERROR' as const } };
         }
-    }
-}
+    },
+};
