@@ -55,20 +55,20 @@ describe('MongoTransactionMapper', () => {
             const result = MongoTransactionMapper.toEntity(document);
 
             expect(result).toEqual(originalIncome);
-            expect(result.expenseCategory).toBeNull();
+            expect(result.expenseCategory).toBeUndefined();
         });
 
-        it('should map an EXPENSE document without category back to null (handling optional field)', () => {
-            const expenseWithNullCategory = fakeTransaction({ type: 'expense' });
-            const document = MongoTransactionMapper.toDocument(expenseWithNullCategory);
+        it('should map an EXPENSE document without category back to undefined (handling optional field)', () => {
+            const expenseWithoutCategory = fakeTransaction({ type: 'expense' });
+            const document = MongoTransactionMapper.toDocument(expenseWithoutCategory);
 
             expect(document).not.toHaveProperty('expenseCategory');
 
             const result = MongoTransactionMapper.toEntity(document);
 
             expect(result.type).toBe('expense');
-            expect(result.expenseCategory).toBeNull();
-            expect(result).toEqual(expenseWithNullCategory);
+            expect(result.expenseCategory).toBeUndefined();
+            expect(result).toEqual(expenseWithoutCategory);
         });
     });
 });

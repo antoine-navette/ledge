@@ -7,7 +7,6 @@ export const fakeTransaction = (overrides: Partial<Transaction> = {}): Transacti
     name: 'Courses',
     value: 150,
     type: 'expense',
-    expenseCategory: 'need',
     createdAt: new Date('2025-01-01T10:00:00.000Z'),
     updatedAt: new Date('2026-01-01T10:00:00.000Z'),
     ...overrides,
