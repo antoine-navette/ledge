@@ -39,7 +39,9 @@ try {
 
     const userRepository = new MongoUserRepository(mongo.db.collection('users'));
     const sessionRepository = new MongoSessionRepository(mongo.db.collection('sessions'));
-    const emailVerificationRepository = new MongoEmailVerificationRepository(mongo.db.collection('emailverifications'));
+    const emailVerificationRepository = new MongoEmailVerificationRepository(
+        mongo.db.collection('email_verifications'),
+    );
     const transactionRepository = new MongoTransactionRepository(mongo.db.collection('transactions'));
 
     const emailSender = new NodemailerEmailSender(smtp.transporter);
