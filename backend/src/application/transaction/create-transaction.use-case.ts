@@ -1,39 +1,36 @@
 import type { TransactionRepository } from '../../domain/repositories/transaction.repository.js';
 import type { Transaction } from '../../domain/entities/transaction.js';
-import type { IdManager } from '../../domain/ports/id-manager.js';
-import type { Logger } from '../../domain/ports/logger.js';
-
-type CreateTransactionInput = { userId: string; month: string; name: string; value: number } & (
-    | { type: 'expense'; expenseCategory: 'need' | 'want' | 'investment' | null }
-    | { type: 'income'; expenseCategory: null }
-);
-
-type CreateTransactionOutput = { transaction: Transaction };
+import type { IdGenerator } from '../../domain/ports/id-generator.js';
 
 export class CreateTransactionUseCase {
     constructor(
         private transactionRepository: TransactionRepository,
-        private idManager: IdManager,
+        private idGenerator: IdGenerator,
     ) {}
 
-    execute = async (input: CreateTransactionInput, logger: Logger): Promise<CreateTransactionOutput> => {
+    execute = async (
+        userId: string,
+        month: string,
+        name: string,
+        value: number,
+        type: 'expense' | 'income',
+        expenseCategory?: 'need' | 'want' | 'investment',
+    ) => {
         const now = new Date();
 
         const transaction: Transaction = {
-            id: this.idManager.generate(),
-            userId: input.userId,
-            month: input.month,
-            name: input.name,
-            value: input.value,
-            ...(input.type === 'expense'
-                ? { type: 'expense', expenseCategory: input.expenseCategory }
-                : { type: 'income', expenseCategory: null }),
+            id: this.idGenerator.generate(),
+            userId,
+            month,
+            name,
+            value,
+            type,
+            ...(type === 'expense' && expenseCategory ? { expenseCategory } : {}),
             createdAt: now,
             updatedAt: now,
         };
         await this.transactionRepository.create(transaction);
-        logger.info({ transactionId: transaction.id, userId: transaction.userId }, 'Transaction created');
 
-        return { transaction };
+        return transaction;
     };
 }

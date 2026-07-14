@@ -19,7 +19,7 @@ function App() {
                     <Route path="/profile" element={<Profile />} />
                     <Route path="/register" element={<Register />} />
                     <Route path="/login" element={<Login />} />
-                    <Route path="/verify-email/:emailVerificationToken" element={<VerifyEmail />} />
+                    <Route path="/verify-email/:token" element={<VerifyEmail />} />
                     <Route path="*" element={<RouteNotFound />} />
                 </Routes>
             </BrowserRouter>

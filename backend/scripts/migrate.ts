@@ -2,49 +2,50 @@ import { fileURLToPath } from 'node:url';
 import path from 'node:path';
 import { MongoDBStorage, Umzug } from 'umzug';
 import type { Db } from 'mongodb';
-import { createPinoInstance } from '../src/infrastructure/config/pino.js';
+import { createPino } from '../src/infrastructure/config/pino.js';
 import { connectToMongo } from '../src/infrastructure/config/mongo.js';
-import { PinoLogger } from '../src/infrastructure/adapters/pino.logger.js';
-import { loadEnv } from '../src/infrastructure/config/env.js';
+import { loadEnv, type Env } from '../src/infrastructure/config/env.js';
 
-export type Context = { mongoDb: Db };
+export type Context = { mongo: { db: Db } };
 
 // .env is not verified yet, but we need a logger now
-const logger = new PinoLogger(
-    createPinoInstance({
-        nodeEnv: process.env.NODE_ENV === 'development' ? 'development' : 'production',
-        lokiUrl: process.env.LOKI_URL || 'http://loki:3100',
-    }),
-);
+const pino = createPino(process.env.NODE_ENV as Env['nodeEnv'], process.env.LOKI_URL as Env['lokiUrl']);
 
-try {
-    const { mongoUrl } = loadEnv();
-    logger.info('Environment loaded');
+// Wrapped in an async function (not awaited at the top level) so the pino transport's
+// unref'd worker thread can't make Node think the module has nothing left to settle and
+// force-exit with "Detected unsettled top-level await" (exit code 13) before flush() resolves.
+const main = async () => {
+    try {
+        const { mongoUrl } = loadEnv();
+        pino.logger.info('Environment loaded');
 
-    const { mongoDb, mongoClient } = await connectToMongo({ mongoUrl });
-    logger.info('Mongo connected');
+        const mongo = await connectToMongo(mongoUrl);
+        pino.logger.info('Mongo connected');
 
-    const __filename = fileURLToPath(import.meta.url);
-    const __dirname = path.dirname(__filename);
-    const umzug = new Umzug<Context>({
-        migrations: {
-            glob: [path.join(__dirname, '../migrations', '*.{js,ts}'), { ignore: '**/*.d.ts' }],
-        },
-        context: { mongoDb },
-        storage: new MongoDBStorage({ connection: mongoDb }),
-        logger,
-    });
-    await umzug.up();
-    logger.info('Migrations applied successfully');
+        const __filename = fileURLToPath(import.meta.url);
+        const __dirname = path.dirname(__filename);
+        const umzug = new Umzug<Context>({
+            migrations: {
+                glob: [path.join(__dirname, '../migrations', '*.{js,ts}'), { ignore: '**/*.d.ts' }],
+            },
+            context: { mongo },
+            storage: new MongoDBStorage({ connection: mongo.db }),
+            logger: pino.logger,
+        });
+        await umzug.up();
+        pino.logger.info('Migrations applied successfully');
 
-    await mongoClient.close();
-    logger.info('Mongo disconnected');
+        await mongo.client.close();
+        pino.logger.info('Mongo disconnected');
 
-    await new Promise((r) => setTimeout(r, 250));
-    process.exit(0);
-} catch (err) {
-    logger.fatal({ err }, err instanceof Error ? err.message : 'Unknown error');
+        await pino.flush();
+        process.exit(0);
+    } catch (err) {
+        pino.logger.fatal({ err }, err instanceof Error ? err.message : 'Unknown error');
 
-    await new Promise((r) => setTimeout(r, 250));
-    process.exit(1);
-}
+        await pino.flush();
+        process.exit(1);
+    }
+};
+
+void main();

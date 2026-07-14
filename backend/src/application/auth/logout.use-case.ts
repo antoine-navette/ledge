@@ -1,20 +1,10 @@
-import type { RefreshTokenRepository } from '../../domain/repositories/refresh-token.repository.js';
-import type { Logger } from '../../domain/ports/logger.js';
-
-type LogoutInput = { refreshToken: string | undefined };
-
-type LogoutOutput = void;
+import type { SessionRepository } from '../../domain/repositories/session.repository.js';
+import type { Session } from '../../domain/entities/session.js';
 
 export class LogoutUseCase {
-    constructor(private refreshTokenRepository: RefreshTokenRepository) {}
+    constructor(private sessionRepository: SessionRepository) {}
 
-    execute = async (input: LogoutInput, logger: Logger): Promise<LogoutOutput> => {
-        if (!input.refreshToken) return;
-
-        const refreshToken = await this.refreshTokenRepository.findByValue(input.refreshToken);
-        if (!refreshToken) return;
-
-        await this.refreshTokenRepository.delete(refreshToken);
-        logger.info({ refreshTokenId: refreshToken.id, userId: refreshToken.userId }, 'Refresh token deleted');
+    execute = async (session: Session): Promise<void> => {
+        await this.sessionRepository.delete(session);
     };
 }

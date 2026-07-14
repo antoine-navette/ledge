@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { requestEmailVerification } from '../api/users.ts';
+import { EmailVerificationService } from '../services/EmailVerificationService';
 import { Navigate } from 'react-router-dom';
 import Navbar from '../components/Navbar.tsx';
 import { useAuth } from '../hooks/useAuth.ts';
@@ -18,12 +18,12 @@ const Profile = () => {
         setMessage(null);
 
         setIsSending(true);
-        const response = await requestEmailVerification({ frontendBaseUrl: window.location.origin });
+        const { error } = await EmailVerificationService.create();
         setIsSending(false);
 
-        if (!response.success) {
+        if (error) {
             setSuccess(false);
-            setMessage(response.code);
+            setMessage(error.code);
             return;
         }
 

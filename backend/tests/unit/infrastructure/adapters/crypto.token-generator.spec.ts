@@ -12,11 +12,6 @@ describe('CryptoTokenGenerator', () => {
             expect(token).toHaveLength(length);
         });
 
-        it('should generate a token with default length (64) if not specified', () => {
-            const token = generator.generate();
-            expect(token).toHaveLength(64);
-        });
-
         it('should generate a valid hexadecimal string', () => {
             const token = generator.generate(10);
             expect(token).toMatch(/^[0-9a-f]+$/);

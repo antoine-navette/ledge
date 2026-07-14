@@ -1,8 +1,6 @@
-import { FormEvent, useState } from 'react';
+import { FormEvent, useEffect, useRef, useState } from 'react';
 import { Link, Navigate, useNavigate } from 'react-router-dom';
-import type { $ZodErrorTree } from 'zod/v4/core';
-import { register } from '../api/auth';
-import type { RegisterSchema } from '@shared/schemas/auth/register.schema';
+import { AuthService } from '../services/AuthService';
 import { useAuth } from '../hooks/useAuth.ts';
 
 const Register = () => {
@@ -12,36 +10,35 @@ const Register = () => {
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
     const [confirmPassword, setConfirmPassword] = useState('');
+    const confirmPasswordRef = useRef<HTMLInputElement>(null);
 
     const [isLoading, setIsLoading] = useState(false);
     const [globalError, setGlobalError] = useState<string | null>(null);
 
-    const [fieldErrors, setFieldErrors] = useState<$ZodErrorTree<RegisterSchema['body']> | null>(null);
+    useEffect(() => {
+        confirmPasswordRef.current?.setCustomValidity(
+            confirmPassword && confirmPassword !== password ? 'Passwords do not match' : '',
+        );
+    }, [password, confirmPassword]);
 
     const handleSubmit = async (e: FormEvent) => {
         e.preventDefault();
 
         setIsLoading(true);
         setGlobalError(null);
-        setFieldErrors(null);
 
-        const response = await register({ email, password, confirmPassword });
+        const { data, error } = await AuthService.register(email, password);
 
         setIsLoading(false);
 
-        if (response.success) {
-            setUser(response.data);
-            navigate('/');
-        } else {
-            if (response.code === 'BAD_REQUEST' && response.tree.properties?.body) {
-                setFieldErrors(response.tree.properties.body);
-            } else {
-                setGlobalError(response.code);
-            }
+        if (error) {
+            setGlobalError(error.code);
+            return;
         }
-    };
 
-    const properties = fieldErrors?.properties;
+        setUser(data);
+        navigate('/');
+    };
 
     if (user) return <Navigate to="/" replace />;
 
@@ -50,7 +47,7 @@ const Register = () => {
             <div className="bg-white p-8 rounded shadow-md w-full max-w-md">
                 <h2 className="text-2xl font-bold mb-6 text-center text-gray-800">Create an Account</h2>
 
-                <form onSubmit={handleSubmit} className="space-y-6" noValidate>
+                <form onSubmit={handleSubmit} className="space-y-6">
                     <div>
                         <label
                             htmlFor="email"
@@ -63,17 +60,9 @@ const Register = () => {
                             id="email"
                             value={email}
                             onChange={(e) => setEmail(e.target.value)}
-                            className={`block w-full px-3 py-2 border rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 transition-colors
-                                ${
-                                    properties?.email?.errors?.length
-                                        ? 'border-red-500 focus:ring-red-200'
-                                        : 'border-gray-300'
-                                }`}
+                            className="block w-full px-3 py-2 border rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 transition-colors border-gray-300"
                             required
                         />
-                        {properties?.email?.errors?.[0] && (
-                            <p className="mt-1 text-xs text-red-600">{properties.email.errors[0]}</p>
-                        )}
                     </div>
 
                     <div>
@@ -88,17 +77,10 @@ const Register = () => {
                             id="password"
                             value={password}
                             onChange={(e) => setPassword(e.target.value)}
-                            className={`block w-full px-3 py-2 border rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 transition-colors
-                                ${
-                                    properties?.password?.errors?.length
-                                        ? 'border-red-500 focus:ring-red-200'
-                                        : 'border-gray-300'
-                                }`}
+                            className="block w-full px-3 py-2 border rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 transition-colors border-gray-300"
                             required
+                            minLength={8}
                         />
-                        {properties?.password?.errors?.[0] && (
-                            <p className="mt-1 text-xs text-red-600">{properties.password.errors[0]}</p>
-                        )}
                     </div>
 
                     <div>
@@ -109,21 +91,14 @@ const Register = () => {
                             Confirm Password
                         </label>
                         <input
+                            ref={confirmPasswordRef}
                             type="password"
                             id="confirmPassword"
                             value={confirmPassword}
                             onChange={(e) => setConfirmPassword(e.target.value)}
-                            className={`block w-full px-3 py-2 border rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 transition-colors
-                                ${
-                                    properties?.confirmPassword?.errors?.length
-                                        ? 'border-red-500 focus:ring-red-200'
-                                        : 'border-gray-300'
-                                }`}
+                            className="block w-full px-3 py-2 border rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 transition-colors border-gray-300"
                             required
                         />
-                        {properties?.confirmPassword?.errors?.[0] && (
-                            <p className="mt-1 text-xs text-red-600">{properties.confirmPassword.errors[0]}</p>
-                        )}
                     </div>
 
                     {globalError && (

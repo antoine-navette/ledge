@@ -42,24 +42,12 @@ jobs:
       - run: npm run test:unit
         working-directory: backend
 
-  quality_shared:
-    name: Shared checks (format)
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v5
-      - uses: actions/setup-node@v5
-        with: { node-version: 24 }
-      - run: npm ci
-        working-directory: shared
-      - run: npm run format:check
-        working-directory: shared
-
   # ==========================================
   # 2. BUILD IMAGES
   # ==========================================
   build_frontend:
     name: Build Frontend
-    needs: [quality_frontend, quality_backend, quality_shared]
+    needs: [quality_frontend, quality_backend]
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v5
@@ -75,11 +63,11 @@ jobs:
             --platform linux/amd64,linux/arm64 \
             -t ghcr.io/antoine-navette/ledge-frontend:${{ github.event.pull_request.head.sha }} \
             -f frontend/Dockerfile \
-            --push .
+            --push frontend
 
   build_backend:
     name: Build Backend
-    needs: [quality_frontend, quality_backend, quality_shared]
+    needs: [quality_frontend, quality_backend]
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v5
@@ -95,7 +83,7 @@ jobs:
             --platform linux/amd64,linux/arm64 \
             -t ghcr.io/antoine-navette/ledge-backend:${{ github.event.pull_request.head.sha }} \
             -f backend/Dockerfile \
-            --push .
+            --push backend
 
   # ==========================================
   # 3. DEPLOY STAGING
@@ -120,6 +108,6 @@ jobs:
         run: |
           cd "$TARGET_PATH"
           IMAGE_TAG=$IMAGE_TAG docker compose pull
-          IMAGE_TAG=$IMAGE_TAG docker compose run --rm --no-deps backend node dist/backend/scripts/migrate.js
+          IMAGE_TAG=$IMAGE_TAG docker compose run --rm --no-deps backend node dist/scripts/migrate.js
           IMAGE_TAG=$IMAGE_TAG docker compose down --remove-orphans
           IMAGE_TAG=$IMAGE_TAG docker compose up -d

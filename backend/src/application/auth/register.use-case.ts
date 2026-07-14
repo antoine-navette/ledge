@@ -1,60 +1,49 @@
 import type { UserRepository } from '../../domain/repositories/user.repository.js';
-import type { RefreshTokenRepository } from '../../domain/repositories/refresh-token.repository.js';
-import type { Hasher } from '../../domain/ports/hasher.js';
-import type { TokenManager } from '../../domain/ports/token-manager.js';
-import type { IdManager } from '../../domain/ports/id-manager.js';
-import type { User } from '../../domain/entities/user.js';
-import type { RefreshToken } from '../../domain/entities/refresh-token.js';
+import type { SessionRepository } from '../../domain/repositories/session.repository.js';
+import type { PasswordHasher } from '../../domain/ports/password-hasher.js';
+import type { IdGenerator } from '../../domain/ports/id-generator.js';
 import type { TokenGenerator } from '../../domain/ports/token-generator.js';
-import type { Logger } from '../../domain/ports/logger.js';
-import { fail, ok, type Result } from '../../core/result.js';
-
-type RegisterInput = { email: string; password: string };
-
-type RegisterResult = Result<{ user: User; accessToken: string; refreshToken: string }, 'DUPLICATE_EMAIL'>;
+import type { User } from '../../domain/entities/user.js';
+import type { Session } from '../../domain/entities/session.js';
 
 export class RegisterUseCase {
-    private readonly REFRESH_TOKEN_DURATION = 7 * 24 * 60 * 60 * 1000;
+    private readonly SESSION_DURATION = 30 * 24 * 60 * 60 * 1000;
+    private readonly SESSION_TOKEN_LENGTH = 64;
 
     constructor(
         private userRepository: UserRepository,
-        private refreshTokenRepository: RefreshTokenRepository,
-        private hasher: Hasher,
-        private tokenManager: TokenManager,
-        private idManager: IdManager,
+        private sessionRepository: SessionRepository,
+        private passwordHasher: PasswordHasher,
+        private idGenerator: IdGenerator,
         private tokenGenerator: TokenGenerator,
     ) {}
 
-    execute = async (input: RegisterInput, logger: Logger): Promise<RegisterResult> => {
+    execute = async (email: string, password: string) => {
         const now = new Date();
 
-        const existingUser = await this.userRepository.findByEmail(input.email);
-        if (existingUser) return fail('DUPLICATE_EMAIL');
+        const existing = await this.userRepository.findByEmail(email);
+        if (existing) return { success: false, error: 'DUPLICATE_EMAIL' } as const;
 
         const user: User = {
-            id: this.idManager.generate(),
-            email: input.email,
-            passwordHash: await this.hasher.hash(input.password),
+            id: this.idGenerator.generate(),
+            email,
+            passwordHash: await this.passwordHasher.hash(password),
             isEmailVerified: false,
             createdAt: now,
             updatedAt: now,
         };
         await this.userRepository.create(user);
-        logger.info({ userId: user.id }, 'User created');
 
-        const refreshToken: RefreshToken = {
-            id: this.idManager.generate(),
+        const session: Session = {
+            id: this.idGenerator.generate(),
             userId: user.id,
-            value: this.tokenGenerator.generate(),
-            expiresAt: new Date(now.getTime() + this.REFRESH_TOKEN_DURATION),
+            token: this.tokenGenerator.generate(this.SESSION_TOKEN_LENGTH),
+            expiresAt: new Date(now.getTime() + this.SESSION_DURATION),
             createdAt: now,
             updatedAt: now,
         };
-        await this.refreshTokenRepository.create(refreshToken);
-        logger.info({ refreshTokenId: refreshToken.id, userId: refreshToken.userId }, 'Refresh token created');
+        await this.sessionRepository.create(session);
 
-        const accessToken = this.tokenManager.signAccess({ userId: user.id });
-
-        return ok({ user, accessToken, refreshToken: refreshToken.value });
+        return { success: true, data: { ...session, user } } as const;
     };
 }

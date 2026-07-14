@@ -5,8 +5,8 @@ import TransactionListSection from '../components/TransactionListSection';
 import TransactionModal from '../components/TransactionModal';
 import DeleteTransactionModal from '../components/DeleteTransactionModal';
 import DateNavigator from '../components/DateNavigator';
-import { readAllTransactions } from '../api/transactions';
-import type { TransactionDto } from '@shared/dto/transaction.dto';
+import { TransactionService } from '../services/TransactionService';
+import type { Transaction } from '../entities/Transaction';
 import { useAuth } from '../hooks/useAuth.ts';
 
 const Month = () => {
@@ -15,25 +15,26 @@ const Month = () => {
     const params = useParams<{ month: string }>();
     const currentMonth = params.month;
 
-    const [transactions, setTransactions] = useState<TransactionDto[]>([]);
+    const [transactions, setTransactions] = useState<Transaction[]>([]);
     const [isLoadingTransactions, setIsLoadingTransactions] = useState(false);
     const [isTransactionModalOpen, setIsTransactionModalOpen] = useState(false);
     const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
-    const [selectedTransaction, setSelectedTransaction] = useState<TransactionDto | null>(null);
+    const [selectedTransaction, setSelectedTransaction] = useState<Transaction | null>(null);
     const [defaultModalType, setDefaultModalType] = useState<'income' | 'expense'>('expense');
 
     useEffect(() => {
         if (isUserLoading || !user) return;
         const fetchData = async () => {
             setIsLoadingTransactions(true);
-            const response = await readAllTransactions();
+            const { data, error } = await TransactionService.readAll();
             setIsLoadingTransactions(false);
-            if (response.success) setTransactions(response.data);
+            if (error) return;
+            setTransactions(data);
         };
         fetchData();
     }, [isUserLoading, user]);
 
-    const handleTransactionSaved = (savedTransaction: TransactionDto) => {
+    const handleTransactionSaved = (savedTransaction: Transaction) => {
         setTransactions((prev) => {
             const exists = prev.find((t) => t.id === savedTransaction.id);
             if (exists) return prev.map((t) => (t.id === savedTransaction.id ? savedTransaction : t));
@@ -43,7 +44,7 @@ const Month = () => {
         setSelectedTransaction(null);
     };
 
-    const handleTransactionDeleted = (deletedTransaction: TransactionDto) => {
+    const handleTransactionDeleted = (deletedTransaction: Transaction) => {
         setTransactions((prev) => prev.filter((t) => t.id !== deletedTransaction.id));
         setIsDeleteModalOpen(false);
         setSelectedTransaction(null);
@@ -53,12 +54,12 @@ const Month = () => {
         return transactions.filter((t) => t.month === currentMonth).sort((a, b) => b.value - a.value);
     }, [transactions, currentMonth]);
 
-    const openEditModal = useCallback((transaction: TransactionDto) => {
+    const openEditModal = useCallback((transaction: Transaction) => {
         setSelectedTransaction(transaction);
         setIsTransactionModalOpen(true);
     }, []);
 
-    const openDeleteModal = useCallback((transaction: TransactionDto) => {
+    const openDeleteModal = useCallback((transaction: Transaction) => {
         setSelectedTransaction(transaction);
         setIsDeleteModalOpen(true);
     }, []);

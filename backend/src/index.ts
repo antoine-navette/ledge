@@ -1,104 +1,137 @@
-import { loadEnv } from './infrastructure/config/env.js';
-import { createPinoInstance } from './infrastructure/config/pino.js';
-import { connectToRedis } from './infrastructure/config/redis.js';
+import { loadEnv, type Env } from './infrastructure/config/env.js';
+import { createPino } from './infrastructure/config/pino.js';
 import { connectToMongo } from './infrastructure/config/mongo.js';
-import { PinoLogger } from './infrastructure/adapters/pino.logger.js';
-import { JwtTokenManager } from './infrastructure/adapters/jwt.token-manager.js';
-import { BcryptHasher } from './infrastructure/adapters/bcrypt.hasher.js';
-import { NodemailerEmailSender } from './infrastructure/adapters/nodemailer.email-sender.js';
 import { connectToSmtp } from './infrastructure/config/nodemailer.js';
-import { RedisCacheStore } from './infrastructure/adapters/redis.cache-store.js';
-import { MongoUserRepository } from './infrastructure/repositories/mongo.user.repository.js';
-import { MongoTransactionRepository } from './infrastructure/repositories/mongo.transaction.repository.js';
-import { MongoRefreshTokenRepository } from './infrastructure/repositories/mongo.refresh-token.repository.js';
-import { createHttpApp } from './presentation/http/app.js';
-import { buildContainer } from './presentation/container.js';
+import { createApp } from './presentation/app.js';
 import { startServer } from './presentation/server.js';
-import { MongoIdManager } from './infrastructure/adapters/mongo.id-manager.js';
+import { MongoUserRepository } from './infrastructure/mongo/repositories/mongo.user.repository.js';
+import { MongoSessionRepository } from './infrastructure/mongo/repositories/mongo.session.repository.js';
+import { MongoEmailVerificationRepository } from './infrastructure/mongo/repositories/mongo.email-verification.repository.js';
+import { NodemailerEmailSender } from './infrastructure/adapters/nodemailer.email-sender.js';
+import { MongoIdGenerator } from './infrastructure/adapters/mongo.id-generator.js';
 import { CryptoTokenGenerator } from './infrastructure/adapters/crypto.token-generator.js';
+import { BcryptPasswordHasher } from './infrastructure/adapters/bcrypt.password-hasher.js';
+import { AuthenticateUseCase } from './application/auth/authenticate.use-case.js';
+import { LogoutUseCase } from './application/auth/logout.use-case.js';
+import { LoginUseCase } from './application/auth/login.use-case.js';
+import { RegisterUseCase } from './application/auth/register.use-case.js';
+import { GetCurrentUserUseCase } from './application/user/get-current-user.use-case.js';
+import { RequestEmailVerificationUseCase } from './application/email-verification/request-email-verification.use-case.js';
+import { VerifyEmailUseCase } from './application/email-verification/verify-email.use-case.js';
+import { MongoTransactionRepository } from './infrastructure/mongo/repositories/mongo.transaction.repository.js';
+import { CreateTransactionUseCase } from './application/transaction/create-transaction.use-case.js';
+import { GetUserTransactionsUseCase } from './application/transaction/get-user-transactions.use-case.js';
+import { GetTransactionUseCase } from './application/transaction/get-transaction.use-case.js';
+import { UpdateTransactionUseCase } from './application/transaction/update-transaction.use-case.js';
+import { DeleteTransactionUseCase } from './application/transaction/delete-transaction.use-case.js';
 
-const logger = new PinoLogger(
-    createPinoInstance({
-        nodeEnv: process.env.NODE_ENV === 'development' ? 'development' : 'production',
-        lokiUrl: process.env.LOKI_URL || 'http://loki:3100',
-    }),
-);
+const pino = createPino(process.env.NODE_ENV as Env['nodeEnv'], process.env.LOKI_URL as Env['lokiUrl']);
 
-const start = async () => {
-    const { redisUrl, mongoUrl, smtpUrl, tokenSecret, emailFrom, allowedOrigins, port } = loadEnv();
-    logger.info('Environment loaded');
+try {
+    const { nodeEnv, mongoUrl, smtpUrl, allowedOrigins, port, emailFrom, webUrl } = loadEnv();
+    pino.logger.info('Environment loaded');
 
-    const { redisClient } = await connectToRedis({ redisUrl });
-    logger.info('Redis connected');
+    const mongo = await connectToMongo(mongoUrl);
+    pino.logger.info('Mongo connected');
 
-    const { mongoClient, mongoDb } = await connectToMongo({ mongoUrl });
-    logger.info('Mongo connected');
+    const smtp = connectToSmtp(smtpUrl);
+    pino.logger.info('SMTP connected');
 
-    const { smtpTransporter } = connectToSmtp({ smtpUrl });
-    logger.info('SMTP connected');
+    const userRepository = new MongoUserRepository(mongo.db.collection('users'));
+    const sessionRepository = new MongoSessionRepository(mongo.db.collection('sessions'));
+    const emailVerificationRepository = new MongoEmailVerificationRepository(
+        mongo.db.collection('email_verifications'),
+    );
+    const transactionRepository = new MongoTransactionRepository(mongo.db.collection('transactions'));
 
-    const idManager = new MongoIdManager();
-    const tokenManager = new JwtTokenManager(tokenSecret);
+    const emailSender = new NodemailerEmailSender(smtp.transporter);
+    const idGenerator = new MongoIdGenerator();
     const tokenGenerator = new CryptoTokenGenerator();
+    const passwordHasher = new BcryptPasswordHasher();
 
-    const container = buildContainer({
-        tokenManager,
-        hasher: new BcryptHasher(),
-        emailSender: new NodemailerEmailSender(smtpTransporter),
-        cacheStore: new RedisCacheStore(redisClient),
-        idManager,
+    const authenticateUseCase = new AuthenticateUseCase(sessionRepository);
+    const logoutUseCase = new LogoutUseCase(sessionRepository);
+    const loginUseCase = new LoginUseCase(
+        userRepository,
+        sessionRepository,
+        passwordHasher,
+        idGenerator,
         tokenGenerator,
-        userRepository: new MongoUserRepository(mongoDb.collection('users')),
-        transactionRepository: new MongoTransactionRepository(mongoDb.collection('transactions')),
-        refreshTokenRepository: new MongoRefreshTokenRepository(mongoDb.collection('refreshtokens')),
+    );
+    const registerUseCase = new RegisterUseCase(
+        userRepository,
+        sessionRepository,
+        passwordHasher,
+        idGenerator,
+        tokenGenerator,
+    );
+    const getCurrentUserUseCase = new GetCurrentUserUseCase(userRepository);
+    const requestEmailVerificationUseCase = new RequestEmailVerificationUseCase(
+        userRepository,
+        emailVerificationRepository,
+        emailSender,
+        idGenerator,
+        tokenGenerator,
         emailFrom,
-    });
+        webUrl,
+    );
+    const verifyEmailUseCase = new VerifyEmailUseCase(userRepository, emailVerificationRepository);
+    const createTransactionUseCase = new CreateTransactionUseCase(transactionRepository, idGenerator);
+    const getUserTransactionsUseCase = new GetUserTransactionsUseCase(transactionRepository);
+    const getTransactionUseCase = new GetTransactionUseCase(transactionRepository);
+    const updateTransactionUseCase = new UpdateTransactionUseCase(transactionRepository);
+    const deleteTransactionUseCase = new DeleteTransactionUseCase(transactionRepository);
 
-    const app = createHttpApp({
-        logger,
-        tokenManager,
-        idManager,
-        tokenGenerator,
-        ...container,
+    const app = createApp(
+        pino.logger,
+        nodeEnv,
         allowedOrigins,
-    });
+        authenticateUseCase,
+        logoutUseCase,
+        loginUseCase,
+        registerUseCase,
+        getCurrentUserUseCase,
+        requestEmailVerificationUseCase,
+        verifyEmailUseCase,
+        createTransactionUseCase,
+        getUserTransactionsUseCase,
+        getTransactionUseCase,
+        updateTransactionUseCase,
+        deleteTransactionUseCase,
+    );
 
-    const { server } = await startServer({ app, port });
-    logger.info('Server started');
+    await startServer(app, port);
+    pino.logger.info('Server started');
 
-    const gracefulShutdown = async (signal: 'SIGINT' | 'SIGTERM') => {
-        logger.info(`Received ${signal}. Starting graceful shutdown...`);
+    const gracefulShutdown = async (signal: NodeJS.Signals) => {
+        pino.logger.info(`Received ${signal}. Starting graceful shutdown...`);
 
         try {
-            await new Promise<void>((resolve, reject) => {
-                server.close((err?: Error) => (err ? reject(err) : resolve()));
-            });
-            logger.info('HTTP server closed');
+            await app.close();
+            pino.logger.info('Server closed');
 
-            await mongoClient.close();
-            logger.info('Mongo disconnected');
+            smtp.transporter.close();
+            pino.logger.info('SMTP disconnected');
 
-            await redisClient.quit();
-            logger.info('Redis disconnected');
+            await mongo.client.close();
+            pino.logger.info('Mongo disconnected');
 
-            smtpTransporter.close();
-            logger.info('SMTP disconnected');
+            pino.logger.info('Graceful shutdown completed successfully. Exiting.');
 
-            logger.info('Graceful shutdown completed successfully. Exiting.');
+            await pino.flush();
             process.exit(0);
         } catch (err) {
-            logger.fatal({ err }, 'Error during graceful shutdown');
+            pino.logger.fatal({ err }, 'Error during graceful shutdown');
+
+            await pino.flush();
             process.exit(1);
         }
     };
-
     process.on('SIGINT', () => gracefulShutdown('SIGINT'));
     process.on('SIGTERM', () => gracefulShutdown('SIGTERM'));
-};
+} catch (err) {
+    pino.logger.fatal({ err }, err instanceof Error ? err.message : 'Unknown error');
 
-try {
-    await start();
-} catch (error) {
-    logger.fatal({ err: error }, error instanceof Error ? error.message : 'Unknown error');
+    await pino.flush();
     process.exit(1);
 }

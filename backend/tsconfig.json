@@ -41,12 +41,7 @@
         "isolatedModules": true,
         "noUncheckedSideEffectImports": true,
         "moduleDetection": "force",
-        "skipLibCheck": true,
-
-        // Added by me
-        "paths": {
-            "@shared/*": ["../shared/src/*"]
-        }
+        "skipLibCheck": true
     },
-    "include": ["./scripts", "./migrations", "./src", "./tests", "../shared/src"] // Added by me
+    "include": ["./scripts", "./migrations", "./src", "./tests"] // Added by me
 }

@@ -1,12 +1,12 @@
-import type { TransactionDto } from '@shared/dto/transaction.dto';
+import type { Transaction } from '../entities/Transaction';
 import { Pencil, Trash2 } from 'lucide-react';
 
 interface Props {
-    transactions: TransactionDto[];
+    transactions: Transaction[];
     total: number;
     type: 'income' | 'expense';
-    onEdit: (transaction: TransactionDto) => void;
-    onDelete: (transaction: TransactionDto) => void;
+    onEdit: (transaction: Transaction) => void;
+    onDelete: (transaction: Transaction) => void;
 }
 
 const TransactionListSection = ({ transactions, total, type, onEdit, onDelete }: Props) => {
