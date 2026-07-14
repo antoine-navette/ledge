@@ -47,7 +47,7 @@ export const loginRoute: FastifyPluginAsync<Options> = async (app, { loginUseCas
 
             const { user, ...session } = result.data;
 
-            reply.setCookie('sessionToken', session.token, {
+            reply.setCookie('session_token', session.token, {
                 expires: session.expiresAt,
                 path: '/',
                 httpOnly: true,

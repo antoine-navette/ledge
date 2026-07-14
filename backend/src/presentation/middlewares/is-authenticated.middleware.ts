@@ -11,7 +11,7 @@ declare module 'fastify' {
 
 export const isAuthenticated = (authenticateUseCase: AuthenticateUseCase) => {
     return async (request: FastifyRequest, reply: FastifyReply) => {
-        const sessionToken = request.cookies.sessionToken;
+        const sessionToken = request.cookies['session_token'];
         if (!sessionToken) {
             request.log.warn('Unauthorized');
             return reply.status(401).send({ code: 'UNAUTHORIZED' } satisfies UnauthorizedSchema);
