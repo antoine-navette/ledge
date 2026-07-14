@@ -63,7 +63,7 @@ jobs:
             --platform linux/amd64,linux/arm64 \
             -t ghcr.io/antoine-navette/ledge-frontend:${{ github.event.pull_request.head.sha }} \
             -f frontend/Dockerfile \
-            --push .
+            --push frontend
 
   build_backend:
     name: Build Backend
@@ -83,7 +83,7 @@ jobs:
             --platform linux/amd64,linux/arm64 \
             -t ghcr.io/antoine-navette/ledge-backend:${{ github.event.pull_request.head.sha }} \
             -f backend/Dockerfile \
-            --push .
+            --push backend
 
   # ==========================================
   # 3. DEPLOY STAGING

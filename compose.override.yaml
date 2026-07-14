@@ -1,8 +1,8 @@
 services:
   frontend:
     build:
-      context: .
-      dockerfile: frontend/Dockerfile.dev
+      context: frontend
+      dockerfile: Dockerfile.dev
     env_file:
       - path: frontend/.env.example
         required: true
@@ -15,8 +15,8 @@ services:
 
   backend:
     build:
-      context: .
-      dockerfile: backend/Dockerfile.dev
+      context: backend
+      dockerfile: Dockerfile.dev
     env_file:
       - path: backend/.env.example
         required: true
