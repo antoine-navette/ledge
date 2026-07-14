@@ -1,13 +1,13 @@
 import { useState } from 'react';
-import { deleteTransaction } from '../api/transactions';
-import type { TransactionDto } from '@shared/dto/transaction.dto';
+import { TransactionService } from '../services/TransactionService';
+import type { Transaction } from '../entities/Transaction';
 import Modal from './Modal.tsx';
 
 interface Props {
     isOpen: boolean;
     onClose: () => void;
-    transaction: TransactionDto;
-    onDelete: (transaction: TransactionDto) => void;
+    transaction: Transaction;
+    onDelete: (transaction: Transaction) => void;
 }
 
 const DeleteTransactionModal = ({ isOpen, onClose, transaction, onDelete }: Props) => {
@@ -18,12 +18,12 @@ const DeleteTransactionModal = ({ isOpen, onClose, transaction, onDelete }: Prop
         setIsDeleting(true);
         setError(null);
 
-        const response = await deleteTransaction({ transactionId: transaction.id });
+        const { error: deleteError } = await TransactionService.delete(transaction.id);
 
         setIsDeleting(false);
 
-        if (!response.success) {
-            setError(response.code);
+        if (deleteError) {
+            setError(deleteError.code);
             return;
         }
 

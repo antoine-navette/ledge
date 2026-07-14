@@ -1,10 +1,10 @@
-import type { UserDto } from '@shared/dto/user.dto.ts';
+import type { User } from '../entities/User';
 import { createContext } from 'react';
 
 type AuthContextType = {
-    user: UserDto | null;
+    user: User | null;
     isLoading: boolean;
-    setUser: (user: UserDto | null) => void;
+    setUser: (user: User | null) => void;
 };
 
 export const AuthContext = createContext<AuthContextType | undefined>(undefined);

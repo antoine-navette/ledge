@@ -1,16 +1,16 @@
 import { useEffect, useState, type ReactNode } from 'react';
-import { me } from '../api/users';
-import type { UserDto } from '@shared/dto/user.dto.ts';
+import { UserService } from '../services/UserService';
+import type { User } from '../entities/User';
 import { AuthContext } from '../contexts/AuthContext.ts';
 
 export const AuthProvider = ({ children }: { children: ReactNode }) => {
-    const [user, setUser] = useState<UserDto | null>(null);
+    const [user, setUser] = useState<User | null>(null);
     const [isLoading, setIsLoading] = useState(true);
 
     useEffect(() => {
         const initAuth = async () => {
-            const response = await me();
-            if (response.success) setUser(response.data);
+            const { data } = await UserService.me();
+            if (data) setUser(data);
             setIsLoading(false);
         };
 

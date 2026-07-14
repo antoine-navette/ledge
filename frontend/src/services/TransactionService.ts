@@ -11,7 +11,7 @@ export const TransactionService = {
         try {
             return await api.client.POST('/transactions', { body: { month, name, value, type, expenseCategory } });
         } catch {
-            return { error: { code: 'NETWORK_ERROR' as const } };
+            return { data: undefined, error: { code: 'NETWORK_ERROR' as const } };
         }
     },
 
@@ -19,7 +19,7 @@ export const TransactionService = {
         try {
             return await api.client.GET('/transactions');
         } catch {
-            return { error: { code: 'NETWORK_ERROR' as const } };
+            return { data: undefined, error: { code: 'NETWORK_ERROR' as const } };
         }
     },
 
@@ -27,7 +27,7 @@ export const TransactionService = {
         try {
             return await api.client.GET('/transactions/{id}', { params: { path: { id } } });
         } catch {
-            return { error: { code: 'NETWORK_ERROR' as const } };
+            return { data: undefined, error: { code: 'NETWORK_ERROR' as const } };
         }
     },
 
@@ -44,7 +44,7 @@ export const TransactionService = {
                 body: { name, value, type, expenseCategory },
             });
         } catch {
-            return { error: { code: 'NETWORK_ERROR' as const } };
+            return { data: undefined, error: { code: 'NETWORK_ERROR' as const } };
         }
     },
 
@@ -52,7 +52,7 @@ export const TransactionService = {
         try {
             return await api.client.DELETE('/transactions/{id}', { params: { path: { id } } });
         } catch {
-            return { error: { code: 'NETWORK_ERROR' as const } };
+            return { data: undefined, error: { code: 'NETWORK_ERROR' as const } };
         }
     },
 };

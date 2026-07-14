@@ -5,7 +5,7 @@ export const UserService = {
         try {
             return await api.client.GET('/users/me');
         } catch {
-            return { error: { code: 'NETWORK_ERROR' as const } };
+            return { data: undefined, error: { code: 'NETWORK_ERROR' as const } };
         }
     },
 };

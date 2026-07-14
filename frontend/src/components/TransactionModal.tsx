@@ -1,18 +1,15 @@
 import { useEffect, useState, FormEvent } from 'react';
-import type { $ZodErrorTree } from 'zod/v4/core';
-import { createTransaction, updateTransaction } from '../api/transactions';
-import type { TransactionDto } from '@shared/dto/transaction.dto';
-import type { CreateTransactionSchema } from '@shared/schemas/transaction/create.schema';
-import type { UpdateTransactionSchema } from '@shared/schemas/transaction/update.schema';
+import { TransactionService } from '../services/TransactionService';
+import type { Transaction } from '../entities/Transaction';
 import Modal from './Modal.tsx';
 
 interface Props {
     isOpen: boolean;
     onClose: () => void;
-    initialTransaction: TransactionDto | null;
+    initialTransaction: Transaction | null;
     defaultType: 'income' | 'expense';
     month: string;
-    onSave: (transaction: TransactionDto) => void;
+    onSave: (transaction: Transaction) => void;
 }
 
 const TransactionModal = ({ isOpen, onClose, initialTransaction, defaultType, month, onSave }: Props) => {
@@ -24,18 +21,16 @@ const TransactionModal = ({ isOpen, onClose, initialTransaction, defaultType, mo
     const [expenseCategory, setExpenseCategory] = useState<'need' | 'want' | 'investment' | null>(null);
 
     const [globalError, setGlobalError] = useState<string | null>(null);
-    const [fieldErrors, setFieldErrors] = useState<$ZodErrorTree<CreateTransactionSchema['body']> | null>(null);
 
     useEffect(() => {
         if (isOpen) {
             setGlobalError(null);
-            setFieldErrors(null);
             setIsLoading(false);
 
             if (initialTransaction) {
                 setName(initialTransaction.name);
                 setValue(String(initialTransaction.value));
-                setExpenseCategory(initialTransaction.type === 'expense' ? initialTransaction.expenseCategory : null);
+                setExpenseCategory(initialTransaction.expenseCategory ?? null);
                 setFixedType(initialTransaction.type);
             } else {
                 setName('');
@@ -50,77 +45,34 @@ const TransactionModal = ({ isOpen, onClose, initialTransaction, defaultType, mo
         e.preventDefault();
         setIsLoading(true);
         setGlobalError(null);
-        setFieldErrors(null);
 
-        const numValue = Number(value.replace(',', '.'));
-        let response;
+        const numValue = Number(value);
 
-        if (initialTransaction) {
-            let body: UpdateTransactionSchema['body'];
-
-            if (fixedType === 'expense') {
-                body = {
-                    name,
-                    value: numValue,
-                    type: 'expense',
-                    expenseCategory: expenseCategory,
-                };
-            } else {
-                body = {
-                    name,
-                    value: numValue,
-                    type: 'income',
-                    expenseCategory: null,
-                };
-            }
-            response = await updateTransaction(body, { transactionId: initialTransaction.id });
-        } else {
-            let body: CreateTransactionSchema['body'];
-
-            if (fixedType === 'expense') {
-                body = {
-                    name,
-                    value: numValue,
-                    type: 'expense',
-                    month,
-                    expenseCategory: expenseCategory,
-                };
-            } else {
-                body = {
-                    name,
-                    value: numValue,
-                    type: 'income',
-                    month,
-                    expenseCategory: null,
-                };
-            }
-            response = await createTransaction(body);
-        }
+        const { data, error } = initialTransaction
+            ? await TransactionService.update(
+                  initialTransaction.id,
+                  name,
+                  numValue,
+                  fixedType,
+                  expenseCategory ?? undefined,
+              )
+            : await TransactionService.create(month, name, numValue, fixedType, expenseCategory ?? undefined);
 
         setIsLoading(false);
 
-        if (response.success) {
-            onSave(response.data);
-        } else {
-            if (response.code === 'BAD_REQUEST') {
-                if (response.tree.properties?.body) {
-                    setFieldErrors(response.tree.properties.body);
-                } else {
-                    setGlobalError(response.code);
-                }
-            } else {
-                setGlobalError(response.code);
-            }
+        if (error) {
+            setGlobalError(error.code);
+            return;
         }
-    };
 
-    const properties = fieldErrors?.properties;
+        onSave(data);
+    };
 
     if (!isOpen) return null;
 
     return (
         <Modal isOpen={isOpen} onClose={onClose} title={initialTransaction ? `Edit ${fixedType}` : `Add ${fixedType}`}>
-            <form onSubmit={handleSubmit} className="space-y-4" noValidate>
+            <form onSubmit={handleSubmit} className="space-y-4">
                 <div>
                     <label
                         className="block text-sm font-medium mb-1 text-gray-700 cursor-pointer select-none"
@@ -134,12 +86,10 @@ const TransactionModal = ({ isOpen, onClose, initialTransaction, defaultType, mo
                         type="text"
                         value={name}
                         onChange={(e) => setName(e.target.value)}
-                        className={`w-full border rounded px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 transition-colors
-                                ${properties?.name?.errors?.length ? 'border-red-500 focus:ring-red-200' : 'border-gray-300'}`}
+                        className="w-full border rounded px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 transition-colors border-gray-300"
+                        required
+                        maxLength={99}
                     />
-                    {properties?.name?.errors?.[0] && (
-                        <p className="text-red-500 text-xs mt-1">{properties.name.errors[0]}</p>
-                    )}
                 </div>
 
                 <div>
@@ -151,16 +101,16 @@ const TransactionModal = ({ isOpen, onClose, initialTransaction, defaultType, mo
                     </label>
                     <input
                         id="value"
-                        type="text"
+                        type="number"
                         inputMode="decimal"
+                        step="0.01"
+                        min="0.01"
+                        max="999999999.99"
                         value={value}
                         onChange={(e) => setValue(e.target.value)}
-                        className={`w-full border rounded px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 transition-colors
-                                ${properties?.value?.errors?.length ? 'border-red-500 focus:ring-red-200' : 'border-gray-300'}`}
+                        className="w-full border rounded px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 transition-colors border-gray-300"
+                        required
                     />
-                    {properties?.value?.errors?.[0] && (
-                        <p className="text-red-500 text-xs mt-1">{properties.value.errors[0]}</p>
-                    )}
                 </div>
 
                 {fixedType === 'expense' && (
@@ -200,10 +150,6 @@ const TransactionModal = ({ isOpen, onClose, initialTransaction, defaultType, mo
                                 Investment
                             </button>
                         </div>
-
-                        {properties && properties.expenseCategory?.errors?.[0] && (
-                            <p className="text-red-500 text-xs mt-1">{properties.expenseCategory.errors[0]}</p>
-                        )}
                     </div>
                 )}
 

@@ -5,7 +5,7 @@ export const AuthService = {
         try {
             return await api.client.POST('/auth/register', { body: { email, password } });
         } catch {
-            return { error: { code: 'NETWORK_ERROR' as const } };
+            return { data: undefined, error: { code: 'NETWORK_ERROR' as const } };
         }
     },
 
@@ -13,7 +13,7 @@ export const AuthService = {
         try {
             return await api.client.POST('/auth/login', { body: { email, password } });
         } catch {
-            return { error: { code: 'NETWORK_ERROR' as const } };
+            return { data: undefined, error: { code: 'NETWORK_ERROR' as const } };
         }
     },
 
@@ -21,7 +21,7 @@ export const AuthService = {
         try {
             return await api.client.POST('/auth/logout');
         } catch {
-            return { error: { code: 'NETWORK_ERROR' as const } };
+            return { data: undefined, error: { code: 'NETWORK_ERROR' as const } };
         }
     },
 };

@@ -5,7 +5,7 @@ export const EmailVerificationService = {
         try {
             return await api.client.POST('/email-verifications');
         } catch {
-            return { error: { code: 'NETWORK_ERROR' as const } };
+            return { data: undefined, error: { code: 'NETWORK_ERROR' as const } };
         }
     },
 
@@ -13,7 +13,7 @@ export const EmailVerificationService = {
         try {
             return await api.client.DELETE('/email-verifications/{token}', { params: { path: { token } } });
         } catch {
-            return { error: { code: 'NETWORK_ERROR' as const } };
+            return { data: undefined, error: { code: 'NETWORK_ERROR' as const } };
         }
     },
 };
