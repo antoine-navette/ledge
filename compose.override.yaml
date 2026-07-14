@@ -11,8 +11,7 @@ services:
     ports:
       - "${FRONTEND_PORT:-5173}:5173"
     volumes:
-      - ./frontend:/app/frontend
-      - ./shared:/app/shared
+      - ./frontend:/app
 
   backend:
     build:
@@ -26,8 +25,7 @@ services:
     ports:
       - "${BACKEND_PORT:-3000}:3000"
     volumes:
-      - ./backend:/app/backend
-      - ./shared:/app/shared
+      - ./backend:/app
     depends_on:
       - mailpit
 
