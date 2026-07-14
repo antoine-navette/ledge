@@ -49,7 +49,13 @@ try {
 
     const authenticateUseCase = new AuthenticateUseCase(sessionRepository);
     const logoutUseCase = new LogoutUseCase(sessionRepository);
-    const loginUseCase = new LoginUseCase(userRepository, sessionRepository, passwordHasher, idGenerator, tokenGenerator);
+    const loginUseCase = new LoginUseCase(
+        userRepository,
+        sessionRepository,
+        passwordHasher,
+        idGenerator,
+        tokenGenerator,
+    );
     const registerUseCase = new RegisterUseCase(
         userRepository,
         sessionRepository,
