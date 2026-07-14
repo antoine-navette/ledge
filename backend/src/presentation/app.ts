@@ -79,6 +79,7 @@ export const createApp = (
     app.register(fastifyCors, {
         origin: allowedOrigins,
         credentials: true,
+        methods: ['GET', 'POST', 'PUT', 'DELETE'],
     });
     app.register(fastifyRateLimit, {
         max: 60,
