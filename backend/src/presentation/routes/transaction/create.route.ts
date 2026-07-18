@@ -41,7 +41,7 @@ export const createTransactionRoute: FastifyPluginAsync<Options> = async (
                     })
                     .max(999999999.99),
                 type: z.enum(['expense', 'income']),
-                expenseCategory: z.enum(['need', 'want', 'investment']).optional(),
+                category: z.enum(['need', 'want', 'investment']).optional(),
             }),
             response: {
                 201: transactionSchema,
@@ -54,7 +54,7 @@ export const createTransactionRoute: FastifyPluginAsync<Options> = async (
         } satisfies FastifyZodOpenApiSchema,
         preHandler: isAuthenticated(authenticateUseCase),
         handler: async (request, reply) => {
-            const { month, name, value, type, expenseCategory } = request.body;
+            const { month, name, value, type, category } = request.body;
 
             const transaction = await createTransactionUseCase.execute(
                 request.session.userId,
@@ -62,7 +62,7 @@ export const createTransactionRoute: FastifyPluginAsync<Options> = async (
                 name,
                 value,
                 type,
-                expenseCategory,
+                category,
             );
 
             return reply.status(201).send(TransactionMapper.toSchema(transaction));

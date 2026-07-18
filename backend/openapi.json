@@ -215,7 +215,7 @@
                             "income"
                         ]
                     },
-                    "expenseCategory": {
+                    "category": {
                         "type": "string",
                         "enum": [
                             "need",
@@ -795,7 +795,7 @@
                                             "income"
                                         ]
                                     },
-                                    "expenseCategory": {
+                                    "category": {
                                         "type": "string",
                                         "enum": [
                                             "need",
@@ -1046,7 +1046,7 @@
                                             "income"
                                         ]
                                     },
-                                    "expenseCategory": {
+                                    "category": {
                                         "type": "string",
                                         "enum": [
                                             "need",

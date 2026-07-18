@@ -10,7 +10,7 @@ export class UpdateTransactionUseCase {
         name: string,
         value: number,
         type: 'expense' | 'income',
-        expenseCategory?: 'need' | 'want' | 'investment',
+        category?: 'need' | 'want' | 'investment',
     ) => {
         const transaction = await this.transactionRepository.findById(id);
         if (!transaction) return { success: false, error: 'TRANSACTION_NOT_FOUND' } as const;
@@ -23,7 +23,7 @@ export class UpdateTransactionUseCase {
             name,
             value,
             type,
-            ...(type === 'expense' && expenseCategory ? { expenseCategory } : {}),
+            ...(type === 'expense' && category ? { category } : {}),
             createdAt: transaction.createdAt,
             updatedAt: new Date(),
         };

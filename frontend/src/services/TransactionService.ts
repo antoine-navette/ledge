@@ -6,10 +6,10 @@ export const TransactionService = {
         name: string,
         value: number,
         type: 'expense' | 'income',
-        expenseCategory?: 'need' | 'want' | 'investment',
+        category?: 'need' | 'want' | 'investment',
     ) => {
         try {
-            return await api.client.POST('/transactions', { body: { month, name, value, type, expenseCategory } });
+            return await api.client.POST('/transactions', { body: { month, name, value, type, category } });
         } catch {
             return { data: undefined, error: { code: 'NETWORK_ERROR' as const } };
         }
@@ -36,12 +36,12 @@ export const TransactionService = {
         name: string,
         value: number,
         type: 'expense' | 'income',
-        expenseCategory?: 'need' | 'want' | 'investment',
+        category?: 'need' | 'want' | 'investment',
     ) => {
         try {
             return await api.client.PUT('/transactions/{id}', {
                 params: { path: { id } },
-                body: { name, value, type, expenseCategory },
+                body: { name, value, type, category },
             });
         } catch {
             return { data: undefined, error: { code: 'NETWORK_ERROR' as const } };

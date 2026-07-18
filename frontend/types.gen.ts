@@ -576,7 +576,7 @@ export interface paths {
                         /** @enum {string} */
                         type: "expense" | "income";
                         /** @enum {string} */
-                        expenseCategory?: "need" | "want" | "investment";
+                        category?: "need" | "want" | "investment";
                     };
                 };
             };
@@ -743,7 +743,7 @@ export interface paths {
                         /** @enum {string} */
                         type: "expense" | "income";
                         /** @enum {string} */
-                        expenseCategory?: "need" | "want" | "investment";
+                        category?: "need" | "want" | "investment";
                     };
                 };
             };
@@ -979,7 +979,7 @@ export interface components {
             /** @enum {string} */
             type: "expense" | "income";
             /** @enum {string} */
-            expenseCategory?: "need" | "want" | "investment";
+            category?: "need" | "want" | "investment";
             createdAt: string;
             updatedAt: string;
         };

@@ -7,7 +7,7 @@ export type MongoTransactionDocument = Readonly<{
     name: string;
     value: number;
     type: 'expense' | 'income';
-    expenseCategory?: 'need' | 'want' | 'investment';
+    category?: 'need' | 'want' | 'investment';
     createdAt: Date;
     updatedAt: Date;
 }>;

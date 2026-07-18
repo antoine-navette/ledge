@@ -9,7 +9,7 @@ export const TransactionMapper = {
         name: transaction.name,
         value: transaction.value,
         type: transaction.type,
-        expenseCategory: transaction.expenseCategory,
+        category: transaction.category,
         createdAt: transaction.createdAt,
         updatedAt: transaction.updatedAt,
     }),
