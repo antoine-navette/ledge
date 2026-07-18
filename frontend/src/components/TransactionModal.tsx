@@ -18,7 +18,7 @@ const TransactionModal = ({ isOpen, onClose, initialTransaction, defaultType, mo
     const [isLoading, setIsLoading] = useState(false);
     const [name, setName] = useState('');
     const [value, setValue] = useState('');
-    const [expenseCategory, setExpenseCategory] = useState<'need' | 'want' | 'investment' | null>(null);
+    const [category, setCategory] = useState<'need' | 'want' | 'investment' | null>(null);
 
     const [globalError, setGlobalError] = useState<string | null>(null);
 
@@ -30,12 +30,12 @@ const TransactionModal = ({ isOpen, onClose, initialTransaction, defaultType, mo
             if (initialTransaction) {
                 setName(initialTransaction.name);
                 setValue(String(initialTransaction.value));
-                setExpenseCategory(initialTransaction.expenseCategory ?? null);
+                setCategory(initialTransaction.category ?? null);
                 setFixedType(initialTransaction.type);
             } else {
                 setName('');
                 setValue('');
-                setExpenseCategory(null);
+                setCategory(null);
                 setFixedType(defaultType);
             }
         }
@@ -49,14 +49,8 @@ const TransactionModal = ({ isOpen, onClose, initialTransaction, defaultType, mo
         const numValue = Number(value);
 
         const { data, error } = initialTransaction
-            ? await TransactionService.update(
-                  initialTransaction.id,
-                  name,
-                  numValue,
-                  fixedType,
-                  expenseCategory ?? undefined,
-              )
-            : await TransactionService.create(month, name, numValue, fixedType, expenseCategory ?? undefined);
+            ? await TransactionService.update(initialTransaction.id, name, numValue, fixedType, category ?? undefined)
+            : await TransactionService.create(month, name, numValue, fixedType, category ?? undefined);
 
         setIsLoading(false);
 
@@ -120,9 +114,9 @@ const TransactionModal = ({ isOpen, onClose, initialTransaction, defaultType, mo
                             <button
                                 key="need"
                                 type="button"
-                                onClick={() => setExpenseCategory(expenseCategory === 'need' ? null : 'need')}
+                                onClick={() => setCategory(category === 'need' ? null : 'need')}
                                 className={`px-3 py-1 rounded-full text-white text-sm cursor-pointer transition select-none bg-blue-500
-                                            ${expenseCategory === 'need' ? 'opacity-100 ring-2 ring-offset-1 ring-gray-300' : 'opacity-40 hover:opacity-70'}
+                                            ${category === 'need' ? 'opacity-100 ring-2 ring-offset-1 ring-gray-300' : 'opacity-40 hover:opacity-70'}
                                         `}
                             >
                                 Need
@@ -130,9 +124,9 @@ const TransactionModal = ({ isOpen, onClose, initialTransaction, defaultType, mo
                             <button
                                 key="want"
                                 type="button"
-                                onClick={() => setExpenseCategory(expenseCategory === 'want' ? null : 'want')}
+                                onClick={() => setCategory(category === 'want' ? null : 'want')}
                                 className={`px-3 py-1 rounded-full text-white text-sm cursor-pointer transition select-none bg-red-500
-                                            ${expenseCategory === 'want' ? 'opacity-100 ring-2 ring-offset-1 ring-gray-300' : 'opacity-40 hover:opacity-70'}
+                                            ${category === 'want' ? 'opacity-100 ring-2 ring-offset-1 ring-gray-300' : 'opacity-40 hover:opacity-70'}
                                         `}
                             >
                                 Want
@@ -140,11 +134,9 @@ const TransactionModal = ({ isOpen, onClose, initialTransaction, defaultType, mo
                             <button
                                 key="investment"
                                 type="button"
-                                onClick={() =>
-                                    setExpenseCategory(expenseCategory === 'investment' ? null : 'investment')
-                                }
+                                onClick={() => setCategory(category === 'investment' ? null : 'investment')}
                                 className={`px-3 py-1 rounded-full text-white text-sm cursor-pointer transition select-none bg-green-500
-                                            ${expenseCategory === 'investment' ? 'opacity-100 ring-2 ring-offset-1 ring-gray-300' : 'opacity-40 hover:opacity-70'}
+                                            ${category === 'investment' ? 'opacity-100 ring-2 ring-offset-1 ring-gray-300' : 'opacity-40 hover:opacity-70'}
                                         `}
                             >
                                 Investment

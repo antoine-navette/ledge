@@ -14,7 +14,7 @@ export class CreateTransactionUseCase {
         name: string,
         value: number,
         type: 'expense' | 'income',
-        expenseCategory?: 'need' | 'want' | 'investment',
+        category?: 'need' | 'want' | 'investment',
     ) => {
         const now = new Date();
 
@@ -25,7 +25,7 @@ export class CreateTransactionUseCase {
             name,
             value,
             type,
-            ...(type === 'expense' && expenseCategory ? { expenseCategory } : {}),
+            ...(type === 'expense' && category ? { category } : {}),
             createdAt: now,
             updatedAt: now,
         };
