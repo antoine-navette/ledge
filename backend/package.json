@@ -6,6 +6,8 @@
     "scripts": {
         "dev": "tsx watch src/index.ts",
         "build": "rimraf dist && tsc",
+        "migrate": "tsx scripts/migrate.ts",
+        "docs:generate": "tsx scripts/generate-docs.ts",
         "format:check": "prettier --check .",
         "format:write": "prettier --write .",
         "lint": "eslint",
