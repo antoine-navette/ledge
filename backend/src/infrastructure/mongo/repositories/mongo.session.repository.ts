@@ -11,7 +11,7 @@ export class MongoSessionRepository implements SessionRepository {
         await this.sessionCollection.insertOne(MongoSessionMapper.toDocument(session));
     };
 
-    findByToken = async (token: string): Promise<Session | null> => {
+    findByToken = async (token: Session['token']): Promise<Session | null> => {
         const document = await this.sessionCollection.findOne({ token });
 
         return document ? MongoSessionMapper.toEntity(document) : null;

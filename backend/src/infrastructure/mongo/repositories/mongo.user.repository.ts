@@ -13,13 +13,13 @@ export class MongoUserRepository implements UserRepository {
         await this.userCollection.insertOne(document);
     };
 
-    findById = async (id: string): Promise<User | null> => {
+    findById = async (id: User['id']): Promise<User | null> => {
         const document = await this.userCollection.findOne({ _id: new ObjectId(id) });
 
         return document ? MongoUserMapper.toEntity(document) : null;
     };
 
-    findByEmail = async (email: string): Promise<User | null> => {
+    findByEmail = async (email: User['email']): Promise<User | null> => {
         const document = await this.userCollection.findOne({ email });
 
         return document ? MongoUserMapper.toEntity(document) : null;

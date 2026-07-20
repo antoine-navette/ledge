@@ -13,13 +13,13 @@ export class MongoTransactionRepository implements TransactionRepository {
         await this.transactionCollection.insertOne(document);
     };
 
-    findById = async (id: string): Promise<Transaction | null> => {
+    findById = async (id: Transaction['id']): Promise<Transaction | null> => {
         const document = await this.transactionCollection.findOne({ _id: new ObjectId(id) });
 
         return document ? MongoTransactionMapper.toEntity(document) : null;
     };
 
-    findByUserId = async (userId: string): Promise<Transaction[]> => {
+    findByUserId = async (userId: Transaction['userId']): Promise<Transaction[]> => {
         const documents = await this.transactionCollection.find({ userId: new ObjectId(userId) }).toArray();
 
         return documents.map((document) => MongoTransactionMapper.toEntity(document));
