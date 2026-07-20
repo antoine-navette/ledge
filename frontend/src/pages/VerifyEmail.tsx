@@ -3,56 +3,50 @@ import { EmailVerificationService } from '../services/EmailVerificationService';
 import { useParams } from 'react-router-dom';
 
 export default function VerifyEmail() {
-    const [isVerifying, setIsVerifying] = useState(false);
-    const [success, setSuccess] = useState<boolean | null>(null);
-    const [message, setMessage] = useState<string | null>(null);
+    const [state, setState] = useState<
+        { status: 'idle' } | { status: 'loading' } | { status: 'success' } | { status: 'error'; message: string }
+    >({ status: 'idle' });
 
     const { token } = useParams<{ token: string }>();
     if (!token) return;
 
     const handleVerify = async () => {
-        setSuccess(null);
-        setMessage(null);
+        setState({ status: 'loading' });
 
-        setIsVerifying(true);
         const { error } = await EmailVerificationService.delete(token);
-        setIsVerifying(false);
-
         if (error) {
-            setSuccess(false);
-            setMessage(error.code);
+            setState({ status: 'error', message: error.code });
             return;
         }
 
-        setSuccess(true);
-        setMessage('Email verified successfully!');
+        setState({ status: 'success' });
     };
 
     return (
         <div className="flex items-center justify-center min-h-screen bg-gray-100">
             <div className="bg-white p-6 rounded shadow-md w-full max-w-md text-center">
                 <h1 className="text-2xl font-bold mb-4">Verify your email</h1>
-                {success === null && (
+                {(state.status === 'idle' || state.status === 'loading') && (
                     <>
                         <p className="mb-4">Click the button below to verify your email address.</p>
                         <button
                             onClick={handleVerify}
                             className="w-full bg-blue-500 text-white py-2 px-4 rounded hover:bg-blue-600 cursor-pointer"
-                            disabled={isVerifying}
+                            disabled={state.status === 'loading'}
                         >
-                            {isVerifying ? 'Verifying...' : 'Verify Email'}
+                            {state.status === 'loading' ? 'Verifying...' : 'Verify Email'}
                         </button>
                     </>
                 )}
-                {success === true && (
+                {state.status === 'success' && (
                     <div className="text-green-600">
-                        <p className="mb-2">{message}</p>
+                        <p className="mb-2">Email verified successfully!</p>
                         <p>You can now leave this page.</p>
                     </div>
                 )}
-                {success === false && (
+                {state.status === 'error' && (
                     <div className="text-red-600">
-                        <p>{message}</p>
+                        <p>{state.message}</p>
                     </div>
                 )}
             </div>
