@@ -8,7 +8,7 @@ export default function VerifyEmail() {
     const [message, setMessage] = useState<string | null>(null);
 
     const { token } = useParams<{ token: string }>();
-    if (!token) return <div className="text-center p-10 text-red-600">Lien invalide (token manquant).</div>;
+    if (!token) return;
 
     const handleVerify = async () => {
         setSuccess(null);
