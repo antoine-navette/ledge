@@ -24,7 +24,7 @@ const Month = () => {
         const fetchData = async () => {
             setIsLoadingTransactions(true);
 
-            const { data, error } = await TransactionService.readAll();
+            const { data, error } = await TransactionService.read();
             setIsLoadingTransactions(false);
             if (error) return;
 

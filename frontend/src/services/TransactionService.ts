@@ -15,7 +15,7 @@ export const TransactionService = {
         }
     },
 
-    readAll: async () => {
+    read: async () => {
         try {
             return await api.client.GET('/transactions');
         } catch {
@@ -23,7 +23,7 @@ export const TransactionService = {
         }
     },
 
-    read: async (id: string) => {
+    readById: async (id: string) => {
         try {
             return await api.client.GET('/transactions/{id}', { params: { path: { id } } });
         } catch {

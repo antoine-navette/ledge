@@ -31,8 +31,8 @@ import { meRoute } from './routes/user/me.route.js';
 import { createEmailVerificationRoute } from './routes/email-verification/create.route.js';
 import { deleteEmailVerificationRoute } from './routes/email-verification/delete.route.js';
 import { createTransactionRoute } from './routes/transaction/create.route.js';
-import { readAllTransactionRoute } from './routes/transaction/read-all.route.js';
-import { readTransactionRoute } from './routes/transaction/read.route.js';
+import { readTransactionsRoute } from './routes/transaction/read.route.js';
+import { readTransactionByIdRoute } from './routes/transaction/read-by-id.route.js';
 import { updateTransactionRoute } from './routes/transaction/update.route.js';
 import { deleteTransactionRoute } from './routes/transaction/delete.route.js';
 import type { RouteNotFoundSchema } from './schemas/route-not-found.schema.js';
@@ -113,8 +113,8 @@ export const createApp = (
     app.register(createEmailVerificationRoute, { requestEmailVerificationUseCase, authenticateUseCase });
     app.register(deleteEmailVerificationRoute, { verifyEmailUseCase });
     app.register(createTransactionRoute, { createTransactionUseCase, authenticateUseCase });
-    app.register(readAllTransactionRoute, { getUserTransactionsUseCase, authenticateUseCase });
-    app.register(readTransactionRoute, { getTransactionUseCase, authenticateUseCase });
+    app.register(readTransactionsRoute, { getUserTransactionsUseCase, authenticateUseCase });
+    app.register(readTransactionByIdRoute, { getTransactionUseCase, authenticateUseCase });
     app.register(updateTransactionRoute, { updateTransactionUseCase, authenticateUseCase });
     app.register(deleteTransactionRoute, { deleteTransactionUseCase, authenticateUseCase });
 
