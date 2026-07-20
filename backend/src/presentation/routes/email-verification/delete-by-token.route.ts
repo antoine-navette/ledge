@@ -15,7 +15,7 @@ type Options = {
     verifyEmailUseCase: VerifyEmailUseCase;
 };
 
-export const deleteEmailVerificationRoute: FastifyPluginAsync<Options> = async (app, { verifyEmailUseCase }) => {
+export const deleteEmailVerificationByTokenRoute: FastifyPluginAsync<Options> = async (app, { verifyEmailUseCase }) => {
     app.withTypeProvider<FastifyZodOpenApiTypeProvider>().route({
         method: 'DELETE',
         url: '/email-verifications/:token',

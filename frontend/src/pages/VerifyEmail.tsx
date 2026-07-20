@@ -13,7 +13,7 @@ export default function VerifyEmail() {
     const handleVerify = async () => {
         setState({ status: 'loading' });
 
-        const { error } = await EmailVerificationService.delete(token);
+        const { error } = await EmailVerificationService.deleteByToken(token);
         if (error) {
             setState({ status: 'error', message: error.code });
             return;

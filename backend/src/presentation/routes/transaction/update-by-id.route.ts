@@ -19,7 +19,7 @@ type Options = {
     authenticateUseCase: AuthenticateUseCase;
 };
 
-export const updateTransactionRoute: FastifyPluginAsync<Options> = async (
+export const updateTransactionByIdRoute: FastifyPluginAsync<Options> = async (
     app,
     { updateTransactionUseCase, authenticateUseCase },
 ) => {

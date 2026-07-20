@@ -18,7 +18,7 @@ const DeleteTransactionModal = ({ isOpen, onClose, transaction, onDelete }: Prop
         setIsDeleting(true);
         setError(null);
 
-        const { error: deleteError } = await TransactionService.delete(transaction.id);
+        const { error: deleteError } = await TransactionService.deleteById(transaction.id);
 
         setIsDeleting(false);
 

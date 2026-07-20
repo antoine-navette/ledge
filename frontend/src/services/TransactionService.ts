@@ -31,7 +31,7 @@ export const TransactionService = {
         }
     },
 
-    update: async (
+    updateById: async (
         id: string,
         name: string,
         value: number,
@@ -48,7 +48,7 @@ export const TransactionService = {
         }
     },
 
-    delete: async (id: string) => {
+    deleteById: async (id: string) => {
         try {
             return await api.client.DELETE('/transactions/{id}', { params: { path: { id } } });
         } catch {

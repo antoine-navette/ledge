@@ -29,12 +29,12 @@ import { loginRoute } from './routes/auth/login.route.js';
 import { logoutRoute } from './routes/auth/logout.route.js';
 import { meRoute } from './routes/user/me.route.js';
 import { createEmailVerificationRoute } from './routes/email-verification/create.route.js';
-import { deleteEmailVerificationRoute } from './routes/email-verification/delete.route.js';
+import { deleteEmailVerificationByTokenRoute } from './routes/email-verification/delete-by-token.route.js';
 import { createTransactionRoute } from './routes/transaction/create.route.js';
 import { readTransactionsRoute } from './routes/transaction/read.route.js';
 import { readTransactionByIdRoute } from './routes/transaction/read-by-id.route.js';
-import { updateTransactionRoute } from './routes/transaction/update.route.js';
-import { deleteTransactionRoute } from './routes/transaction/delete.route.js';
+import { updateTransactionByIdRoute } from './routes/transaction/update-by-id.route.js';
+import { deleteTransactionByIdRoute } from './routes/transaction/delete-by-id.route.js';
 import type { RouteNotFoundSchema } from './schemas/route-not-found.schema.js';
 import type { BadRequestSchema } from './schemas/bad-request.schema.js';
 import type { PayloadTooLargeSchema } from './schemas/payload-too-large.schema.js';
@@ -111,12 +111,12 @@ export const createApp = (
     app.register(logoutRoute, { authenticateUseCase, logoutUseCase });
     app.register(meRoute, { getCurrentUserUseCase, authenticateUseCase });
     app.register(createEmailVerificationRoute, { requestEmailVerificationUseCase, authenticateUseCase });
-    app.register(deleteEmailVerificationRoute, { verifyEmailUseCase });
+    app.register(deleteEmailVerificationByTokenRoute, { verifyEmailUseCase });
     app.register(createTransactionRoute, { createTransactionUseCase, authenticateUseCase });
     app.register(readTransactionsRoute, { getUserTransactionsUseCase, authenticateUseCase });
     app.register(readTransactionByIdRoute, { getTransactionUseCase, authenticateUseCase });
-    app.register(updateTransactionRoute, { updateTransactionUseCase, authenticateUseCase });
-    app.register(deleteTransactionRoute, { deleteTransactionUseCase, authenticateUseCase });
+    app.register(updateTransactionByIdRoute, { updateTransactionUseCase, authenticateUseCase });
+    app.register(deleteTransactionByIdRoute, { deleteTransactionUseCase, authenticateUseCase });
 
     // Not found
     app.setNotFoundHandler(async (request, reply) => {

@@ -17,7 +17,7 @@ type Options = {
     authenticateUseCase: AuthenticateUseCase;
 };
 
-export const deleteTransactionRoute: FastifyPluginAsync<Options> = async (
+export const deleteTransactionByIdRoute: FastifyPluginAsync<Options> = async (
     app,
     { deleteTransactionUseCase, authenticateUseCase },
 ) => {

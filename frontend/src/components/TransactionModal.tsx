@@ -49,7 +49,13 @@ const TransactionModal = ({ isOpen, onClose, initialTransaction, defaultType, mo
         const numValue = Number(value);
 
         const { data, error } = initialTransaction
-            ? await TransactionService.update(initialTransaction.id, name, numValue, fixedType, category ?? undefined)
+            ? await TransactionService.updateById(
+                  initialTransaction.id,
+                  name,
+                  numValue,
+                  fixedType,
+                  category ?? undefined,
+              )
             : await TransactionService.create(month, name, numValue, fixedType, category ?? undefined);
 
         setIsLoading(false);

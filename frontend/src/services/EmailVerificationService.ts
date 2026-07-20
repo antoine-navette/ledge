@@ -9,7 +9,7 @@ export const EmailVerificationService = {
         }
     },
 
-    delete: async (token: string) => {
+    deleteByToken: async (token: string) => {
         try {
             return await api.client.DELETE('/email-verifications/{token}', { params: { path: { token } } });
         } catch {
