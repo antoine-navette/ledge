@@ -3,15 +3,12 @@ import { EmailVerificationService } from '../services/EmailVerificationService';
 import { useParams } from 'react-router-dom';
 
 export default function VerifyEmail() {
-    const { token } = useParams<{ token: string }>();
-
     const [isVerifying, setIsVerifying] = useState(false);
     const [success, setSuccess] = useState<boolean | null>(null);
     const [message, setMessage] = useState<string | null>(null);
 
-    if (!token) {
-        return <div className="text-center p-10 text-red-600">Lien invalide (token manquant).</div>;
-    }
+    const { token } = useParams<{ token: string }>();
+    if (!token) return <div className="text-center p-10 text-red-600">Lien invalide (token manquant).</div>;
 
     const handleVerify = async () => {
         setSuccess(null);

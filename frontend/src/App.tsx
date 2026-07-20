@@ -7,6 +7,8 @@ import Profile from './pages/Profile';
 import VerifyEmail from './pages/VerifyEmail';
 import RouteNotFound from './pages/RouteNotFound.tsx';
 import { useEffect } from 'react';
+import RequireAuth from './guards/RequireAuth.tsx';
+import RequireGuest from './guards/RequireGuest.tsx';
 
 function App() {
     const { pathname } = useLocation();
@@ -18,11 +20,17 @@ function App() {
     return (
         <div className="min-h-screen bg-gray-100">
             <Routes>
-                <Route path="/" element={<HomePage />} />
-                <Route path="/month/:month" element={<MonthPage />} />
-                <Route path="/profile" element={<Profile />} />
-                <Route path="/register" element={<Register />} />
-                <Route path="/login" element={<Login />} />
+                <Route element={<RequireGuest />}>
+                    <Route path="/register" element={<Register />} />
+                    <Route path="/login" element={<Login />} />
+                </Route>
+
+                <Route element={<RequireAuth />}>
+                    <Route path="/" element={<HomePage />} />
+                    <Route path="/month/:month" element={<MonthPage />} />
+                    <Route path="/profile" element={<Profile />} />
+                </Route>
+
                 <Route path="/verify-email/:token" element={<VerifyEmail />} />
                 <Route path="*" element={<RouteNotFound />} />
             </Routes>

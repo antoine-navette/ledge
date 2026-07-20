@@ -1,21 +1,21 @@
 import { useEffect, useState, type ReactNode } from 'react';
 import { UserService } from '../services/UserService';
 import type { User } from '../entities/User';
-import { AuthContext } from '../contexts/AuthContext.ts';
+import { AuthContext, AuthState } from '../contexts/AuthContext.ts';
 
 export const AuthProvider = ({ children }: { children: ReactNode }) => {
-    const [user, setUser] = useState<User | null>(null);
-    const [isLoading, setIsLoading] = useState(true);
+    const [state, setState] = useState<AuthState>({ status: 'loading' });
 
     useEffect(() => {
         const initAuth = async () => {
             const { data } = await UserService.me();
-            if (data) setUser(data);
-            setIsLoading(false);
+            setState({ status: 'success', user: data ?? null });
         };
 
-        initAuth();
+        void initAuth();
     }, []);
 
-    return <AuthContext.Provider value={{ user, isLoading, setUser }}>{children}</AuthContext.Provider>;
+    const setUser = (user: User | null) => setState({ status: 'success', user });
+
+    return <AuthContext.Provider value={{ state, setUser }}>{children}</AuthContext.Provider>;
 };

@@ -1,6 +1,5 @@
 import { useState } from 'react';
 import { EmailVerificationService } from '../services/EmailVerificationService';
-import { Navigate } from 'react-router-dom';
 import Navbar from '../components/Navbar.tsx';
 import { useAuth } from '../hooks/useAuth.ts';
 
@@ -9,9 +8,8 @@ const Profile = () => {
     const [success, setSuccess] = useState<boolean | null>(null);
     const [message, setMessage] = useState<string | null>(null);
 
-    const { user, isLoading } = useAuth();
-    if (isLoading) return <div className="flex flex-col flex-1 items-center justify-center p-4">Loading...</div>;
-    if (!user) return <Navigate to="/login" />;
+    const auth = useAuth();
+    if (auth.state.status !== 'success' || !auth.state.user) return;
 
     const handleRequestEmailVerification = async () => {
         setSuccess(null);
@@ -37,7 +35,7 @@ const Profile = () => {
             <div className="flex flex-col flex-1 items-center justify-center p-4">
                 <h1 className="text-4xl font-bold mb-4">Profile page</h1>
                 <p className="text-lg mb-6">This is the profile page.</p>
-                {!user.isEmailVerified && (
+                {!auth.state.user.isEmailVerified && (
                     <button
                         className="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700 transition cursor-pointer disabled:opacity-50"
                         onClick={handleRequestEmailVerification}

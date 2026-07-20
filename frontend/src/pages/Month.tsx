@@ -7,10 +7,8 @@ import DeleteTransactionModal from '../components/DeleteTransactionModal';
 import DateNavigator from '../components/DateNavigator';
 import { TransactionService } from '../services/TransactionService';
 import type { Transaction } from '../entities/Transaction';
-import { useAuth } from '../hooks/useAuth.ts';
 
 const Month = () => {
-    const { user, isLoading: isUserLoading } = useAuth();
     const navigate = useNavigate();
     const params = useParams<{ month: string }>();
     const currentMonth = params.month;
@@ -23,16 +21,18 @@ const Month = () => {
     const [defaultModalType, setDefaultModalType] = useState<'income' | 'expense'>('expense');
 
     useEffect(() => {
-        if (isUserLoading || !user) return;
         const fetchData = async () => {
             setIsLoadingTransactions(true);
+
             const { data, error } = await TransactionService.readAll();
             setIsLoadingTransactions(false);
             if (error) return;
+
             setTransactions(data);
         };
-        fetchData();
-    }, [isUserLoading, user]);
+
+        void fetchData();
+    }, []);
 
     const handleTransactionSaved = (savedTransaction: Transaction) => {
         setTransactions((prev) => {
@@ -65,8 +65,6 @@ const Month = () => {
     }, []);
 
     const regex = /^\d{4}-(0[1-9]|1[0-2])$/;
-    if (isUserLoading) return <div className="flex flex-col flex-1 items-center justify-center p-4">Loading...</div>;
-    if (!user) return <Navigate to="/login" replace />;
     if (!currentMonth || !regex.test(currentMonth)) return <Navigate to="/" replace />;
 
     const [yearStr, monthStr] = currentMonth.split('-');

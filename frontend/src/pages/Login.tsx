@@ -1,11 +1,11 @@
 import { FormEvent, useState } from 'react';
-import { Link, Navigate, useNavigate } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import { AuthService } from '../services/AuthService';
 import { useAuth } from '../hooks/useAuth.ts';
 
 const Login = () => {
     const navigate = useNavigate();
-    const { user, setUser } = useAuth();
+    const auth = useAuth();
 
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
@@ -28,11 +28,9 @@ const Login = () => {
             return;
         }
 
-        setUser(data);
+        auth.setUser(data);
         navigate('/');
     };
-
-    if (user) return <Navigate to="/" replace />;
 
     return (
         <div className="flex items-center justify-center min-h-screen bg-gray-100 px-4">
