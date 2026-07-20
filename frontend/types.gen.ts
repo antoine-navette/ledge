@@ -514,7 +514,9 @@ export interface paths {
         };
         get: {
             parameters: {
-                query?: never;
+                query?: {
+                    month?: string;
+                };
                 header?: never;
                 path?: never;
                 cookie?: never;
@@ -528,6 +530,15 @@ export interface paths {
                     };
                     content: {
                         "application/json": components["schemas"]["Transaction"][];
+                    };
+                };
+                /** @description Default Response */
+                400: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["BadRequest"];
                     };
                 };
                 /** @description Default Response */

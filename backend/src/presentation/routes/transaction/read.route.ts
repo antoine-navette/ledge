@@ -5,6 +5,7 @@ import type { GetUserTransactionsUseCase } from '../../../application/transactio
 import type { AuthenticateUseCase } from '../../../application/auth/authenticate.use-case.js';
 import { isAuthenticated } from '../../middlewares/is-authenticated.middleware.js';
 import { transactionSchema } from '../../schemas/transaction.schema.js';
+import { badRequestSchema } from '../../schemas/bad-request.schema.js';
 import { unauthorizedSchema } from '../../schemas/unauthorized.schema.js';
 import { tooManyRequestsSchema } from '../../schemas/too-many-requests.schema.js';
 import { internalServerErrorSchema } from '../../schemas/internal-server-error.schema.js';
@@ -24,8 +25,15 @@ export const readTransactionsRoute: FastifyPluginAsync<Options> = async (
         url: '/transactions',
         schema: {
             tags: ['Transaction'],
+            querystring: z.object({
+                month: z
+                    .string()
+                    .regex(/^\d{4}-(0[1-9]|1[0-2])$/)
+                    .optional(),
+            }),
             response: {
                 200: z.array(transactionSchema),
+                400: badRequestSchema,
                 401: unauthorizedSchema,
                 429: tooManyRequestsSchema,
                 500: internalServerErrorSchema,
@@ -33,7 +41,9 @@ export const readTransactionsRoute: FastifyPluginAsync<Options> = async (
         } satisfies FastifyZodOpenApiSchema,
         preHandler: isAuthenticated(authenticateUseCase),
         handler: async (request, reply) => {
-            const transactions = await getUserTransactionsUseCase.execute(request.session.userId);
+            const { month } = request.query;
+
+            const transactions = await getUserTransactionsUseCase.execute(request.session.userId, month);
 
             return reply.status(200).send(transactions.map(TransactionMapper.toSchema));
         },

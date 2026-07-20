@@ -15,9 +15,9 @@ export const TransactionService = {
         }
     },
 
-    read: async () => {
+    read: async (criteria?: { month?: string }) => {
         try {
-            return await api.client.GET('/transactions');
+            return await api.client.GET('/transactions', { params: { query: criteria } });
         } catch {
             return { data: undefined, error: { code: 'NETWORK_ERROR' as const } };
         }
