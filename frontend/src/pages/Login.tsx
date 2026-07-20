@@ -7,24 +7,20 @@ const Login = () => {
     const navigate = useNavigate();
     const auth = useAuth();
 
-    const [email, setEmail] = useState('');
-    const [password, setPassword] = useState('');
+    const [state, setState] = useState<
+        { status: 'idle' } | { status: 'loading' } | { status: 'error'; message: string }
+    >({ status: 'idle' });
 
-    const [isLoading, setIsLoading] = useState(false);
-    const [globalError, setGlobalError] = useState<string | null>(null);
+    const [form, setForm] = useState({ email: '', password: '' });
 
     const handleSubmit = async (e: FormEvent) => {
         e.preventDefault();
 
-        setIsLoading(true);
-        setGlobalError(null);
+        setState({ status: 'loading' });
 
-        const { data, error } = await AuthService.login(email, password);
-
-        setIsLoading(false);
-
+        const { data, error } = await AuthService.login(form.email, form.password);
         if (error) {
-            setGlobalError(error.code);
+            setState({ status: 'error', message: error.code });
             return;
         }
 
@@ -48,8 +44,8 @@ const Login = () => {
                         <input
                             type="email"
                             id="email"
-                            value={email}
-                            onChange={(e) => setEmail(e.target.value)}
+                            value={form.email}
+                            onChange={(e) => setForm((prev) => ({ ...prev, email: e.target.value }))}
                             className="block w-full px-3 py-2 border rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 transition-colors border-gray-300"
                             required
                         />
@@ -65,26 +61,26 @@ const Login = () => {
                         <input
                             type="password"
                             id="password"
-                            value={password}
-                            onChange={(e) => setPassword(e.target.value)}
+                            value={form.password}
+                            onChange={(e) => setForm((prev) => ({ ...prev, password: e.target.value }))}
                             className="block w-full px-3 py-2 border rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 transition-colors border-gray-300"
                             required
                         />
                     </div>
 
-                    {globalError && (
+                    {state.status === 'error' && (
                         <div className="p-3 rounded bg-red-50 text-red-600 text-sm text-center font-medium border border-red-100">
-                            {globalError}
+                            {state.message}
                         </div>
                     )}
 
                     <button
                         type="submit"
-                        disabled={isLoading}
+                        disabled={state.status === 'loading'}
                         className={`w-full text-white font-semibold py-2 px-4 rounded transition duration-200
-                            ${isLoading ? 'bg-blue-400 cursor-not-allowed' : 'bg-blue-600 hover:bg-blue-700 cursor-pointer'}`}
+                            ${state.status === 'loading' ? 'bg-blue-400 cursor-not-allowed' : 'bg-blue-600 hover:bg-blue-700 cursor-pointer'}`}
                     >
-                        {isLoading ? 'Logging in...' : 'Login'}
+                        {state.status === 'loading' ? 'Logging in...' : 'Login'}
                     </button>
                 </form>
 
