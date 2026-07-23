@@ -1,4 +1,4 @@
-import { FormEvent, useEffect, useRef, useState } from 'react';
+import { FormEvent, useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { AuthService } from '../services/AuthService';
 import { useAuth } from '../hooks/useAuth.ts';
@@ -9,17 +9,9 @@ const Register = () => {
 
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
-    const [confirmPassword, setConfirmPassword] = useState('');
-    const confirmPasswordRef = useRef<HTMLInputElement>(null);
 
     const [isLoading, setIsLoading] = useState(false);
     const [globalError, setGlobalError] = useState<string | null>(null);
-
-    useEffect(() => {
-        confirmPasswordRef.current?.setCustomValidity(
-            confirmPassword && confirmPassword !== password ? 'Passwords do not match' : '',
-        );
-    }, [password, confirmPassword]);
 
     const handleSubmit = async (e: FormEvent) => {
         e.preventDefault();
@@ -78,24 +70,6 @@ const Register = () => {
                             className="block w-full px-3 py-2 border rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 transition-colors border-gray-300"
                             required
                             minLength={8}
-                        />
-                    </div>
-
-                    <div>
-                        <label
-                            htmlFor="confirmPassword"
-                            className="block text-sm font-medium text-gray-700 mb-1 cursor-pointer select-none"
-                        >
-                            Confirm Password
-                        </label>
-                        <input
-                            ref={confirmPasswordRef}
-                            type="password"
-                            id="confirmPassword"
-                            value={confirmPassword}
-                            onChange={(e) => setConfirmPassword(e.target.value)}
-                            className="block w-full px-3 py-2 border rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 transition-colors border-gray-300"
-                            required
                         />
                     </div>
 
