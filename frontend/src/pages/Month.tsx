@@ -1,9 +1,7 @@
-import { useCallback, useEffect, useMemo, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import { Navigate, useNavigate, useParams } from 'react-router-dom';
 import Navbar from '../components/Navbar';
 import TransactionListSection from '../components/TransactionListSection';
-import TransactionModal from '../components/TransactionModal';
-import DeleteTransactionModal from '../components/DeleteTransactionModal';
 import DateNavigator from '../components/DateNavigator';
 import { TransactionService } from '../services/TransactionService';
 import type { Transaction } from '../entities/Transaction';
@@ -15,10 +13,6 @@ const Month = () => {
 
     const [transactions, setTransactions] = useState<Transaction[]>([]);
     const [isLoadingTransactions, setIsLoadingTransactions] = useState(false);
-    const [isTransactionModalOpen, setIsTransactionModalOpen] = useState(false);
-    const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
-    const [selectedTransaction, setSelectedTransaction] = useState<Transaction | null>(null);
-    const [modalType, setModalType] = useState<'income' | 'expense'>('expense');
 
     useEffect(() => {
         const fetchData = async () => {
@@ -34,36 +28,21 @@ const Month = () => {
         void fetchData();
     }, []);
 
-    const handleTransactionSaved = (savedTransaction: Transaction) => {
+    const handleUpsert = (savedTransaction: Transaction) => {
         setTransactions((prev) => {
             const exists = prev.find((t) => t.id === savedTransaction.id);
             if (exists) return prev.map((t) => (t.id === savedTransaction.id ? savedTransaction : t));
             return [...prev, savedTransaction];
         });
-        setIsTransactionModalOpen(false);
-        setSelectedTransaction(null);
     };
 
-    const handleTransactionDeleted = (deletedTransaction: Transaction) => {
+    const handleDelete = (deletedTransaction: Transaction) => {
         setTransactions((prev) => prev.filter((t) => t.id !== deletedTransaction.id));
-        setIsDeleteModalOpen(false);
-        setSelectedTransaction(null);
     };
 
     const currentMonthTransactions = useMemo(() => {
         return transactions.filter((t) => t.month === currentMonth).sort((a, b) => b.value - a.value);
     }, [transactions, currentMonth]);
-
-    const openEditModal = useCallback((transaction: Transaction) => {
-        setSelectedTransaction(transaction);
-        setModalType(transaction.type);
-        setIsTransactionModalOpen(true);
-    }, []);
-
-    const openDeleteModal = useCallback((transaction: Transaction) => {
-        setSelectedTransaction(transaction);
-        setIsDeleteModalOpen(true);
-    }, []);
 
     const regex = /^\d{4}-(0[1-9]|1[0-2])$/;
     if (!currentMonth || !regex.test(currentMonth)) return <Navigate to="/" replace />;
@@ -85,34 +64,9 @@ const Month = () => {
     const totalExpenses = expenses.reduce((acc, t) => acc + t.value, 0);
     const total = totalIncomes - totalExpenses;
 
-    const openAddModal = (type: 'income' | 'expense') => {
-        setSelectedTransaction(null);
-        setModalType(type);
-        setIsTransactionModalOpen(true);
-    };
-
     return (
         <>
             <Navbar />
-
-            {isTransactionModalOpen && (
-                <TransactionModal
-                    key={selectedTransaction?.id ?? 'new'}
-                    onClose={() => setIsTransactionModalOpen(false)}
-                    transaction={selectedTransaction}
-                    type={modalType}
-                    month={currentMonth}
-                    onSave={handleTransactionSaved}
-                />
-            )}
-
-            {isDeleteModalOpen && selectedTransaction && (
-                <DeleteTransactionModal
-                    onClose={() => setIsDeleteModalOpen(false)}
-                    transaction={selectedTransaction}
-                    onDelete={handleTransactionDeleted}
-                />
-            )}
 
             <div className="flex flex-col flex-1 items-center p-4">
                 <h1 className="text-3xl font-bold mb-6 text-gray-800 select-none">Ledge</h1>
@@ -124,21 +78,6 @@ const Month = () => {
                     onToday={() => navigate(`/month/${todayStr}`)}
                     isCurrent={currentMonth === todayStr}
                 />
-
-                <div className="grid grid-cols-2 gap-4 mb-6 w-full max-w-5xl">
-                    <button
-                        onClick={() => openAddModal('income')}
-                        className="bg-green-600 hover:bg-green-700 text-white rounded-md px-4 py-3 text-sm shadow cursor-pointer transition select-none font-semibold flex items-center justify-center gap-2"
-                    >
-                        + Income
-                    </button>
-                    <button
-                        onClick={() => openAddModal('expense')}
-                        className="bg-red-600 hover:bg-red-700 text-white rounded-md px-4 py-3 text-sm shadow cursor-pointer transition select-none font-semibold flex items-center justify-center gap-2"
-                    >
-                        + Expense
-                    </button>
-                </div>
 
                 <div className="w-full max-w-5xl bg-white shadow-md rounded-lg p-4 mb-6 text-center">
                     <h3 className="text-xl font-semibold text-gray-800 select-none">Total balance</h3>
@@ -153,16 +92,18 @@ const Month = () => {
                     <TransactionListSection
                         transactions={incomes}
                         total={totalIncomes}
+                        month={currentMonth}
                         type="income"
-                        onEdit={openEditModal}
-                        onDelete={openDeleteModal}
+                        onUpsert={handleUpsert}
+                        onDelete={handleDelete}
                     />
                     <TransactionListSection
                         transactions={expenses}
                         total={totalExpenses}
+                        month={currentMonth}
                         type="expense"
-                        onEdit={openEditModal}
-                        onDelete={openDeleteModal}
+                        onUpsert={handleUpsert}
+                        onDelete={handleDelete}
                     />
                 </div>
             </div>

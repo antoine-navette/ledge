@@ -8,10 +8,10 @@ interface Props {
     transaction: Transaction | null;
     type: 'income' | 'expense';
     month: string;
-    onSave: (transaction: Transaction) => void;
+    onUpsert: (transaction: Transaction) => void;
 }
 
-const TransactionModal = ({ onClose, transaction, type, month, onSave }: Props) => {
+const UpsertTransactionModal = ({ onClose, transaction, type, month, onUpsert }: Props) => {
     const [state, setState] = useState<
         { status: 'idle' } | { status: 'loading' } | { status: 'error'; message: string }
     >({ status: 'idle' });
@@ -35,7 +35,8 @@ const TransactionModal = ({ onClose, transaction, type, month, onSave }: Props) 
             return;
         }
 
-        onSave(data);
+        onUpsert(data);
+        onClose();
     };
 
     return (
@@ -153,4 +154,4 @@ const TransactionModal = ({ onClose, transaction, type, month, onSave }: Props) 
     );
 };
 
-export default TransactionModal;
+export default UpsertTransactionModal;

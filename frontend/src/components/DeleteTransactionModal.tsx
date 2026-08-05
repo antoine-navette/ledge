@@ -24,6 +24,7 @@ const DeleteTransactionModal = ({ onClose, transaction, onDelete }: Props) => {
         }
 
         onDelete(transaction);
+        onClose();
     };
 
     return (
