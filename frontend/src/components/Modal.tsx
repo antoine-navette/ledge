@@ -14,8 +14,8 @@ const Modal = ({ isOpen, onClose, title, children }: ModalProps) => {
         };
 
         if (isOpen) {
+            document.body.style.overflow = 'hidden'; // Empêche le scroll
             window.addEventListener('keydown', handleKeyDown);
-            document.body.style.overflow = 'hidden';
         }
 
         return () => {
@@ -24,7 +24,7 @@ const Modal = ({ isOpen, onClose, title, children }: ModalProps) => {
         };
     }, [isOpen, onClose]);
 
-    if (!isOpen) return null;
+    if (!isOpen) return;
 
     return (
         <div
@@ -43,7 +43,7 @@ const Modal = ({ isOpen, onClose, title, children }: ModalProps) => {
                     ✕
                 </button>
 
-                {title && <h2 className="text-xl font-bold mb-6 text-gray-800 capitalize">{title}</h2>}
+                <h2 className="text-xl font-bold mb-6 text-gray-800 capitalize">{title}</h2>
 
                 {children}
             </div>
