@@ -211,8 +211,8 @@
                     "type": {
                         "type": "string",
                         "enum": [
-                            "expense",
-                            "income"
+                            "income",
+                            "expense"
                         ]
                     },
                     "category": {
@@ -791,8 +791,8 @@
                                     "type": {
                                         "type": "string",
                                         "enum": [
-                                            "expense",
-                                            "income"
+                                            "income",
+                                            "expense"
                                         ]
                                     },
                                     "category": {
@@ -1062,8 +1062,8 @@
                                     "type": {
                                         "type": "string",
                                         "enum": [
-                                            "expense",
-                                            "income"
+                                            "income",
+                                            "expense"
                                         ]
                                     },
                                     "category": {

@@ -5,7 +5,7 @@ export const TransactionService = {
         month: string,
         name: string,
         value: number,
-        type: 'expense' | 'income',
+        type: 'income' | 'expense',
         category?: 'need' | 'want' | 'investment',
     ) => {
         try {
@@ -35,7 +35,7 @@ export const TransactionService = {
         id: string,
         name: string,
         value: number,
-        type: 'expense' | 'income',
+        type: 'income' | 'expense',
         category?: 'need' | 'want' | 'investment',
     ) => {
         try {

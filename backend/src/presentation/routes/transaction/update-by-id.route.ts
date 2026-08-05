@@ -44,7 +44,7 @@ export const updateTransactionByIdRoute: FastifyPluginAsync<Options> = async (
                         return !decimals || decimals.length <= 2;
                     })
                     .max(999999999.99),
-                type: z.enum(['expense', 'income']),
+                type: z.enum(['income', 'expense']),
                 category: z.enum(['need', 'want', 'investment']).optional(),
             }),
             response: {

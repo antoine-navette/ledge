@@ -7,7 +7,7 @@ export const transactionSchema = z
         month: z.string(),
         name: z.string(),
         value: z.number(),
-        type: z.enum(['expense', 'income']),
+        type: z.enum(['income', 'expense']),
         category: z.enum(['need', 'want', 'investment']).optional(),
         createdAt: z.date(),
         updatedAt: z.date(),

@@ -9,7 +9,7 @@ export class UpdateTransactionUseCase {
         userId: string,
         name: string,
         value: number,
-        type: 'expense' | 'income',
+        type: 'income' | 'expense',
         category?: 'need' | 'want' | 'investment',
     ) => {
         const transaction = await this.transactionRepository.findById(id);

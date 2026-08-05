@@ -4,13 +4,12 @@ import type { Transaction } from '../entities/Transaction';
 import Modal from './Modal.tsx';
 
 interface Props {
-    isOpen: boolean;
     onClose: () => void;
     transaction: Transaction;
     onDelete: (transaction: Transaction) => void;
 }
 
-const DeleteTransactionModal = ({ isOpen, onClose, transaction, onDelete }: Props) => {
+const DeleteTransactionModal = ({ onClose, transaction, onDelete }: Props) => {
     const [state, setState] = useState<
         { status: 'idle' } | { status: 'loading' } | { status: 'error'; message: string }
     >({ status: 'idle' });
@@ -27,10 +26,8 @@ const DeleteTransactionModal = ({ isOpen, onClose, transaction, onDelete }: Prop
         onDelete(transaction);
     };
 
-    if (!isOpen) return;
-
     return (
-        <Modal isOpen={isOpen} onClose={onClose} title="Delete transaction">
+        <Modal onClose={onClose} title="Delete transaction">
             <p className="mb-6 text-gray-600">
                 Are you sure you want to delete <strong>{transaction.name}</strong> ({transaction.value} €)?
                 <br />

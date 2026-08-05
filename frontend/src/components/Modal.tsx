@@ -1,30 +1,25 @@
 import { useEffect, ReactNode } from 'react';
 
 interface ModalProps {
-    isOpen: boolean;
     onClose: () => void;
     title: string;
     children: ReactNode;
 }
 
-const Modal = ({ isOpen, onClose, title, children }: ModalProps) => {
+const Modal = ({ onClose, title, children }: ModalProps) => {
     useEffect(() => {
         const handleKeyDown = (e: KeyboardEvent) => {
             if (e.key === 'Escape') onClose();
         };
 
-        if (isOpen) {
-            document.body.style.overflow = 'hidden'; // Empêche le scroll
-            window.addEventListener('keydown', handleKeyDown);
-        }
+        document.body.style.overflow = 'hidden'; // Empêche le scroll
+        window.addEventListener('keydown', handleKeyDown);
 
         return () => {
             window.removeEventListener('keydown', handleKeyDown);
             document.body.style.overflow = '';
         };
-    }, [isOpen, onClose]);
-
-    if (!isOpen) return;
+    }, [onClose]);
 
     return (
         <div

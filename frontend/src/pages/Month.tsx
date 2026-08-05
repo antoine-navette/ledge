@@ -18,7 +18,7 @@ const Month = () => {
     const [isTransactionModalOpen, setIsTransactionModalOpen] = useState(false);
     const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
     const [selectedTransaction, setSelectedTransaction] = useState<Transaction | null>(null);
-    const [defaultModalType, setDefaultModalType] = useState<'income' | 'expense'>('expense');
+    const [modalType, setModalType] = useState<'income' | 'expense'>('expense');
 
     useEffect(() => {
         const fetchData = async () => {
@@ -56,6 +56,7 @@ const Month = () => {
 
     const openEditModal = useCallback((transaction: Transaction) => {
         setSelectedTransaction(transaction);
+        setModalType(transaction.type);
         setIsTransactionModalOpen(true);
     }, []);
 
@@ -86,7 +87,7 @@ const Month = () => {
 
     const openAddModal = (type: 'income' | 'expense') => {
         setSelectedTransaction(null);
-        setDefaultModalType(type);
+        setModalType(type);
         setIsTransactionModalOpen(true);
     };
 
@@ -94,18 +95,19 @@ const Month = () => {
         <>
             <Navbar />
 
-            <TransactionModal
-                isOpen={isTransactionModalOpen}
-                onClose={() => setIsTransactionModalOpen(false)}
-                initialTransaction={selectedTransaction}
-                defaultType={defaultModalType}
-                month={currentMonth}
-                onSave={handleTransactionSaved}
-            />
+            {isTransactionModalOpen && (
+                <TransactionModal
+                    key={selectedTransaction?.id ?? 'new'}
+                    onClose={() => setIsTransactionModalOpen(false)}
+                    transaction={selectedTransaction}
+                    type={modalType}
+                    month={currentMonth}
+                    onSave={handleTransactionSaved}
+                />
+            )}
 
-            {selectedTransaction && (
+            {isDeleteModalOpen && selectedTransaction && (
                 <DeleteTransactionModal
-                    isOpen={isDeleteModalOpen}
                     onClose={() => setIsDeleteModalOpen(false)}
                     transaction={selectedTransaction}
                     onDelete={handleTransactionDeleted}
