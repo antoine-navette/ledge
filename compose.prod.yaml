@@ -15,8 +15,6 @@ services:
         required: true
     ports:
       - "${BACKEND_PORT}:3000"
-    depends_on:
-      - loki
     restart: unless-stopped
 
   mongo:
@@ -26,26 +24,3 @@ services:
       MONGO_INITDB_ROOT_USERNAME: ${MONGO_USER}
       MONGO_INITDB_ROOT_PASSWORD: ${MONGO_PASSWORD}
     restart: unless-stopped
-
-  loki:
-    image: grafana/loki:3.5
-    volumes:
-      - loki:/loki
-    restart: unless-stopped
-
-  grafana:
-    image: grafana/grafana:12.3
-    ports:
-      - "${GRAFANA_PORT}:3000"
-    volumes:
-      - grafana:/var/lib/grafana
-    environment:
-      - GF_SECURITY_ADMIN_USER=${GRAFANA_USER}
-      - GF_SECURITY_ADMIN_PASSWORD=${GRAFANA_PASSWORD}
-    depends_on:
-      - loki
-    restart: unless-stopped
-
-volumes:
-  loki:
-  grafana:

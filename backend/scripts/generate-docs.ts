@@ -16,7 +16,7 @@ import type { UpdateTransactionUseCase } from '../src/application/transaction/up
 import type { DeleteTransactionUseCase } from '../src/application/transaction/delete-transaction.use-case.js';
 
 // .env is not verified yet, but we need a logger now
-const pino = createPino(process.env.NODE_ENV as Env['nodeEnv'], process.env.LOKI_URL as Env['lokiUrl']);
+const pino = createPino(process.env.NODE_ENV as Env['nodeEnv']);
 
 // Wrapped in an async function (not awaited at the top level) so the pino transport's
 // unref'd worker thread can't make Node think the module has nothing left to settle and
