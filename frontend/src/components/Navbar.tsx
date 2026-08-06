@@ -6,14 +6,14 @@ import { useAuth } from '../hooks/useAuth.ts';
 const Navbar = () => {
     const [state, setState] = useState<{ status: 'idle' } | { status: 'loading' }>({ status: 'idle' });
 
-    const { setUser } = useAuth();
+    const auth = useAuth();
 
     const handleLogout = async () => {
         setState({ status: 'loading' });
 
         await AuthService.logout(); // We don't really care if an error occurred
 
-        setUser(null); // The main component should redirect us to the login page
+        auth.setUser(null); // RequireAuth will redirect us to login
     };
 
     return (

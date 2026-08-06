@@ -1,10 +1,9 @@
 import { FormEvent, useState } from 'react';
-import { Link, useNavigate } from 'react-router-dom';
+import { Link } from 'react-router-dom';
 import { AuthService } from '../services/AuthService';
 import { useAuth } from '../hooks/useAuth.ts';
 
 const Login = () => {
-    const navigate = useNavigate();
     const auth = useAuth();
 
     const [state, setState] = useState<
@@ -24,8 +23,7 @@ const Login = () => {
             return;
         }
 
-        auth.setUser(data);
-        navigate('/');
+        auth.setUser(data); // RequireGuest will redirect us to home
     };
 
     return (
