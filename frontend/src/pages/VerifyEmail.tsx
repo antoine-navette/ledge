@@ -7,7 +7,7 @@ export default function VerifyEmail() {
         { status: 'idle' } | { status: 'loading' } | { status: 'success' } | { status: 'error'; message: string }
     >({ status: 'idle' });
 
-    const { token } = useParams<{ token: string }>();
+    const { token } = useParams();
     if (!token) return;
 
     const handleClick = async () => {
@@ -43,6 +43,7 @@ export default function VerifyEmail() {
                         )}
                     </>
                 )}
+
                 {state.status === 'success' && (
                     <div className="text-green-600">
                         <p className="mb-2">Email verified successfully!</p>

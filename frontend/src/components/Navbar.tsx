@@ -4,12 +4,12 @@ import { useState } from 'react';
 import { useAuth } from '../hooks/useAuth.ts';
 
 const Navbar = () => {
-    const [isLoading, setIsLoading] = useState(false);
+    const [state, setState] = useState<{ status: 'idle' } | { status: 'loading' }>({ status: 'idle' });
 
     const { setUser } = useAuth();
 
     const handleLogout = async () => {
-        setIsLoading(true);
+        setState({ status: 'loading' });
 
         await AuthService.logout(); // We don't really care if an error occurred
 
@@ -54,9 +54,9 @@ const Navbar = () => {
                 <button
                     className="px-4 py-2 bg-gray-200 text-gray-700 rounded hover:bg-gray-300 cursor-pointer transition disabled:opacity-50"
                     onClick={handleLogout}
-                    disabled={isLoading}
+                    disabled={state.status === 'loading'}
                 >
-                    {isLoading ? 'Logging out...' : 'Logout'}
+                    {state.status === 'loading' ? 'Logging out...' : 'Logout'}
                 </button>
             </div>
         </nav>

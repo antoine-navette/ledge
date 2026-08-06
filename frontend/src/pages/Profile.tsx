@@ -38,9 +38,11 @@ const Profile = () => {
                         >
                             {state.status === 'loading' ? 'Sending...' : 'Request email verification'}
                         </button>
+
                         {state.status === 'success' && (
                             <div className="mt-4 text-green-600">Email sent successfully!</div>
                         )}
+
                         {state.status === 'error' && <div className={'mt-4 text-red-600'}>{state.message}</div>}
                     </>
                 )}
