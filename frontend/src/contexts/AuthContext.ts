@@ -1,10 +1,8 @@
 import type { User } from '../entities/User';
 import { createContext } from 'react';
 
-type AuthContextType = {
-    user: User | null;
-    isLoading: boolean;
-    setUser: (user: User | null) => void;
-};
+export type AuthState = { status: 'loading' } | { status: 'success'; user: User | null };
 
-export const AuthContext = createContext<AuthContextType | undefined>(undefined);
+export const AuthContext = createContext<{ state: AuthState; setUser: (user: User | null) => void } | undefined>(
+    undefined,
+);

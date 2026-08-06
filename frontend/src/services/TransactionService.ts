@@ -5,7 +5,7 @@ export const TransactionService = {
         month: string,
         name: string,
         value: number,
-        type: 'expense' | 'income',
+        type: 'income' | 'expense',
         category?: 'need' | 'want' | 'investment',
     ) => {
         try {
@@ -15,15 +15,15 @@ export const TransactionService = {
         }
     },
 
-    readAll: async () => {
+    read: async (criteria?: { month?: string }) => {
         try {
-            return await api.client.GET('/transactions');
+            return await api.client.GET('/transactions', { params: { query: criteria } });
         } catch {
             return { data: undefined, error: { code: 'NETWORK_ERROR' as const } };
         }
     },
 
-    read: async (id: string) => {
+    readById: async (id: string) => {
         try {
             return await api.client.GET('/transactions/{id}', { params: { path: { id } } });
         } catch {
@@ -31,11 +31,11 @@ export const TransactionService = {
         }
     },
 
-    update: async (
+    updateById: async (
         id: string,
         name: string,
         value: number,
-        type: 'expense' | 'income',
+        type: 'income' | 'expense',
         category?: 'need' | 'want' | 'investment',
     ) => {
         try {
@@ -48,7 +48,7 @@ export const TransactionService = {
         }
     },
 
-    delete: async (id: string) => {
+    deleteById: async (id: string) => {
         try {
             return await api.client.DELETE('/transactions/{id}', { params: { path: { id } } });
         } catch {

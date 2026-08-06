@@ -3,7 +3,7 @@ import type { TransactionRepository } from '../../domain/repositories/transactio
 export class GetUserTransactionsUseCase {
     constructor(private transactionRepository: TransactionRepository) {}
 
-    execute = async (userId: string) => {
-        return await this.transactionRepository.findByUserId(userId);
+    execute = async (userId: string, month?: string) => {
+        return await this.transactionRepository.find({ userId, ...(month ? { month } : {}) });
     };
 }

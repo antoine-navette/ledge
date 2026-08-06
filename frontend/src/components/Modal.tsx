@@ -1,30 +1,25 @@
 import { useEffect, ReactNode } from 'react';
 
 interface ModalProps {
-    isOpen: boolean;
     onClose: () => void;
     title: string;
     children: ReactNode;
 }
 
-const Modal = ({ isOpen, onClose, title, children }: ModalProps) => {
+const Modal = ({ onClose, title, children }: ModalProps) => {
     useEffect(() => {
         const handleKeyDown = (e: KeyboardEvent) => {
             if (e.key === 'Escape') onClose();
         };
 
-        if (isOpen) {
-            window.addEventListener('keydown', handleKeyDown);
-            document.body.style.overflow = 'hidden';
-        }
+        document.body.style.overflow = 'hidden'; // Empêche le scroll
+        window.addEventListener('keydown', handleKeyDown);
 
         return () => {
             window.removeEventListener('keydown', handleKeyDown);
             document.body.style.overflow = '';
         };
-    }, [isOpen, onClose]);
-
-    if (!isOpen) return null;
+    }, [onClose]);
 
     return (
         <div
@@ -43,7 +38,7 @@ const Modal = ({ isOpen, onClose, title, children }: ModalProps) => {
                     ✕
                 </button>
 
-                {title && <h2 className="text-xl font-bold mb-6 text-gray-800 capitalize">{title}</h2>}
+                <h2 className="text-xl font-bold mb-6 text-gray-800 capitalize">{title}</h2>
 
                 {children}
             </div>

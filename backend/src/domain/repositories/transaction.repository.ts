@@ -1,9 +1,14 @@
 import type { Transaction } from '../entities/transaction.js';
 
+export type TransactionCriteria = {
+    userId?: Transaction['userId'];
+    month?: Transaction['month'];
+};
+
 export interface TransactionRepository {
     create: (transaction: Transaction) => Promise<void>;
-    findById: (id: string) => Promise<Transaction | null>;
-    findByUserId: (userId: string) => Promise<Transaction[]>;
+    find: (criteria: TransactionCriteria) => Promise<Transaction[]>;
+    findById: (id: Transaction['id']) => Promise<Transaction | null>;
     save: (transaction: Transaction) => Promise<void>;
     delete: (transaction: Transaction) => Promise<void>;
 }

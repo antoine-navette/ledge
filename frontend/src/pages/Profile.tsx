@@ -1,34 +1,26 @@
 import { useState } from 'react';
 import { EmailVerificationService } from '../services/EmailVerificationService';
-import { Navigate } from 'react-router-dom';
 import Navbar from '../components/Navbar.tsx';
 import { useAuth } from '../hooks/useAuth.ts';
 
 const Profile = () => {
-    const [isSending, setIsSending] = useState(false);
-    const [success, setSuccess] = useState<boolean | null>(null);
-    const [message, setMessage] = useState<string | null>(null);
+    const [state, setState] = useState<
+        { status: 'idle' } | { status: 'loading' } | { status: 'success' } | { status: 'error'; message: string }
+    >({ status: 'idle' });
 
-    const { user, isLoading } = useAuth();
-    if (isLoading) return <div className="flex flex-col flex-1 items-center justify-center p-4">Loading...</div>;
-    if (!user) return <Navigate to="/login" />;
+    const auth = useAuth();
+    if (auth.state.status !== 'success' || !auth.state.user) return;
 
-    const handleRequestEmailVerification = async () => {
-        setSuccess(null);
-        setMessage(null);
+    const handleClick = async () => {
+        setState({ status: 'loading' });
 
-        setIsSending(true);
         const { error } = await EmailVerificationService.create();
-        setIsSending(false);
-
         if (error) {
-            setSuccess(false);
-            setMessage(error.code);
+            setState({ status: 'error', message: error.code });
             return;
         }
 
-        setSuccess(true);
-        setMessage('Email sent successfully!');
+        setState({ status: 'success' });
     };
 
     return (
@@ -37,16 +29,23 @@ const Profile = () => {
             <div className="flex flex-col flex-1 items-center justify-center p-4">
                 <h1 className="text-4xl font-bold mb-4">Profile page</h1>
                 <p className="text-lg mb-6">This is the profile page.</p>
-                {!user.isEmailVerified && (
-                    <button
-                        className="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700 transition cursor-pointer disabled:opacity-50"
-                        onClick={handleRequestEmailVerification}
-                        disabled={isSending}
-                    >
-                        {isSending ? 'Sending...' : 'Request email verification'}
-                    </button>
+                {!auth.state.user.isEmailVerified && (
+                    <>
+                        <button
+                            className="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700 transition cursor-pointer disabled:opacity-50"
+                            onClick={handleClick}
+                            disabled={state.status === 'loading'}
+                        >
+                            {state.status === 'loading' ? 'Sending...' : 'Request email verification'}
+                        </button>
+
+                        {state.status === 'success' && (
+                            <div className="mt-4 text-green-600">Email sent successfully!</div>
+                        )}
+
+                        {state.status === 'error' && <div className={'mt-4 text-red-600'}>{state.message}</div>}
+                    </>
                 )}
-                {message && <div className={`mt-4 ${success ? 'text-green-600' : 'text-red-600'}`}>{message}</div>}
             </div>
         </>
     );

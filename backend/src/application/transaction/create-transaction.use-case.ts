@@ -13,7 +13,7 @@ export class CreateTransactionUseCase {
         month: string,
         name: string,
         value: number,
-        type: 'expense' | 'income',
+        type: 'income' | 'expense',
         category?: 'need' | 'want' | 'investment',
     ) => {
         const now = new Date();

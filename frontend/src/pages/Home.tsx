@@ -1,8 +1,7 @@
-import { Link, Navigate } from 'react-router-dom';
+import { Link } from 'react-router-dom';
 import Navbar from '../components/Navbar';
 import DateNavigator from '../components/DateNavigator';
 import useYear from '../hooks/useYear';
-import { useAuth } from '../hooks/useAuth.ts';
 
 const monthCardClassByStatus = {
     current: 'bg-blue-50 border-blue-200 text-blue-700 hover:bg-blue-100 hover:border-blue-300',
@@ -11,11 +10,7 @@ const monthCardClassByStatus = {
 } as const;
 
 const Home = () => {
-    const { user, isLoading } = useAuth();
     const { year, goToPreviousYear, goToNextYear, goToCurrentYear } = useYear();
-
-    if (isLoading) return <div className="flex flex-col flex-1 items-center justify-center p-4">Loading...</div>;
-    if (!user) return <Navigate to="/login" replace />;
 
     return (
         <>

@@ -1,71 +1,46 @@
-import { useEffect, useState, FormEvent } from 'react';
+import { useState, FormEvent } from 'react';
 import { TransactionService } from '../services/TransactionService';
 import type { Transaction } from '../entities/Transaction';
 import Modal from './Modal.tsx';
 
 interface Props {
-    isOpen: boolean;
     onClose: () => void;
-    initialTransaction: Transaction | null;
-    defaultType: 'income' | 'expense';
+    transaction: Transaction | null;
+    type: 'income' | 'expense';
     month: string;
-    onSave: (transaction: Transaction) => void;
+    onUpsert: (transaction: Transaction) => void;
 }
 
-const TransactionModal = ({ isOpen, onClose, initialTransaction, defaultType, month, onSave }: Props) => {
-    const [fixedType, setFixedType] = useState<'income' | 'expense'>(defaultType);
+const UpsertTransactionModal = ({ onClose, transaction, type, month, onUpsert }: Props) => {
+    const [state, setState] = useState<
+        { status: 'idle' } | { status: 'loading' } | { status: 'error'; message: string }
+    >({ status: 'idle' });
 
-    const [isLoading, setIsLoading] = useState(false);
-    const [name, setName] = useState('');
-    const [value, setValue] = useState('');
-    const [category, setCategory] = useState<'need' | 'want' | 'investment' | null>(null);
-
-    const [globalError, setGlobalError] = useState<string | null>(null);
-
-    useEffect(() => {
-        if (isOpen) {
-            setGlobalError(null);
-            setIsLoading(false);
-
-            if (initialTransaction) {
-                setName(initialTransaction.name);
-                setValue(String(initialTransaction.value));
-                setCategory(initialTransaction.category ?? null);
-                setFixedType(initialTransaction.type);
-            } else {
-                setName('');
-                setValue('');
-                setCategory(null);
-                setFixedType(defaultType);
-            }
-        }
-    }, [isOpen, initialTransaction, defaultType]);
+    const [form, setForm] = useState({
+        name: transaction ? transaction.name : '',
+        value: transaction ? String(transaction.value) : '',
+        category: transaction ? transaction.category : undefined,
+    });
 
     const handleSubmit = async (e: FormEvent) => {
         e.preventDefault();
-        setIsLoading(true);
-        setGlobalError(null);
 
-        const numValue = Number(value);
+        setState({ status: 'loading' });
 
-        const { data, error } = initialTransaction
-            ? await TransactionService.update(initialTransaction.id, name, numValue, fixedType, category ?? undefined)
-            : await TransactionService.create(month, name, numValue, fixedType, category ?? undefined);
-
-        setIsLoading(false);
-
+        const { data, error } = transaction
+            ? await TransactionService.updateById(transaction.id, form.name, Number(form.value), type, form.category)
+            : await TransactionService.create(month, form.name, Number(form.value), type, form.category);
         if (error) {
-            setGlobalError(error.code);
+            setState({ status: 'error', message: error.code });
             return;
         }
 
-        onSave(data);
+        onUpsert(data);
+        onClose();
     };
 
-    if (!isOpen) return null;
-
     return (
-        <Modal isOpen={isOpen} onClose={onClose} title={initialTransaction ? `Edit ${fixedType}` : `Add ${fixedType}`}>
+        <Modal onClose={onClose} title={transaction ? `Edit ${type}` : `Add ${type}`}>
             <form onSubmit={handleSubmit} className="space-y-4">
                 <div>
                     <label
@@ -78,8 +53,8 @@ const TransactionModal = ({ isOpen, onClose, initialTransaction, defaultType, mo
                         id="name"
                         autoFocus
                         type="text"
-                        value={name}
-                        onChange={(e) => setName(e.target.value)}
+                        value={form.name}
+                        onChange={(e) => setForm((prev) => ({ ...prev, name: e.target.value }))}
                         className="w-full border rounded px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 transition-colors border-gray-300"
                         required
                         maxLength={99}
@@ -100,23 +75,28 @@ const TransactionModal = ({ isOpen, onClose, initialTransaction, defaultType, mo
                         step="0.01"
                         min="0.01"
                         max="999999999.99"
-                        value={value}
-                        onChange={(e) => setValue(e.target.value)}
+                        value={form.value}
+                        onChange={(e) => setForm((prev) => ({ ...prev, value: e.target.value }))}
                         className="w-full border rounded px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 transition-colors border-gray-300"
                         required
                     />
                 </div>
 
-                {fixedType === 'expense' && (
+                {type === 'expense' && (
                     <div className="animate-fade-in">
                         <label className="block text-sm font-medium mb-2 text-gray-700 select-none">Category</label>
                         <div className="flex gap-2 flex-wrap">
                             <button
                                 key="need"
                                 type="button"
-                                onClick={() => setCategory(category === 'need' ? null : 'need')}
+                                onClick={() =>
+                                    setForm((prev) => ({
+                                        ...prev,
+                                        category: prev.category === 'need' ? undefined : ('need' as const),
+                                    }))
+                                }
                                 className={`px-3 py-1 rounded-full text-white text-sm cursor-pointer transition select-none bg-blue-500
-                                            ${category === 'need' ? 'opacity-100 ring-2 ring-offset-1 ring-gray-300' : 'opacity-40 hover:opacity-70'}
+                                            ${form.category === 'need' ? 'opacity-100 ring-2 ring-offset-1 ring-gray-300' : 'opacity-40 hover:opacity-70'}
                                         `}
                             >
                                 Need
@@ -124,9 +104,14 @@ const TransactionModal = ({ isOpen, onClose, initialTransaction, defaultType, mo
                             <button
                                 key="want"
                                 type="button"
-                                onClick={() => setCategory(category === 'want' ? null : 'want')}
+                                onClick={() =>
+                                    setForm((prev) => ({
+                                        ...prev,
+                                        category: prev.category === 'want' ? undefined : ('want' as const),
+                                    }))
+                                }
                                 className={`px-3 py-1 rounded-full text-white text-sm cursor-pointer transition select-none bg-red-500
-                                            ${category === 'want' ? 'opacity-100 ring-2 ring-offset-1 ring-gray-300' : 'opacity-40 hover:opacity-70'}
+                                            ${form.category === 'want' ? 'opacity-100 ring-2 ring-offset-1 ring-gray-300' : 'opacity-40 hover:opacity-70'}
                                         `}
                             >
                                 Want
@@ -134,9 +119,14 @@ const TransactionModal = ({ isOpen, onClose, initialTransaction, defaultType, mo
                             <button
                                 key="investment"
                                 type="button"
-                                onClick={() => setCategory(category === 'investment' ? null : 'investment')}
+                                onClick={() =>
+                                    setForm((prev) => ({
+                                        ...prev,
+                                        category: prev.category === 'investment' ? undefined : ('investment' as const),
+                                    }))
+                                }
                                 className={`px-3 py-1 rounded-full text-white text-sm cursor-pointer transition select-none bg-green-500
-                                            ${category === 'investment' ? 'opacity-100 ring-2 ring-offset-1 ring-gray-300' : 'opacity-40 hover:opacity-70'}
+                                            ${form.category === 'investment' ? 'opacity-100 ring-2 ring-offset-1 ring-gray-300' : 'opacity-40 hover:opacity-70'}
                                         `}
                             >
                                 Investment
@@ -145,23 +135,23 @@ const TransactionModal = ({ isOpen, onClose, initialTransaction, defaultType, mo
                     </div>
                 )}
 
-                {globalError && (
+                {state.status === 'error' && (
                     <div className="p-3 rounded bg-red-50 text-red-600 text-sm text-center border border-red-100">
-                        {globalError}
+                        {state.message}
                     </div>
                 )}
 
                 <button
                     type="submit"
-                    disabled={isLoading}
+                    disabled={state.status === 'loading'}
                     className={`w-full text-white font-semibold px-4 py-2 rounded text-sm disabled:opacity-50 cursor-pointer transition select-none bg-blue-600 hover:bg-blue-700
                         `}
                 >
-                    {isLoading ? 'Saving...' : initialTransaction ? 'Update' : 'Add'}
+                    {state.status === 'loading' ? 'Saving...' : transaction ? 'Update' : 'Add'}
                 </button>
             </form>
         </Modal>
     );
 };
 
-export default TransactionModal;
+export default UpsertTransactionModal;
