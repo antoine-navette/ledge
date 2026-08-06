@@ -107,7 +107,7 @@ jobs:
       - name: Deploy
         run: |
           cd "$TARGET_PATH"
-          IMAGE_TAG=$IMAGE_TAG docker compose pull
-          IMAGE_TAG=$IMAGE_TAG docker compose run --rm --no-deps backend node dist/scripts/migrate.js
-          IMAGE_TAG=$IMAGE_TAG docker compose down --remove-orphans
-          IMAGE_TAG=$IMAGE_TAG docker compose up -d
+          docker compose pull
+          docker compose run --rm --no-deps backend node dist/scripts/migrate.js
+          docker compose down --remove-orphans
+          docker compose up -d
