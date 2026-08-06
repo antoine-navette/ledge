@@ -27,7 +27,8 @@ services:
     volumes:
       - ./backend:/app
     depends_on:
-      - mailpit
+      mailpit:
+        condition: service_healthy
 
   mongo:
     ports:
@@ -44,6 +45,11 @@ services:
       MP_DATABASE: /data/mailpit.db
     volumes:
       - mailpit:/data
+    healthcheck:
+      test: ["CMD", "/mailpit", "readyz"]
+      interval: 5s
+      timeout: 3s
+      retries: 5
 
 volumes:
   mailpit:

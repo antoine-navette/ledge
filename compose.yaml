@@ -1,11 +1,8 @@
 services:
-  frontend:
-    depends_on:
-      - backend
-
   backend:
     depends_on:
-      - mongo
+      mongo:
+        condition: service_healthy
 
   mongo:
     image: mongo:8.0
@@ -13,6 +10,11 @@ services:
       - mongo:/data/db
     tmpfs:
       - /data/configdb
+    healthcheck:
+      test: mongosh --quiet --eval "db.adminCommand('ping')"
+      interval: 5s
+      timeout: 3s
+      retries: 5
 
 volumes:
   mongo:
