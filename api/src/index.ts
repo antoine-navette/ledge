@@ -25,7 +25,7 @@ import { GetTransactionUseCase } from './application/transaction/get-transaction
 import { UpdateTransactionUseCase } from './application/transaction/update-transaction.use-case.js';
 import { DeleteTransactionUseCase } from './application/transaction/delete-transaction.use-case.js';
 
-const pino = createPino(process.env.NODE_ENV as Env['nodeEnv'], process.env.LOKI_URL as Env['lokiUrl']);
+const pino = createPino(process.env.NODE_ENV as Env['nodeEnv']);
 
 try {
     const { mongoUrl, smtpUrl, allowedOrigins, port, emailFrom, webUrl } = loadEnv();

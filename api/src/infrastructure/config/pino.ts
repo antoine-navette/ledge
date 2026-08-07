@@ -1,7 +1,7 @@
 import pino from 'pino';
 import type { Env } from './env.js';
 
-export const createPino = (nodeEnv: Env['nodeEnv'], lokiUrl: Env['lokiUrl']) => {
+export const createPino = (nodeEnv: Env['nodeEnv']) => {
     if (nodeEnv === 'development') {
         const transport = pino.transport({
             target: 'pino-pretty',
@@ -17,12 +17,10 @@ export const createPino = (nodeEnv: Env['nodeEnv'], lokiUrl: Env['lokiUrl']) => 
         return { logger, flush };
     }
 
+    // Writes to stdout for now. Swap target/options here once BetterStack is wired in.
     const transport = pino.transport({
-        target: 'pino-loki',
-        options: {
-            host: lokiUrl,
-            labels: { service_name: 'backend' },
-        },
+        target: 'pino/file',
+        options: { destination: 1 },
     });
     const logger = pino({ level: 'info' }, transport);
     const flush = () =>

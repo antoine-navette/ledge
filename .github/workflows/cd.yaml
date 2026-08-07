@@ -25,12 +25,12 @@ jobs:
       - name: Retag images to latest
         run: |
           docker buildx imagetools create \
-            ghcr.io/antoine-navette/ledge-backend:$HEAD_SHA \
-            --tag ghcr.io/antoine-navette/ledge-backend:latest
+            ghcr.io/antoine-navette/ledge-api:$HEAD_SHA \
+            --tag ghcr.io/antoine-navette/ledge-api:latest
 
           docker buildx imagetools create \
-            ghcr.io/antoine-navette/ledge-frontend:$HEAD_SHA \
-            --tag ghcr.io/antoine-navette/ledge-frontend:latest
+            ghcr.io/antoine-navette/ledge-web:$HEAD_SHA \
+            --tag ghcr.io/antoine-navette/ledge-web:latest
 
       - name: Pull latest code
         run: |
@@ -41,6 +41,5 @@ jobs:
         run: |
           cd "$TARGET_PATH"
           docker compose pull
-          docker compose run --rm --no-deps backend node dist/scripts/migrate.js
-          docker compose down --remove-orphans
-          docker compose up -d
+          docker compose run --rm --no-deps api node dist/scripts/migrate.js
+          docker compose up -d --remove-orphans
