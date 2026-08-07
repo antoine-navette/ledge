@@ -12,42 +12,42 @@ jobs:
   # ==========================================
   # 1. QUALITY CHECKS
   # ==========================================
-  quality_frontend:
-    name: Frontend checks (format, lint)
+  quality_web:
+    name: Web checks (format, lint)
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v5
       - uses: actions/setup-node@v5
         with: { node-version: 24 }
       - run: npm ci
-        working-directory: frontend
+        working-directory: web
       - run: npm run format:check
-        working-directory: frontend
+        working-directory: web
       - run: npm run lint
-        working-directory: frontend
+        working-directory: web
 
-  quality_backend:
-    name: Backend checks (format, lint, unit tests)
+  quality_api:
+    name: API checks (format, lint, unit tests)
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v5
       - uses: actions/setup-node@v5
         with: { node-version: 24 }
       - run: npm ci
-        working-directory: backend
+        working-directory: api
       - run: npm run format:check
-        working-directory: backend
+        working-directory: api
       - run: npm run lint
-        working-directory: backend
+        working-directory: api
       - run: npm run test:unit
-        working-directory: backend
+        working-directory: api
 
   # ==========================================
   # 2. BUILD IMAGES
   # ==========================================
-  build_frontend:
-    name: Build Frontend
-    needs: [quality_frontend, quality_backend]
+  build_web:
+    name: Build Web
+    needs: [quality_web, quality_api]
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v5
@@ -61,13 +61,13 @@ jobs:
         run: |
           docker buildx build \
             --platform linux/amd64,linux/arm64 \
-            -t ghcr.io/antoine-navette/ledge-frontend:${{ github.event.pull_request.head.sha }} \
-            -f frontend/Dockerfile \
-            --push frontend
+            -t ghcr.io/antoine-navette/ledge-web:${{ github.event.pull_request.head.sha }} \
+            -f web/Dockerfile \
+            --push web
 
-  build_backend:
-    name: Build Backend
-    needs: [quality_frontend, quality_backend]
+  build_api:
+    name: Build API
+    needs: [quality_web, quality_api]
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v5
@@ -81,16 +81,16 @@ jobs:
         run: |
           docker buildx build \
             --platform linux/amd64,linux/arm64 \
-            -t ghcr.io/antoine-navette/ledge-backend:${{ github.event.pull_request.head.sha }} \
-            -f backend/Dockerfile \
-            --push backend
+            -t ghcr.io/antoine-navette/ledge-api:${{ github.event.pull_request.head.sha }} \
+            -f api/Dockerfile \
+            --push api
 
   # ==========================================
   # 3. DEPLOY STAGING
   # ==========================================
   deploy_staging:
     name: Deploy to Staging
-    needs: [build_frontend, build_backend]
+    needs: [build_web, build_api]
     runs-on: [self-hosted, ledge]
     env:
       TARGET_PATH: /srv/apps/ledge/staging
@@ -108,6 +108,6 @@ jobs:
         run: |
           cd "$TARGET_PATH"
           docker compose pull
-          docker compose run --rm --no-deps backend node dist/scripts/migrate.js
+          docker compose run --rm --no-deps api node dist/scripts/migrate.js
           docker compose down --remove-orphans
           docker compose up -d
