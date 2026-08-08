@@ -24,6 +24,7 @@ import { GetUserTransactionsUseCase } from './application/transaction/get-user-t
 import { GetTransactionUseCase } from './application/transaction/get-transaction.use-case.js';
 import { UpdateTransactionUseCase } from './application/transaction/update-transaction.use-case.js';
 import { DeleteTransactionUseCase } from './application/transaction/delete-transaction.use-case.js';
+import 'dotenv/config';
 
 const pino = createPino(process.env.NODE_ENV as Env['nodeEnv']);
 
