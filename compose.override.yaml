@@ -22,8 +22,6 @@ services:
         required: true
       - path: api/.env
         required: false
-    ports:
-      - "${API_PORT:-3000}:3000"
     volumes:
       - ./api:/app
     depends_on:

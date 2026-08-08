@@ -23,13 +23,12 @@ const pino = createPino(process.env.NODE_ENV as Env['nodeEnv']);
 // force-exit with "Detected unsettled top-level await" (exit code 13) before flush() resolves.
 const main = async () => {
     try {
-        const { allowedOrigins } = loadEnv();
+        loadEnv();
         pino.logger.info('Environment loaded');
 
         // No route is ever called: only the schemas attached to each route matter for the OpenAPI spec.
         const app = createApp(
             pino.logger,
-            allowedOrigins,
             {} as AuthenticateUseCase,
             {} as LogoutUseCase,
             {} as LoginUseCase,

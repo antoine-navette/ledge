@@ -1,5 +1,4 @@
 import Fastify from 'fastify';
-import fastifyCors from '@fastify/cors';
 import fastifyCookie from '@fastify/cookie';
 import fastifyRateLimit from '@fastify/rate-limit';
 import fastifySwagger from '@fastify/swagger';
@@ -11,7 +10,6 @@ import {
     validatorCompiler,
 } from 'fastify-zod-openapi';
 import type { Logger } from 'pino';
-import type { Env } from '../infrastructure/config/env.js';
 import type { AuthenticateUseCase } from '../application/auth/authenticate.use-case.js';
 import type { LogoutUseCase } from '../application/auth/logout.use-case.js';
 import type { LoginUseCase } from '../application/auth/login.use-case.js';
@@ -43,7 +41,6 @@ import type { InternalServerErrorSchema } from './schemas/internal-server-error.
 
 export const createApp = (
     logger: Logger,
-    allowedOrigins: Env['allowedOrigins'],
     authenticateUseCase: AuthenticateUseCase,
     logoutUseCase: LogoutUseCase,
     loginUseCase: LoginUseCase,
@@ -74,11 +71,6 @@ export const createApp = (
     });
 
     // Security
-    app.register(fastifyCors, {
-        origin: allowedOrigins,
-        credentials: true,
-        methods: ['GET', 'POST', 'PUT', 'DELETE'],
-    });
     app.register(fastifyRateLimit, {
         max: 60,
         timeWindow: '1 minute',
