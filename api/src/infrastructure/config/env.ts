@@ -3,19 +3,14 @@ import z from 'zod';
 const schema = z
     .object({
         NODE_ENV: z.enum(['development', 'production']),
-        ALLOWED_ORIGINS: z
-            .string()
-            .transform((value) => value.split(','))
-            .pipe(z.array(z.url())),
         PORT: z.coerce.number(),
         MONGO_URL: z.url(),
         SMTP_URL: z.url(),
         EMAIL_FROM: z.string(),
         WEB_URL: z.url(),
     })
-    .transform(({ NODE_ENV, ALLOWED_ORIGINS, PORT, MONGO_URL, SMTP_URL, EMAIL_FROM, WEB_URL }) => ({
+    .transform(({ NODE_ENV, PORT, MONGO_URL, SMTP_URL, EMAIL_FROM, WEB_URL }) => ({
         nodeEnv: NODE_ENV,
-        allowedOrigins: ALLOWED_ORIGINS,
         port: PORT,
         mongoUrl: MONGO_URL,
         smtpUrl: SMTP_URL,

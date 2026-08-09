@@ -24,11 +24,12 @@ import { GetUserTransactionsUseCase } from './application/transaction/get-user-t
 import { GetTransactionUseCase } from './application/transaction/get-transaction.use-case.js';
 import { UpdateTransactionUseCase } from './application/transaction/update-transaction.use-case.js';
 import { DeleteTransactionUseCase } from './application/transaction/delete-transaction.use-case.js';
+import 'dotenv/config';
 
 const pino = createPino(process.env.NODE_ENV as Env['nodeEnv']);
 
 try {
-    const { mongoUrl, smtpUrl, allowedOrigins, port, emailFrom, webUrl } = loadEnv();
+    const { mongoUrl, smtpUrl, port, emailFrom, webUrl } = loadEnv();
     pino.logger.info('Environment loaded');
 
     const mongo = await connectToMongo(mongoUrl);
@@ -84,7 +85,6 @@ try {
 
     const app = createApp(
         pino.logger,
-        allowedOrigins,
         authenticateUseCase,
         logoutUseCase,
         loginUseCase,

@@ -14,6 +14,7 @@ import type { GetUserTransactionsUseCase } from '../src/application/transaction/
 import type { GetTransactionUseCase } from '../src/application/transaction/get-transaction.use-case.js';
 import type { UpdateTransactionUseCase } from '../src/application/transaction/update-transaction.use-case.js';
 import type { DeleteTransactionUseCase } from '../src/application/transaction/delete-transaction.use-case.js';
+import 'dotenv/config';
 
 // .env is not verified yet, but we need a logger now
 const pino = createPino(process.env.NODE_ENV as Env['nodeEnv']);
@@ -23,13 +24,12 @@ const pino = createPino(process.env.NODE_ENV as Env['nodeEnv']);
 // force-exit with "Detected unsettled top-level await" (exit code 13) before flush() resolves.
 const main = async () => {
     try {
-        const { allowedOrigins } = loadEnv();
+        loadEnv();
         pino.logger.info('Environment loaded');
 
         // No route is ever called: only the schemas attached to each route matter for the OpenAPI spec.
         const app = createApp(
             pino.logger,
-            allowedOrigins,
             {} as AuthenticateUseCase,
             {} as LogoutUseCase,
             {} as LoginUseCase,

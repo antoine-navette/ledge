@@ -13,8 +13,6 @@ services:
     env_file:
       - path: api/.env
         required: true
-    ports:
-      - "${API_PORT}:3000"
     restart: unless-stopped
 
   mongo:
