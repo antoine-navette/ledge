@@ -26,8 +26,14 @@ export const readTransactionsRoute: FastifyPluginAsync<Options> = async (
         schema: {
             tags: ['Transaction'],
             querystring: z.object({
-                from: z.iso.date().transform((value) => new Date(value)).optional(),
-                to: z.iso.date().transform((value) => new Date(value)).optional(),
+                from: z.iso
+                    .date()
+                    .transform((value) => new Date(value))
+                    .optional(),
+                to: z.iso
+                    .date()
+                    .transform((value) => new Date(value))
+                    .optional(),
             }),
             response: {
                 200: z.array(transactionSchema),
