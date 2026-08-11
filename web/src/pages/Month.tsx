@@ -8,7 +8,13 @@ import type { Transaction } from '../entities/Transaction';
 
 const Month = () => {
     const navigate = useNavigate();
-    const { month } = useParams();
+    const params = useParams();
+
+    const year = Number(params.year);
+    const month = Number(params.month);
+
+    const currentYear = new Date().getFullYear();
+    const currentMonth = new Date().getMonth() + 1;
 
     const [state, setState] = useState<
         | { status: 'loading' }
@@ -20,11 +26,14 @@ const Month = () => {
         let ignore = false; // Permet d'ignorer les réponses des anciennes requêtes lorsque l'on change de page trop vite
 
         const fetchData = async () => {
-            if (!month) return; // Théoriquement inutile, mais gardé au cas où
-
             setState({ status: 'loading' });
 
-            const { data, error } = await TransactionService.read({ month });
+            // TODO: clean
+            const from = `${year}-${String(month).padStart(2, '0')}-01`;
+            const [nextYear, nextMonth] = month === 12 ? [year + 1, 1] : [year, month + 1];
+            const to = `${nextYear}-${String(nextMonth).padStart(2, '0')}-01`;
+
+            const { data, error } = await TransactionService.read({ from, to });
             if (ignore) return;
             if (error) {
                 setState({ status: 'error', message: error.code });
@@ -39,7 +48,7 @@ const Month = () => {
         return () => {
             ignore = true;
         };
-    }, [month]);
+    }, [year, month]);
 
     const handleUpsert = (transaction: Transaction) => {
         setState((prev) => {
@@ -62,18 +71,22 @@ const Month = () => {
         });
     };
 
-    const regex = /^\d{4}-(0[1-9]|1[0-2])$/;
-    if (!month || !regex.test(month)) return <Navigate to="/" replace />;
+    if (!Number.isInteger(year) || year < 1970 || year > currentYear) {
+        return <Navigate to="/" replace />;
+    }
 
-    const [yearStr, monthStr] = month.split('-');
-    const label = `${monthStr}/${yearStr}`;
-    const todayStr = new Date().toISOString().slice(0, 7);
+    if (!Number.isInteger(month) || month < 1 || month > 12 || (year === currentYear && month > currentMonth)) {
+        return <Navigate to={`/${year}`} replace />;
+    }
 
-    const navigateToMonthOffset = (offset: number) => {
-        const [y, m] = month.split('-').map(Number);
-        const date = new Date(y, m - 1 + offset);
-        date.setDate(15);
-        navigate(`/month/${date.toISOString().slice(0, 7)}`);
+    const goToPreviousMonth = () => {
+        if (month === 1) navigate(`/${year - 1}/12`);
+        else navigate(`/${year}/${String(month - 1).padStart(2, '0')}`);
+    };
+
+    const goToNextMonth = () => {
+        if (month === 12) navigate(`/${year + 1}/01`);
+        else navigate(`/${year}/${String(month + 1).padStart(2, '0')}`);
     };
 
     return (
@@ -84,11 +97,13 @@ const Month = () => {
                 <h1 className="text-3xl font-bold mb-6 text-gray-800 select-none">Ledge</h1>
 
                 <DateNavigator
-                    label={label}
-                    onPrev={() => navigateToMonthOffset(-1)}
-                    onNext={() => navigateToMonthOffset(1)}
-                    onToday={() => navigate(`/month/${todayStr}`)}
-                    isCurrent={month === todayStr}
+                    label={`${String(month).padStart(2, '0')}/${year}`}
+                    onPrev={goToPreviousMonth}
+                    onToday={() => navigate(`/${currentYear}/${String(currentMonth).padStart(2, '0')}`)}
+                    onNext={goToNextMonth}
+                    isPrevDisabled={year === 1970 && month === 1}
+                    isTodayDisabled={year === currentYear && month === currentMonth}
+                    isNextDisabled={year === currentYear && month === currentMonth}
                 />
 
                 {state.status === 'loading' && <p className="text-gray-500 select-none">Loading...</p>}
@@ -98,6 +113,7 @@ const Month = () => {
                 {state.status === 'success' && (
                     <TransactionsOverview
                         transactions={state.transactions}
+                        year={year}
                         month={month}
                         onUpsert={handleUpsert}
                         onDelete={handleDelete}

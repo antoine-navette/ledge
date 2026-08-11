@@ -10,22 +10,22 @@ export class CreateTransactionUseCase {
 
     execute = async (
         userId: string,
-        month: string,
         name: string,
         value: number,
         type: 'income' | 'expense',
-        category?: 'need' | 'want' | 'investment',
+        category: 'need' | 'want' | 'investment' | undefined,
+        date: Date,
     ) => {
         const now = new Date();
 
         const transaction: Transaction = {
             id: this.idGenerator.generate(),
             userId,
-            month,
             name,
             value,
             type,
             ...(type === 'expense' && category ? { category } : {}),
+            date,
             createdAt: now,
             updatedAt: now,
         };

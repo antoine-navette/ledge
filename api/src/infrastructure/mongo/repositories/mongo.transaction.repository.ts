@@ -20,7 +20,14 @@ export class MongoTransactionRepository implements TransactionRepository {
         const documents = await this.transactionCollection
             .find({
                 ...(criteria.userId ? { userId: new ObjectId(criteria.userId) } : {}),
-                ...(criteria.month ? { month: criteria.month } : {}),
+                ...(criteria.from || criteria.to
+                    ? {
+                          date: {
+                              ...(criteria.from ? { $gte: criteria.from } : {}),
+                              ...(criteria.to ? { $lt: criteria.to } : {}),
+                          },
+                      }
+                    : {}),
             })
             .toArray();
 

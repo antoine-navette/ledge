@@ -7,13 +7,14 @@ import DeleteTransactionModal from './DeleteTransactionModal.tsx';
 interface Props {
     transactions: Transaction[];
     total: number;
-    month: string;
+    year: number;
+    month: number;
     type: 'income' | 'expense';
     onUpsert: (transaction: Transaction) => void;
     onDelete: (transaction: Transaction) => void;
 }
 
-const TransactionListSection = ({ transactions, total, month, type, onUpsert, onDelete }: Props) => {
+const TransactionListSection = ({ transactions, total, year, month, type, onUpsert, onDelete }: Props) => {
     const [modal, setModal] = useState<
         | { status: 'closed' }
         | { status: 'upsert'; transaction: Transaction | null }
@@ -34,6 +35,7 @@ const TransactionListSection = ({ transactions, total, month, type, onUpsert, on
                     onClose={() => setModal({ status: 'closed' })}
                     transaction={modal.transaction}
                     type={type}
+                    year={year}
                     month={month}
                     onUpsert={onUpsert}
                 />
@@ -74,7 +76,7 @@ const TransactionListSection = ({ transactions, total, month, type, onUpsert, on
                                         <h4 className="text-gray-800 font-medium select-none">{transaction.name}</h4>
 
                                         <p className="text-gray-400 text-xs mt-0.5 select-none">
-                                            {new Date(transaction.createdAt).toLocaleString('en-UK')}
+                                            {new Date(transaction.date).toLocaleDateString('en-UK')}
                                         </p>
                                     </div>
 

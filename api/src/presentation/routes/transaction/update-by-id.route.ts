@@ -46,6 +46,7 @@ export const updateTransactionByIdRoute: FastifyPluginAsync<Options> = async (
                     .max(999999999.99),
                 type: z.enum(['income', 'expense']),
                 category: z.enum(['need', 'want', 'investment']).optional(),
+                date: z.iso.date().transform((value) => new Date(value)),
             }),
             response: {
                 200: transactionSchema,
@@ -60,7 +61,7 @@ export const updateTransactionByIdRoute: FastifyPluginAsync<Options> = async (
         } satisfies FastifyZodOpenApiSchema,
         preHandler: isAuthenticated(authenticateUseCase),
         handler: async (request, reply) => {
-            const { name, value, type, category } = request.body;
+            const { name, value, type, category, date } = request.body;
 
             const result = await updateTransactionUseCase.execute(
                 request.params.id,
@@ -69,6 +70,7 @@ export const updateTransactionByIdRoute: FastifyPluginAsync<Options> = async (
                 value,
                 type,
                 category,
+                date,
             );
             if (!result.success) {
                 switch (result.error) {

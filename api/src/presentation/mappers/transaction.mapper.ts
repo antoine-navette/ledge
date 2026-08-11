@@ -5,11 +5,11 @@ export const TransactionMapper = {
     toSchema: (transaction: Transaction): TransactionSchema => ({
         id: transaction.id,
         userId: transaction.userId,
-        month: transaction.month,
         name: transaction.name,
         value: transaction.value,
         type: transaction.type,
         category: transaction.category,
+        date: transaction.date,
         createdAt: transaction.createdAt,
         updatedAt: transaction.updatedAt,
     }),

@@ -3,12 +3,13 @@ import TransactionListSection from './TransactionListSection.tsx';
 
 interface Props {
     transactions: Transaction[];
-    month: string;
+    year: number;
+    month: number;
     onUpsert: (transaction: Transaction) => void;
     onDelete: (transaction: Transaction) => void;
 }
 
-const TransactionsOverview = ({ transactions, month, onUpsert, onDelete }: Props) => {
+const TransactionsOverview = ({ transactions, year, month, onUpsert, onDelete }: Props) => {
     const incomes = transactions.filter((t) => t.type === 'income');
     const expenses = transactions.filter((t) => t.type === 'expense');
     const totalIncomes = incomes.reduce((acc, t) => acc + t.value, 0);
@@ -30,6 +31,7 @@ const TransactionsOverview = ({ transactions, month, onUpsert, onDelete }: Props
                 <TransactionListSection
                     transactions={incomes}
                     total={totalIncomes}
+                    year={year}
                     month={month}
                     type="income"
                     onUpsert={onUpsert}
@@ -38,6 +40,7 @@ const TransactionsOverview = ({ transactions, month, onUpsert, onDelete }: Props
                 <TransactionListSection
                     transactions={expenses}
                     total={totalExpenses}
+                    year={year}
                     month={month}
                     type="expense"
                     onUpsert={onUpsert}
