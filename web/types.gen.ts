@@ -515,7 +515,8 @@ export interface paths {
         get: {
             parameters: {
                 query?: {
-                    month?: string;
+                    from?: string;
+                    to?: string;
                 };
                 header?: never;
                 path?: never;
@@ -581,13 +582,14 @@ export interface paths {
             requestBody: {
                 content: {
                     "application/json": {
-                        month: string;
                         name: string;
                         value: number;
                         /** @enum {string} */
                         type: "income" | "expense";
                         /** @enum {string} */
                         category?: "need" | "want" | "investment";
+                        /** Format: date */
+                        date: string;
                     };
                 };
             };
@@ -755,6 +757,8 @@ export interface paths {
                         type: "income" | "expense";
                         /** @enum {string} */
                         category?: "need" | "want" | "investment";
+                        /** Format: date */
+                        date: string;
                     };
                 };
             };
@@ -984,13 +988,13 @@ export interface components {
         Transaction: {
             id: string;
             userId: string;
-            month: string;
             name: string;
             value: number;
             /** @enum {string} */
             type: "income" | "expense";
             /** @enum {string} */
             category?: "need" | "want" | "investment";
+            date: string;
             createdAt: string;
             updatedAt: string;
         };

@@ -2,7 +2,8 @@ import type { Transaction } from '../entities/transaction.js';
 
 export type TransactionCriteria = {
     userId?: Transaction['userId'];
-    month?: Transaction['month'];
+    from?: Date;
+    to?: Date;
 };
 
 export interface TransactionRepository {

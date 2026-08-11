@@ -7,19 +7,30 @@ interface Props {
     onClose: () => void;
     transaction: Transaction | null;
     type: 'income' | 'expense';
-    month: string;
+    year: number;
+    month: number;
     onUpsert: (transaction: Transaction) => void;
 }
 
-const UpsertTransactionModal = ({ onClose, transaction, type, month, onUpsert }: Props) => {
+const UpsertTransactionModal = ({ onClose, transaction, type, year, month, onUpsert }: Props) => {
     const [state, setState] = useState<
         { status: 'idle' } | { status: 'loading' } | { status: 'error'; message: string }
     >({ status: 'idle' });
+
+    // TODO: clean
+    const monthStr = String(month).padStart(2, '0');
+    const minDate = `${year}-${monthStr}-01`;
+    const lastDayOfMonth = new Date(year, month, 0).getDate();
+    const maxDateOfMonth = `${year}-${monthStr}-${String(lastDayOfMonth).padStart(2, '0')}`;
+    const now = new Date();
+    const today = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}-${String(now.getDate()).padStart(2, '0')}`;
+    const maxDate = today < maxDateOfMonth ? today : maxDateOfMonth;
 
     const [form, setForm] = useState({
         name: transaction ? transaction.name : '',
         value: transaction ? String(transaction.value) : '',
         category: transaction ? transaction.category : undefined,
+        date: transaction ? transaction.date.slice(0, 10) : '',
     });
 
     const handleSubmit = async (e: FormEvent) => {
@@ -28,8 +39,15 @@ const UpsertTransactionModal = ({ onClose, transaction, type, month, onUpsert }:
         setState({ status: 'loading' });
 
         const { data, error } = transaction
-            ? await TransactionService.updateById(transaction.id, form.name, Number(form.value), type, form.category)
-            : await TransactionService.create(month, form.name, Number(form.value), type, form.category);
+            ? await TransactionService.updateById(
+                  transaction.id,
+                  form.name,
+                  Number(form.value),
+                  type,
+                  form.category,
+                  form.date,
+              )
+            : await TransactionService.create(form.name, Number(form.value), type, form.category, form.date);
         if (error) {
             setState({ status: 'error', message: error.code });
             return;
@@ -58,6 +76,25 @@ const UpsertTransactionModal = ({ onClose, transaction, type, month, onUpsert }:
                         className="w-full border rounded px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 transition-colors border-gray-300"
                         required
                         maxLength={99}
+                    />
+                </div>
+
+                <div>
+                    <label
+                        className="block text-sm font-medium mb-1 text-gray-700 cursor-pointer select-none"
+                        htmlFor="date"
+                    >
+                        Date
+                    </label>
+                    <input
+                        id="date"
+                        type="date"
+                        min={minDate}
+                        max={maxDate}
+                        value={form.date}
+                        onChange={(e) => setForm((prev) => ({ ...prev, date: e.target.value }))}
+                        className="w-full border rounded px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 transition-colors border-gray-300"
+                        required
                     />
                 </div>
 

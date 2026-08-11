@@ -2,20 +2,20 @@ import { api } from '../config/api';
 
 export const TransactionService = {
     create: async (
-        month: string,
         name: string,
         value: number,
         type: 'income' | 'expense',
-        category?: 'need' | 'want' | 'investment',
+        category: 'need' | 'want' | 'investment' | undefined,
+        date: string,
     ) => {
         try {
-            return await api.client.POST('/transactions', { body: { month, name, value, type, category } });
+            return await api.client.POST('/transactions', { body: { name, value, type, category, date } });
         } catch {
             return { data: undefined, error: { code: 'NETWORK_ERROR' as const } };
         }
     },
 
-    read: async (criteria?: { month?: string }) => {
+    read: async (criteria?: { from?: string; to?: string }) => {
         try {
             return await api.client.GET('/transactions', { params: { query: criteria } });
         } catch {
@@ -36,12 +36,13 @@ export const TransactionService = {
         name: string,
         value: number,
         type: 'income' | 'expense',
-        category?: 'need' | 'want' | 'investment',
+        category: 'need' | 'want' | 'investment' | undefined,
+        date: string,
     ) => {
         try {
             return await api.client.PUT('/transactions/{id}', {
                 params: { path: { id } },
-                body: { name, value, type, category },
+                body: { name, value, type, category, date },
             });
         } catch {
             return { data: undefined, error: { code: 'NETWORK_ERROR' as const } };

@@ -26,9 +26,13 @@ export const readTransactionsRoute: FastifyPluginAsync<Options> = async (
         schema: {
             tags: ['Transaction'],
             querystring: z.object({
-                month: z
-                    .string()
-                    .regex(/^\d{4}-(0[1-9]|1[0-2])$/)
+                from: z.iso
+                    .date()
+                    .transform((value) => new Date(value))
+                    .optional(),
+                to: z.iso
+                    .date()
+                    .transform((value) => new Date(value))
                     .optional(),
             }),
             response: {
@@ -41,9 +45,9 @@ export const readTransactionsRoute: FastifyPluginAsync<Options> = async (
         } satisfies FastifyZodOpenApiSchema,
         preHandler: isAuthenticated(authenticateUseCase),
         handler: async (request, reply) => {
-            const { month } = request.query;
+            const { from, to } = request.query;
 
-            const transactions = await getUserTransactionsUseCase.execute(request.session.userId, month);
+            const transactions = await getUserTransactionsUseCase.execute(request.session.userId, from, to);
 
             return reply.status(200).send(transactions.map(TransactionMapper.toSchema));
         },

@@ -1,17 +1,20 @@
 interface Props {
     label: string;
     onPrev: () => void;
-    onNext: () => void;
     onToday: () => void;
-    isCurrent: boolean;
+    onNext: () => void;
+    isPrevDisabled: boolean;
+    isTodayDisabled: boolean;
+    isNextDisabled: boolean;
 }
 
-const DateNavigator = ({ label, onPrev, onNext, onToday, isCurrent }: Props) => {
+const DateNavigator = ({ label, onPrev, onToday, onNext, isPrevDisabled, isTodayDisabled, isNextDisabled }: Props) => {
     return (
         <div className="flex items-center gap-6 mb-8">
             <button
                 onClick={onPrev}
-                className="text-2xl px-2 text-gray-600 hover:text-gray-900 cursor-pointer select-none transition"
+                disabled={isPrevDisabled}
+                className="text-2xl px-2 text-gray-600 hover:text-gray-900 cursor-pointer select-none transition disabled:opacity-30 disabled:cursor-default disabled:hover:text-gray-600"
                 aria-label="Previous"
             >
                 ←
@@ -22,10 +25,10 @@ const DateNavigator = ({ label, onPrev, onNext, onToday, isCurrent }: Props) => 
 
                 <button
                     onClick={onToday}
-                    disabled={isCurrent}
+                    disabled={isTodayDisabled}
                     className={`text-xs mt-1 font-medium transition select-none
                         ${
-                            isCurrent
+                            isTodayDisabled
                                 ? 'text-gray-300 cursor-default'
                                 : 'text-blue-600 hover:text-blue-800 cursor-pointer hover:underline'
                         }`}
@@ -36,7 +39,8 @@ const DateNavigator = ({ label, onPrev, onNext, onToday, isCurrent }: Props) => 
 
             <button
                 onClick={onNext}
-                className="text-2xl px-2 text-gray-600 hover:text-gray-900 cursor-pointer select-none transition"
+                disabled={isNextDisabled}
+                className="text-2xl px-2 text-gray-600 hover:text-gray-900 cursor-pointer select-none transition disabled:opacity-30 disabled:cursor-default disabled:hover:text-gray-600"
                 aria-label="Next"
             >
                 →

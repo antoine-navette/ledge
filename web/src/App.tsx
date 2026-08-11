@@ -1,4 +1,4 @@
-import { Route, Routes, useLocation } from 'react-router-dom';
+import { Navigate, Route, Routes, useLocation } from 'react-router-dom';
 import HomePage from './pages/Home';
 import MonthPage from './pages/Month';
 import Login from './pages/Login';
@@ -26,8 +26,9 @@ function App() {
                 </Route>
 
                 <Route element={<RequireAuth />}>
-                    <Route path="/" element={<HomePage />} />
-                    <Route path="/month/:month" element={<MonthPage />} />
+                    <Route path="/" element={<Navigate to={`/${new Date().getFullYear()}`} replace />} />
+                    <Route path="/:year" element={<HomePage />} />
+                    <Route path="/:year/:month" element={<MonthPage />} />
                     <Route path="/profile" element={<Profile />} />
                 </Route>
 

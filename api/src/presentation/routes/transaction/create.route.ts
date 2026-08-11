@@ -27,7 +27,6 @@ export const createTransactionRoute: FastifyPluginAsync<Options> = async (
         schema: {
             tags: ['Transaction'],
             body: z.object({
-                month: z.string().regex(/^\d{4}-(0[1-9]|1[0-2])$/),
                 name: z.string().min(1).max(99),
                 value: z
                     .number()
@@ -42,6 +41,7 @@ export const createTransactionRoute: FastifyPluginAsync<Options> = async (
                     .max(999999999.99),
                 type: z.enum(['income', 'expense']),
                 category: z.enum(['need', 'want', 'investment']).optional(),
+                date: z.iso.date().transform((value) => new Date(value)),
             }),
             response: {
                 201: transactionSchema,
@@ -54,15 +54,15 @@ export const createTransactionRoute: FastifyPluginAsync<Options> = async (
         } satisfies FastifyZodOpenApiSchema,
         preHandler: isAuthenticated(authenticateUseCase),
         handler: async (request, reply) => {
-            const { month, name, value, type, category } = request.body;
+            const { name, value, type, category, date } = request.body;
 
             const transaction = await createTransactionUseCase.execute(
                 request.session.userId,
-                month,
                 name,
                 value,
                 type,
                 category,
+                date,
             );
 
             return reply.status(201).send(TransactionMapper.toSchema(transaction));
