@@ -27,11 +27,11 @@ export class RequestEmailVerificationUseCase {
             this.userRepository.findById(userId),
             this.emailVerificationRepository.findByUserId(userId),
         ]);
-        if (!user) return { success: false, error: 'USER_NOT_FOUND' } as const;
-        if (user.isEmailVerified) return { success: false, error: 'EMAIL_ALREADY_VERIFIED' } as const;
+        if (!user) return { success: false, code: 'USER_NOT_FOUND' } as const;
+        if (user.isEmailVerified) return { success: false, code: 'EMAIL_ALREADY_VERIFIED' } as const;
         if (existing) {
             if (now.getTime() - existing.createdAt.getTime() < this.COOLDOWN_DURATION) {
-                return { success: false, error: 'ACTIVE_COOLDOWN' } as const;
+                return { success: false, code: 'ACTIVE_COOLDOWN' } as const;
             }
 
             await this.emailVerificationRepository.delete(existing);
@@ -53,6 +53,6 @@ export class RequestEmailVerificationUseCase {
             `Click here to verify your email address: <a href="${this.webUrl}/verify-email/${emailVerification.token}">verify email</a>. This link will expire in 1 hour.`,
         );
 
-        return { success: true } as const;
+        return { success: true, data: emailVerification } as const;
     };
 }

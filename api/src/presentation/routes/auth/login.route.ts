@@ -38,7 +38,7 @@ export const loginRoute: FastifyPluginAsync<Options> = async (app, { loginUseCas
 
             const result = await loginUseCase.execute(email, password);
             if (!result.success) {
-                switch (result.error) {
+                switch (result.code) {
                     case 'USER_NOT_FOUND':
                     case 'INVALID_PASSWORD':
                         return reply.status(401).send({ code: 'INVALID_CREDENTIALS' });
@@ -46,6 +46,8 @@ export const loginRoute: FastifyPluginAsync<Options> = async (app, { loginUseCas
             }
 
             const { user, ...session } = result.data;
+
+            request.log.info({ sessionId: session.id, userId: user.id }, 'User logged in');
 
             reply.setCookie('session_token', session.token, {
                 expires: session.expiresAt,

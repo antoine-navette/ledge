@@ -22,7 +22,7 @@ export class RegisterUseCase {
         const now = new Date();
 
         const existing = await this.userRepository.findByEmail(email);
-        if (existing) return { success: false, error: 'DUPLICATE_EMAIL' } as const;
+        if (existing) return { success: false, code: 'DUPLICATE_EMAIL' } as const;
 
         const user: User = {
             id: this.idGenerator.generate(),

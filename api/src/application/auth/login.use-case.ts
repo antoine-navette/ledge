@@ -21,10 +21,10 @@ export class LoginUseCase {
         const now = new Date();
 
         const user = await this.userRepository.findByEmail(email);
-        if (!user) return { success: false, error: 'USER_NOT_FOUND' } as const;
+        if (!user) return { success: false, code: 'USER_NOT_FOUND' } as const;
 
         const isPasswordValid = await this.passwordHasher.compare(password, user.passwordHash);
-        if (!isPasswordValid) return { success: false, error: 'INVALID_PASSWORD' } as const;
+        if (!isPasswordValid) return { success: false, code: 'INVALID_PASSWORD' } as const;
 
         const session: Session = {
             id: this.idGenerator.generate(),

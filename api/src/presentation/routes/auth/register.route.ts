@@ -44,13 +44,15 @@ export const registerRoute: FastifyPluginAsync<Options> = async (app, { register
 
             const result = await registerUseCase.execute(email, password);
             if (!result.success) {
-                switch (result.error) {
+                switch (result.code) {
                     case 'DUPLICATE_EMAIL':
                         return reply.status(409).send({ code: 'DUPLICATE_EMAIL' });
                 }
             }
 
             const { user, ...session } = result.data;
+
+            request.log.info({ sessionId: session.id, userId: user.id }, 'User registered');
 
             reply.setCookie('session_token', session.token, {
                 expires: session.expiresAt,
