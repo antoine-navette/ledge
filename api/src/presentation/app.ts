@@ -1,3 +1,4 @@
+import { randomUUID } from 'node:crypto';
 import Fastify from 'fastify';
 import fastifyCookie from '@fastify/cookie';
 import fastifyRateLimit from '@fastify/rate-limit';
@@ -59,6 +60,12 @@ export const createApp = (
         disableRequestLogging: true,
         trustProxy: true,
         bodyLimit: 100 * 1024,
+        genReqId: () => randomUUID(),
+    });
+
+    // Request ID
+    app.addHook('onSend', async (request, reply) => {
+        reply.header('request-id', request.id);
     });
 
     // Logging
