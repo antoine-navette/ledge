@@ -46,14 +46,15 @@ export const deleteTransactionByIdRoute: FastifyPluginAsync<Options> = async (
             if (!result.success) {
                 switch (result.code) {
                     case 'TRANSACTION_NOT_OWNED':
+                        request.log.warn({ code: result.code }, 'Forbidden');
                         return reply.status(403).send({ code: 'FORBIDDEN' });
                     case 'TRANSACTION_NOT_FOUND':
+                        request.log.warn({ code: result.code }, 'Not found');
                         return reply.status(404).send({ code: 'TRANSACTION_NOT_FOUND' });
                 }
             }
 
             request.log.info({ transactionId: result.data.id }, 'Transaction deleted');
-
             return reply.status(204).send();
         },
     });

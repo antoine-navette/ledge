@@ -66,7 +66,6 @@ export const createTransactionRoute: FastifyPluginAsync<Options> = async (
             );
 
             request.log.info({ transactionId: transaction.id }, 'Transaction created');
-
             return reply.status(201).send(TransactionMapper.toSchema(transaction));
         },
     });

@@ -41,13 +41,12 @@ export const loginRoute: FastifyPluginAsync<Options> = async (app, { loginUseCas
                 switch (result.code) {
                     case 'USER_NOT_FOUND':
                     case 'INVALID_PASSWORD':
+                        request.log.warn({ code: result.code }, 'Unauthorized');
                         return reply.status(401).send({ code: 'INVALID_CREDENTIALS' });
                 }
             }
 
             const { user, ...session } = result.data;
-
-            request.log.info({ sessionId: session.id, userId: user.id }, 'User logged in');
 
             reply.setCookie('session_token', session.token, {
                 expires: session.expiresAt,
@@ -56,7 +55,7 @@ export const loginRoute: FastifyPluginAsync<Options> = async (app, { loginUseCas
                 secure: true,
                 sameSite: 'strict',
             });
-
+            request.log.info({ sessionId: session.id, userId: user.id }, 'User logged in');
             return reply.status(200).send(UserMapper.toSchema(user));
         },
     });

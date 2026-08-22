@@ -117,7 +117,7 @@ export const createApp = (
 
     // Not found
     app.setNotFoundHandler(async (request, reply) => {
-        request.log.warn('Route not found');
+        request.log.warn('Not found');
         return reply.status(404).send({ code: 'ROUTE_NOT_FOUND' } satisfies RouteNotFoundSchema);
     });
 
