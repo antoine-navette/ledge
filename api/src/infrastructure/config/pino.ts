@@ -1,7 +1,7 @@
 import pino from 'pino';
 import type { Env } from './env.js';
 
-export const createPino = (nodeEnv: Env['nodeEnv']) => {
+export const createPino = (nodeEnv: Env['nodeEnv'], betterStackToken: Env['betterStackToken']) => {
     if (nodeEnv === 'development') {
         const transport = pino.transport({
             target: 'pino-pretty',
@@ -17,10 +17,9 @@ export const createPino = (nodeEnv: Env['nodeEnv']) => {
         return { logger, flush };
     }
 
-    // Writes to stdout for now. Swap target/options here once BetterStack is wired in.
     const transport = pino.transport({
-        target: 'pino/file',
-        options: { destination: 1 },
+        target: '@logtail/pino',
+        options: { sourceToken: betterStackToken },
     });
     const logger = pino({ level: 'info' }, transport);
     const flush = () =>

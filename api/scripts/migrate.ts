@@ -10,7 +10,10 @@ import 'dotenv/config';
 export type Context = { mongo: { db: Db } };
 
 // .env is not verified yet, but we need a logger now
-const pino = createPino(process.env.NODE_ENV as Env['nodeEnv']);
+const pino = createPino(
+    process.env.NODE_ENV as Env['nodeEnv'],
+    process.env.BETTERSTACK_TOKEN as Env['betterStackToken'],
+);
 
 // Wrapped in an async function (not awaited at the top level) so the pino transport's
 // unref'd worker thread can't make Node think the module has nothing left to settle and
