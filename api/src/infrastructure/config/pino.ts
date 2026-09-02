@@ -1,8 +1,8 @@
 import pino from 'pino';
 import type { Env } from './env.js';
 
-export const createPino = (nodeEnv: Env['nodeEnv'], betterStackToken: Env['betterStackToken']) => {
-    if (nodeEnv === 'development') {
+export const createPino = (env: Env) => {
+    if (env.pinoTarget === 'pino-pretty') {
         const transport = pino.transport({
             target: 'pino-pretty',
             options: { colorize: true },
@@ -19,7 +19,10 @@ export const createPino = (nodeEnv: Env['nodeEnv'], betterStackToken: Env['bette
 
     const transport = pino.transport({
         target: '@logtail/pino',
-        options: { sourceToken: betterStackToken },
+        options: {
+            sourceToken: env.betterStackToken,
+            options: { endpoint: env.betterStackUrl },
+        },
     });
     const logger = pino({ level: 'info' }, transport);
     const flush = () =>
