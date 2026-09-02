@@ -78,8 +78,6 @@ export const createApp = (
                 statusCode: reply.statusCode,
                 duration: reply.elapsedTime,
                 ip: request.ip,
-                // Temporary, to check whether trustProxy resolves request.ip correctly behind the Cloudflare Tunnel
-                cfConnectingIp: request.headers['cf-connecting-ip'],
                 userAgent: request.headers['user-agent'],
             },
             'Request handled',
