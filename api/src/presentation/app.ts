@@ -1,5 +1,5 @@
 import { randomUUID } from 'node:crypto';
-import Fastify from 'fastify';
+import Fastify, { LogController } from 'fastify';
 import fastifyCookie from '@fastify/cookie';
 import fastifyRateLimit from '@fastify/rate-limit';
 import fastifySwagger from '@fastify/swagger';
@@ -57,7 +57,7 @@ export const createApp = (
 ) => {
     const app = Fastify({
         loggerInstance: logger,
-        disableRequestLogging: true,
+        logController: new LogController({ disableRequestLogging: true }),
         trustProxy: true,
         bodyLimit: 100 * 1024,
         genReqId: () => randomUUID(),
@@ -80,7 +80,7 @@ export const createApp = (
                 ip: request.ip,
                 userAgent: request.headers['user-agent'],
             },
-            'Request handled',
+            'Request completed',
         );
     });
 
