@@ -2,5 +2,6 @@ FROM node:24-slim
 
 WORKDIR /app
 
+USER node
 EXPOSE 5173
 CMD ["sh", "-c", "npm install && exec node_modules/.bin/vite --host"]
