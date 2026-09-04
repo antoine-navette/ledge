@@ -1,4 +1,4 @@
-import { Collection, ObjectId } from 'mongodb';
+import { Collection } from 'mongodb';
 import type { SessionRepository } from '../../../domain/repositories/session.repository.js';
 import type { Session } from '../../../domain/entities/session.js';
 import type { MongoSessionDocument } from '../documents/mongo.session.document.js';
@@ -8,7 +8,9 @@ export class MongoSessionRepository implements SessionRepository {
     constructor(private sessionCollection: Collection<MongoSessionDocument>) {}
 
     create = async (session: Session): Promise<void> => {
-        await this.sessionCollection.insertOne(MongoSessionMapper.toDocument(session));
+        const document = MongoSessionMapper.toDocument(session);
+
+        await this.sessionCollection.insertOne(document);
     };
 
     findByToken = async (token: Session['token']): Promise<Session | null> => {
@@ -18,6 +20,8 @@ export class MongoSessionRepository implements SessionRepository {
     };
 
     delete = async (session: Session): Promise<void> => {
-        await this.sessionCollection.deleteOne({ _id: new ObjectId(session.id) });
+        const { _id } = MongoSessionMapper.toDocument(session);
+
+        await this.sessionCollection.deleteOne({ _id });
     };
 }

@@ -8,7 +8,9 @@ export class MongoEmailVerificationRepository implements EmailVerificationReposi
     constructor(private emailVerificationCollection: Collection<MongoEmailVerificationDocument>) {}
 
     create = async (emailVerification: EmailVerification): Promise<void> => {
-        await this.emailVerificationCollection.insertOne(MongoEmailVerificationMapper.toDocument(emailVerification));
+        const document = MongoEmailVerificationMapper.toDocument(emailVerification);
+
+        await this.emailVerificationCollection.insertOne(document);
     };
 
     findByUserId = async (userId: EmailVerification['userId']): Promise<EmailVerification | null> => {
@@ -26,6 +28,8 @@ export class MongoEmailVerificationRepository implements EmailVerificationReposi
     };
 
     delete = async (emailVerification: EmailVerification): Promise<void> => {
-        await this.emailVerificationCollection.deleteOne({ _id: new ObjectId(emailVerification.id) });
+        const { _id } = MongoEmailVerificationMapper.toDocument(emailVerification);
+
+        await this.emailVerificationCollection.deleteOne({ _id });
     };
 }
