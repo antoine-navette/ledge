@@ -1,4 +1,5 @@
-import Fastify from 'fastify';
+import { randomUUID } from 'node:crypto';
+import Fastify, { LogController } from 'fastify';
 import fastifyCookie from '@fastify/cookie';
 import fastifyRateLimit from '@fastify/rate-limit';
 import fastifySwagger from '@fastify/swagger';
@@ -56,18 +57,31 @@ export const createApp = (
 ) => {
     const app = Fastify({
         loggerInstance: logger,
-        disableRequestLogging: true,
+        logController: new LogController({ disableRequestLogging: true }),
         trustProxy: true,
         bodyLimit: 100 * 1024,
+        genReqId: () => randomUUID(),
+    });
+
+    // Request ID
+    app.addHook('onSend', async (request, reply) => {
+        reply.header('request-id', request.id);
     });
 
     // Logging
-    app.addHook('onRequest', async (request) => {
-        request.log = request.log.child({
-            method: request.method,
-            url: request.url,
-            route: request.routeOptions.url,
-        });
+    app.addHook('onResponse', async (request, reply) => {
+        request.log.info(
+            {
+                method: request.method,
+                url: request.url,
+                route: request.routeOptions.url,
+                statusCode: reply.statusCode,
+                duration: reply.elapsedTime,
+                ip: request.ip,
+                userAgent: request.headers['user-agent'],
+            },
+            'Request completed',
+        );
     });
 
     // Security
@@ -112,7 +126,7 @@ export const createApp = (
 
     // Not found
     app.setNotFoundHandler(async (request, reply) => {
-        request.log.warn('Route not found');
+        request.log.warn('Not found');
         return reply.status(404).send({ code: 'ROUTE_NOT_FOUND' } satisfies RouteNotFoundSchema);
     });
 
@@ -121,23 +135,23 @@ export const createApp = (
         // Malformed/empty JSON body on any bodywith route (POST/PUT/PATCH/DELETE/OPTIONS) even without a body
         // schema, or a zod validation failure (body/params/querystring) on any route with an input schema.
         if (err instanceof Error && 'statusCode' in err && err.statusCode === 400) {
-            request.log.warn({ err }, err.message);
+            request.log.warn({ err }, 'Bad request');
             return reply.status(400).send({ code: 'BAD_REQUEST' } satisfies BadRequestSchema);
         }
 
         // Body over bodyLimit — only possible on bodywith routes (POST/PUT/PATCH/DELETE/OPTIONS); GET/HEAD/TRACE
         // never attempt to parse a body at all, regardless of whether the route declares one.
         if (err instanceof Error && 'statusCode' in err && err.statusCode === 413) {
-            request.log.warn({ err }, err.message);
+            request.log.warn({ err }, 'Payload too large');
             return reply.status(413).send({ code: 'PAYLOAD_TOO_LARGE' } satisfies PayloadTooLargeSchema);
         }
 
         if (err instanceof Error && 'statusCode' in err && err.statusCode === 429) {
-            request.log.warn({ err }, err.message);
+            request.log.warn({ err }, 'Too many requests');
             return reply.status(429).send({ code: 'TOO_MANY_REQUESTS' } satisfies TooManyRequestsSchema);
         }
 
-        request.log.error({ err }, err instanceof Error ? err.message : 'Unknown error');
+        request.log.error({ err }, 'Internal server error');
         return reply.status(500).send({ code: 'INTERNAL_SERVER_ERROR' } satisfies InternalServerErrorSchema);
     });
 

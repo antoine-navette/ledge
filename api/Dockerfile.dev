@@ -2,5 +2,6 @@ FROM node:24-slim
 
 WORKDIR /app
 
+USER node
 EXPOSE 3000
 CMD ["sh", "-c", "npm install && node_modules/.bin/tsx scripts/migrate.ts && exec node_modules/.bin/tsx watch src/index.ts"]

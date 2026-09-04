@@ -40,16 +40,20 @@ export const createEmailVerificationRoute: FastifyPluginAsync<Options> = async (
         handler: async (request, reply) => {
             const result = await requestEmailVerificationUseCase.execute(request.session.userId);
             if (!result.success) {
-                switch (result.error) {
+                switch (result.code) {
                     case 'USER_NOT_FOUND':
+                        request.log.warn({ code: result.code }, 'Unauthorized');
                         return reply.status(401).send({ code: 'UNAUTHORIZED' });
                     case 'ACTIVE_COOLDOWN':
+                        request.log.warn({ code: result.code }, 'Conflict');
                         return reply.status(409).send({ code: 'ACTIVE_COOLDOWN' });
                     case 'EMAIL_ALREADY_VERIFIED':
+                        request.log.warn({ code: result.code }, 'Conflict');
                         return reply.status(409).send({ code: 'EMAIL_ALREADY_VERIFIED' });
                 }
             }
 
+            request.log.info({ emailVerificationId: result.data.id }, 'Email verification requested');
             return reply.status(201).send();
         },
     });

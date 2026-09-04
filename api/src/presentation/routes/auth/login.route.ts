@@ -38,9 +38,10 @@ export const loginRoute: FastifyPluginAsync<Options> = async (app, { loginUseCas
 
             const result = await loginUseCase.execute(email, password);
             if (!result.success) {
-                switch (result.error) {
+                switch (result.code) {
                     case 'USER_NOT_FOUND':
                     case 'INVALID_PASSWORD':
+                        request.log.warn({ code: result.code }, 'Unauthorized');
                         return reply.status(401).send({ code: 'INVALID_CREDENTIALS' });
                 }
             }
@@ -54,7 +55,7 @@ export const loginRoute: FastifyPluginAsync<Options> = async (app, { loginUseCas
                 secure: true,
                 sameSite: 'strict',
             });
-
+            request.log.info({ sessionId: session.id, userId: user.id }, 'User logged in');
             return reply.status(200).send(UserMapper.toSchema(user));
         },
     });

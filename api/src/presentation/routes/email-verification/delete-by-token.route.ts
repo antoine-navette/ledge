@@ -38,18 +38,23 @@ export const deleteEmailVerificationByTokenRoute: FastifyPluginAsync<Options> = 
         handler: async (request, reply) => {
             const result = await verifyEmailUseCase.execute(request.params.token);
             if (!result.success) {
-                switch (result.error) {
+                switch (result.code) {
                     case 'EMAIL_VERIFICATION_NOT_FOUND':
+                        request.log.warn({ code: result.code }, 'Not found');
                         return reply.status(404).send({ code: 'EMAIL_VERIFICATION_NOT_FOUND' });
                     case 'USER_NOT_FOUND':
+                        request.log.warn({ code: result.code }, 'Not found');
                         return reply.status(404).send({ code: 'USER_NOT_FOUND' });
                     case 'TOKEN_EXPIRED':
+                        request.log.warn({ code: result.code }, 'Gone');
                         return reply.status(410).send({ code: 'TOKEN_EXPIRED' });
                     case 'EMAIL_ALREADY_VERIFIED':
+                        request.log.warn({ code: result.code }, 'Conflict');
                         return reply.status(409).send({ code: 'EMAIL_ALREADY_VERIFIED' });
                 }
             }
 
+            request.log.info({ emailVerificationId: result.data.id, userId: result.data.userId }, 'Email verified');
             return reply.status(204).send();
         },
     });

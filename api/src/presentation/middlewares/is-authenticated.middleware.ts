@@ -19,10 +19,11 @@ export const isAuthenticated = (authenticateUseCase: AuthenticateUseCase) => {
 
         const result = await authenticateUseCase.execute(sessionToken);
         if (!result.success) {
-            request.log.warn({ err: result.error }, 'Unauthorized');
+            request.log.warn({ code: result.code }, 'Unauthorized');
             return reply.status(401).send({ code: 'UNAUTHORIZED' } satisfies UnauthorizedSchema);
         }
 
         request.session = result.data;
+        request.log = request.log.child({ sessionId: result.data.id, userId: result.data.userId });
     };
 };

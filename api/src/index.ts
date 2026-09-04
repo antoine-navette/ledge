@@ -26,7 +26,12 @@ import { UpdateTransactionUseCase } from './application/transaction/update-trans
 import { DeleteTransactionUseCase } from './application/transaction/delete-transaction.use-case.js';
 import 'dotenv/config';
 
-const pino = createPino(process.env.NODE_ENV as Env['nodeEnv']);
+// .env is not verified yet, but we need a logger now
+const pino = createPino({
+    pinoTarget: process.env.PINO_TARGET,
+    betterStackToken: process.env.BETTERSTACK_TOKEN,
+    betterStackUrl: process.env.BETTERSTACK_URL,
+} as Env);
 
 try {
     const { mongoUrl, smtpUrl, port, emailFrom, webUrl } = loadEnv();

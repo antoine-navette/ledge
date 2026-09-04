@@ -5,7 +5,7 @@ export class GetCurrentUserUseCase {
 
     execute = async (id: string) => {
         const user = await this.userRepository.findById(id);
-        if (!user) return { success: false, error: 'USER_NOT_FOUND' } as const;
+        if (!user) return { success: false, code: 'USER_NOT_FOUND' } as const;
 
         return { success: true, data: user } as const;
     };

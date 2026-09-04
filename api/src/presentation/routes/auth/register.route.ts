@@ -44,8 +44,9 @@ export const registerRoute: FastifyPluginAsync<Options> = async (app, { register
 
             const result = await registerUseCase.execute(email, password);
             if (!result.success) {
-                switch (result.error) {
+                switch (result.code) {
                     case 'DUPLICATE_EMAIL':
+                        request.log.warn({ code: result.code }, 'Conflict');
                         return reply.status(409).send({ code: 'DUPLICATE_EMAIL' });
                 }
             }
@@ -59,7 +60,7 @@ export const registerRoute: FastifyPluginAsync<Options> = async (app, { register
                 secure: true,
                 sameSite: 'strict',
             });
-
+            request.log.info({ sessionId: session.id, userId: user.id }, 'User registered');
             return reply.status(201).send(UserMapper.toSchema(user));
         },
     });

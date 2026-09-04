@@ -44,10 +44,12 @@ export const readTransactionByIdRoute: FastifyPluginAsync<Options> = async (
         handler: async (request, reply) => {
             const result = await getTransactionUseCase.execute(request.params.id, request.session.userId);
             if (!result.success) {
-                switch (result.error) {
+                switch (result.code) {
                     case 'TRANSACTION_NOT_OWNED':
+                        request.log.warn({ code: result.code }, 'Forbidden');
                         return reply.status(403).send({ code: 'FORBIDDEN' });
                     case 'TRANSACTION_NOT_FOUND':
+                        request.log.warn({ code: result.code }, 'Not found');
                         return reply.status(404).send({ code: 'TRANSACTION_NOT_FOUND' });
                 }
             }

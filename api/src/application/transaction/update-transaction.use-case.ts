@@ -14,8 +14,8 @@ export class UpdateTransactionUseCase {
         date: Date,
     ) => {
         const transaction = await this.transactionRepository.findById(id);
-        if (!transaction) return { success: false, error: 'TRANSACTION_NOT_FOUND' } as const;
-        if (transaction.userId !== userId) return { success: false, error: 'TRANSACTION_NOT_OWNED' } as const;
+        if (!transaction) return { success: false, code: 'TRANSACTION_NOT_FOUND' } as const;
+        if (transaction.userId !== userId) return { success: false, code: 'TRANSACTION_NOT_OWNED' } as const;
 
         const updated: Transaction = {
             id: transaction.id,

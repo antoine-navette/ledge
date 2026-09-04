@@ -31,8 +31,9 @@ export const meRoute: FastifyPluginAsync<Options> = async (app, { getCurrentUser
         handler: async (request, reply) => {
             const result = await getCurrentUserUseCase.execute(request.session.userId);
             if (!result.success) {
-                switch (result.error) {
+                switch (result.code) {
                     case 'USER_NOT_FOUND':
+                        request.log.warn({ code: result.code }, 'Unauthorized');
                         return reply.status(401).send({ code: 'UNAUTHORIZED' });
                 }
             }
