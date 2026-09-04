@@ -27,7 +27,7 @@ export const deleteTransactionByIdRoute: FastifyPluginAsync<Options> = async (
         schema: {
             tags: ['Transaction'],
             params: z.object({
-                id: z.string().length(24),
+                id: z.string(),
             }),
             response: {
                 204: { description: 'Transaction deleted successfully' },

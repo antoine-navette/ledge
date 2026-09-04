@@ -12,6 +12,8 @@ export class MongoEmailVerificationRepository implements EmailVerificationReposi
     };
 
     findByUserId = async (userId: EmailVerification['userId']): Promise<EmailVerification | null> => {
+        if (!ObjectId.isValid(userId)) return null;
+
         const document = await this.emailVerificationCollection.findOne({ userId: new ObjectId(userId) });
 
         return document ? MongoEmailVerificationMapper.toEntity(document) : null;

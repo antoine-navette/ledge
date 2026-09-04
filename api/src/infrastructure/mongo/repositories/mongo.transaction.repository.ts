@@ -17,6 +17,8 @@ export class MongoTransactionRepository implements TransactionRepository {
     };
 
     find = async (criteria: TransactionCriteria): Promise<Transaction[]> => {
+        if (criteria.userId !== undefined && !ObjectId.isValid(criteria.userId)) return [];
+
         const documents = await this.transactionCollection
             .find({
                 ...(criteria.userId ? { userId: new ObjectId(criteria.userId) } : {}),
@@ -35,6 +37,8 @@ export class MongoTransactionRepository implements TransactionRepository {
     };
 
     findById = async (id: Transaction['id']): Promise<Transaction | null> => {
+        if (!ObjectId.isValid(id)) return null;
+
         const document = await this.transactionCollection.findOne({ _id: new ObjectId(id) });
 
         return document ? MongoTransactionMapper.toEntity(document) : null;

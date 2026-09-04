@@ -14,6 +14,8 @@ export class MongoUserRepository implements UserRepository {
     };
 
     findById = async (id: User['id']): Promise<User | null> => {
+        if (!ObjectId.isValid(id)) return null;
+
         const document = await this.userCollection.findOne({ _id: new ObjectId(id) });
 
         return document ? MongoUserMapper.toEntity(document) : null;
