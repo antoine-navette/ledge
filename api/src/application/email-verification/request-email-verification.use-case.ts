@@ -3,12 +3,10 @@ import type { UserRepository } from '../../domain/repositories/user.repository.j
 import type { EmailVerificationRepository } from '../../domain/repositories/email-verification.repository.js';
 import type { IdGenerator } from '../../domain/ports/id-generator.js';
 import type { TokenGenerator } from '../../domain/ports/token-generator.js';
-import type { EmailVerification } from '../../domain/entities/email-verification.js';
+import { EmailVerification } from '../../domain/entities/email-verification.js';
 
 export class RequestEmailVerificationUseCase {
     private readonly COOLDOWN_DURATION = 5 * 60 * 1000;
-    private readonly EMAIL_VERIFICATION_DURATION = 60 * 60 * 1000;
-    private readonly EMAIL_VERIFICATION_TOKEN_LENGTH = 64;
 
     constructor(
         private userRepository: UserRepository,
@@ -37,13 +35,11 @@ export class RequestEmailVerificationUseCase {
             await this.emailVerificationRepository.delete(existing);
         }
 
-        const emailVerification: EmailVerification = {
-            id: this.idGenerator.generate(),
-            userId: user.id,
-            token: this.tokenGenerator.generate(this.EMAIL_VERIFICATION_TOKEN_LENGTH),
-            expiresAt: new Date(now.getTime() + this.EMAIL_VERIFICATION_DURATION),
-            createdAt: now,
-        };
+        const emailVerification = EmailVerification.create(
+            this.idGenerator.generate(),
+            user.id,
+            this.tokenGenerator.generate(EmailVerification.TOKEN_LENGTH),
+        );
         await this.emailVerificationRepository.create(emailVerification);
 
         await this.emailSender.send(

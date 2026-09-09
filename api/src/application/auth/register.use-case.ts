@@ -4,12 +4,9 @@ import type { PasswordHasher } from '../../domain/ports/password-hasher.js';
 import type { IdGenerator } from '../../domain/ports/id-generator.js';
 import type { TokenGenerator } from '../../domain/ports/token-generator.js';
 import { User } from '../../domain/entities/user.js';
-import type { Session } from '../../domain/entities/session.js';
+import { Session } from '../../domain/entities/session.js';
 
 export class RegisterUseCase {
-    private readonly SESSION_DURATION = 30 * 24 * 60 * 60 * 1000;
-    private readonly SESSION_TOKEN_LENGTH = 64;
-
     constructor(
         private userRepository: UserRepository,
         private sessionRepository: SessionRepository,
@@ -19,8 +16,6 @@ export class RegisterUseCase {
     ) {}
 
     execute = async (email: string, password: string) => {
-        const now = new Date();
-
         const existing = await this.userRepository.findByEmail(email);
         if (existing) return { success: false, code: 'DUPLICATE_EMAIL' } as const;
 
@@ -30,14 +25,11 @@ export class RegisterUseCase {
 
         await this.userRepository.create(user);
 
-        const session: Session = {
-            id: this.idGenerator.generate(),
-            userId: user.id,
-            token: this.tokenGenerator.generate(this.SESSION_TOKEN_LENGTH),
-            expiresAt: new Date(now.getTime() + this.SESSION_DURATION),
-            createdAt: now,
-            updatedAt: now,
-        };
+        const session = Session.create(
+            this.idGenerator.generate(),
+            user.id,
+            this.tokenGenerator.generate(Session.TOKEN_LENGTH),
+        );
         await this.sessionRepository.create(session);
 
         return { success: true, data: { ...session, user } } as const;

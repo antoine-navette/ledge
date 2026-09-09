@@ -1,5 +1,5 @@
 import { ObjectId } from 'mongodb';
-import type { EmailVerification } from '../../../domain/entities/email-verification.js';
+import { EmailVerification } from '../../../domain/entities/email-verification.js';
 import type { MongoEmailVerificationDocument } from '../documents/mongo.email-verification.document.js';
 
 export const MongoEmailVerificationMapper = {
@@ -11,11 +11,12 @@ export const MongoEmailVerificationMapper = {
         createdAt: emailVerification.createdAt,
     }),
 
-    toEntity: (document: MongoEmailVerificationDocument): EmailVerification => ({
-        id: document._id.toString(),
-        userId: document.userId.toString(),
-        token: document.token,
-        expiresAt: document.expiresAt,
-        createdAt: document.createdAt,
-    }),
+    toEntity: (document: MongoEmailVerificationDocument): EmailVerification =>
+        EmailVerification.reconstitute(
+            document._id.toString(),
+            document.userId.toString(),
+            document.token,
+            document.expiresAt,
+            document.createdAt,
+        ),
 };
