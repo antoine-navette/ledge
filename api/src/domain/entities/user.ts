@@ -30,7 +30,7 @@ export class User {
         } as const;
     };
 
-    verifyEmail = (): User => {
+    verifyEmail = () => {
         const now = new Date();
 
         return new User(this.id, this.email, this.passwordHash, true, this.createdAt, now);
