@@ -9,7 +9,6 @@ export const up = async ({ context: { mongo } }: { context: Context }) => {
         },
         { $unset: 'month' },
     ]);
-
     await mongo.db.collection('transactions').dropIndex('userId_1');
     await mongo.db.collection('transactions').createIndex({ userId: 1, date: 1 });
 };
