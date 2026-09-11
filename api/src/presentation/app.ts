@@ -23,6 +23,8 @@ import type { GetUserTransactionsUseCase } from '../application/transaction/get-
 import type { GetTransactionUseCase } from '../application/transaction/get-transaction.use-case.js';
 import type { UpdateTransactionUseCase } from '../application/transaction/update-transaction.use-case.js';
 import type { DeleteTransactionUseCase } from '../application/transaction/delete-transaction.use-case.js';
+import type { Session } from '../domain/entities/session.js';
+import { SESSION_COOKIE_NAME, SESSION_COOKIE_OPTIONS } from './constants/session-cookie.js';
 import { registerRoute } from './routes/auth/register.route.js';
 import { loginRoute } from './routes/auth/login.route.js';
 import { logoutRoute } from './routes/auth/logout.route.js';
@@ -39,6 +41,17 @@ import type { BadRequestSchema } from './schemas/bad-request.schema.js';
 import type { PayloadTooLargeSchema } from './schemas/payload-too-large.schema.js';
 import type { TooManyRequestsSchema } from './schemas/too-many-requests.schema.js';
 import type { InternalServerErrorSchema } from './schemas/internal-server-error.schema.js';
+
+declare module 'fastify' {
+    interface FastifyRequest {
+        session: Session;
+    }
+
+    interface FastifyReply {
+        setSessionCookie(session: Session): void;
+        clearSessionCookie(): void;
+    }
+}
 
 export const createApp = (
     logger: Logger,
@@ -92,6 +105,14 @@ export const createApp = (
 
     // Parsing
     app.register(fastifyCookie);
+
+    // Session cookie
+    app.decorateReply('setSessionCookie', function (session: Session) {
+        this.setCookie(SESSION_COOKIE_NAME, session.token, { ...SESSION_COOKIE_OPTIONS, expires: session.expiresAt });
+    });
+    app.decorateReply('clearSessionCookie', function () {
+        this.clearCookie(SESSION_COOKIE_NAME, SESSION_COOKIE_OPTIONS);
+    });
 
     // OpenAPI (validation, serialization — needed in every env)
     app.setValidatorCompiler(validatorCompiler);

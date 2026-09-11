@@ -53,13 +53,7 @@ export const registerRoute: FastifyPluginAsync<Options> = async (app, { register
             const { user, ...session } = result.data;
 
             request.log.info({ sessionId: session.id, userId: user.id }, 'User registered');
-            reply.setCookie('session_token', session.token, {
-                expires: session.expiresAt,
-                path: '/',
-                httpOnly: true,
-                secure: true,
-                sameSite: 'strict',
-            });
+            reply.setSessionCookie(session);
             return reply.status(201).send(UserMapper.toSchema(user));
         },
     });

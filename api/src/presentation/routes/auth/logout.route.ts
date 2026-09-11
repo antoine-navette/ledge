@@ -34,7 +34,7 @@ export const logoutRoute: FastifyPluginAsync<Options> = async (app, { authentica
             await logoutUseCase.execute(request.session);
 
             request.log.info('User logged out');
-            reply.clearCookie('session_token', { path: '/' });
+            reply.clearSessionCookie();
             return reply.status(204).send();
         },
     });
