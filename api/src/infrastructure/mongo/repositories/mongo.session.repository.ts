@@ -19,6 +19,12 @@ export class MongoSessionRepository implements SessionRepository {
         return document ? MongoSessionMapper.toEntity(document) : null;
     };
 
+    save = async (session: Session): Promise<void> => {
+        const { _id, ...rest } = MongoSessionMapper.toDocument(session);
+
+        await this.sessionCollection.updateOne({ _id }, { $set: rest });
+    };
+
     delete = async (session: Session): Promise<void> => {
         const { _id } = MongoSessionMapper.toDocument(session);
 

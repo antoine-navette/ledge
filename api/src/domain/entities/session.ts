@@ -17,6 +17,19 @@ export class Session {
         return new Session(id, userId, token, new Date(now.getTime() + Session.DURATION), now, now);
     };
 
+    extend = () => {
+        const now = new Date();
+
+        return new Session(
+            this.id,
+            this.userId,
+            this.token,
+            new Date(now.getTime() + Session.DURATION),
+            this.createdAt,
+            now,
+        );
+    };
+
     static reconstitute = (
         id: string,
         userId: string,

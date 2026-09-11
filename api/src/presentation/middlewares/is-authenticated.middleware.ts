@@ -22,8 +22,16 @@ export const isAuthenticated = (authenticateUseCase: AuthenticateUseCase) => {
             request.log.warn({ code: result.code }, 'Unauthorized');
             return reply.status(401).send({ code: 'UNAUTHORIZED' } satisfies UnauthorizedSchema);
         }
+        const session = result.data;
 
-        request.session = result.data;
-        request.log = request.log.child({ sessionId: result.data.id, userId: result.data.userId });
+        request.session = session;
+        request.log = request.log.child({ sessionId: session.id, userId: session.userId });
+        reply.setCookie('session_token', session.token, {
+            expires: session.expiresAt,
+            path: '/',
+            httpOnly: true,
+            secure: true,
+            sameSite: 'strict',
+        });
     };
 };

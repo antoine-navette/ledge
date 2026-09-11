@@ -47,6 +47,7 @@ export const loginRoute: FastifyPluginAsync<Options> = async (app, { loginUseCas
             }
             const { user, ...session } = result.data;
 
+            request.log.info({ sessionId: session.id, userId: user.id }, 'User logged in');
             reply.setCookie('session_token', session.token, {
                 expires: session.expiresAt,
                 path: '/',
@@ -54,7 +55,6 @@ export const loginRoute: FastifyPluginAsync<Options> = async (app, { loginUseCas
                 secure: true,
                 sameSite: 'strict',
             });
-            request.log.info({ sessionId: session.id, userId: user.id }, 'User logged in');
             return reply.status(200).send(UserMapper.toSchema(user));
         },
     });
