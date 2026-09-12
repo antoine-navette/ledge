@@ -595,6 +595,7 @@ export interface paths {
                         type: "income" | "expense";
                         /** @enum {string} */
                         category?: "need" | "want" | "investment";
+                        /** Format: date */
                         date: string;
                     };
                 };
@@ -772,6 +773,7 @@ export interface paths {
                         type: "income" | "expense";
                         /** @enum {string} */
                         category?: "need" | "want" | "investment";
+                        /** Format: date */
                         date: string;
                     };
                 };

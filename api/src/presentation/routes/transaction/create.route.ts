@@ -32,7 +32,12 @@ export const createTransactionRoute: FastifyPluginAsync<Options> = async (
                 value: z.number(),
                 type: z.enum(['income', 'expense']),
                 category: z.enum(['need', 'want', 'investment']).optional(),
-                date: z.string().transform((value) => new Date(value)),
+                // Deliberately duplicates part of what Transaction.create() re-validates:
+                // this only rejects a string that isn't shaped like a date at all (400,
+                // a format/type problem), while the entity still fully re-checks format,
+                // midnight and range regardless (422 for a well-formed but business-invalid
+                // date) — it has to stay safe for any caller, not just this route.
+                date: z.iso.date().transform((value) => new Date(value)),
             }),
             response: {
                 201: transactionSchema,

@@ -73,7 +73,14 @@ export class Transaction {
             return { success: false, code: 'TRANSACTION_CATEGORY_INVALID' } as const;
         }
 
-        // date must be a valid, UTC-midnight day between the epoch and today
+        // date must be a valid, UTC-midnight day between the epoch and today. The format
+        // and midnight checks below are deliberately duplicated with the routes' Zod
+        // schema (z.iso.date()) rather than trusted away: this entity must stay safe for
+        // any caller that doesn't go through Zod first (e.g. tests calling create()/
+        // update() directly). Number.isNaN must stay first and short-circuit the rest —
+        // date.toISOString() throws on an Invalid Date, and NaN comparisons always
+        // evaluate to false, so removing it wouldn't just be "redundant": it would either
+        // crash this call or let an Invalid Date silently pass the range check below.
         if (
             Number.isNaN(date.getTime()) ||
             !date.toISOString().endsWith('T00:00:00.000Z') ||
