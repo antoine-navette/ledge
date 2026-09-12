@@ -73,6 +73,19 @@
                 ],
                 "additionalProperties": false
             },
+            "UnprocessableContent": {
+                "type": "object",
+                "properties": {
+                    "code": {
+                        "type": "string",
+                        "const": "UNPROCESSABLE_CONTENT"
+                    }
+                },
+                "required": [
+                    "code"
+                ],
+                "additionalProperties": false
+            },
             "TooManyRequests": {
                 "type": "object",
                 "properties": {
@@ -284,27 +297,10 @@
                                 "type": "object",
                                 "properties": {
                                     "email": {
-                                        "type": "string",
-                                        "format": "email",
-                                        "pattern": "^(?!\\.)(?!.*\\.\\.)([A-Za-z0-9_'+\\-\\.]*)[A-Za-z0-9_+-]@([A-Za-z0-9][A-Za-z0-9\\-]*\\.)+[A-Za-z]{2,}$"
+                                        "type": "string"
                                     },
                                     "password": {
-                                        "type": "string",
-                                        "minLength": 8,
-                                        "allOf": [
-                                            {
-                                                "pattern": "[A-Z]"
-                                            },
-                                            {
-                                                "pattern": "[a-z]"
-                                            },
-                                            {
-                                                "pattern": "\\d"
-                                            },
-                                            {
-                                                "pattern": "[!@#$%^&*(),.?\":{}|<>]"
-                                            }
-                                        ]
+                                        "type": "string"
                                     }
                                 },
                                 "required": [
@@ -356,6 +352,16 @@
                             }
                         }
                     },
+                    "422": {
+                        "description": "Default Response",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/UnprocessableContent"
+                                }
+                            }
+                        }
+                    },
                     "429": {
                         "description": "Default Response",
                         "content": {
@@ -392,13 +398,10 @@
                                 "type": "object",
                                 "properties": {
                                     "email": {
-                                        "type": "string",
-                                        "format": "email",
-                                        "pattern": "^(?!\\.)(?!.*\\.\\.)([A-Za-z0-9_'+\\-\\.]*)[A-Za-z0-9_+-]@([A-Za-z0-9][A-Za-z0-9\\-]*\\.)+[A-Za-z]{2,}$"
+                                        "type": "string"
                                     },
                                     "password": {
-                                        "type": "string",
-                                        "minLength": 1
+                                        "type": "string"
                                     }
                                 },
                                 "required": [
@@ -775,14 +778,10 @@
                                 "type": "object",
                                 "properties": {
                                     "name": {
-                                        "type": "string",
-                                        "minLength": 1,
-                                        "maxLength": 99
+                                        "type": "string"
                                     },
                                     "value": {
-                                        "type": "number",
-                                        "minimum": 0.01,
-                                        "maximum": 999999999.99
+                                        "type": "number"
                                     },
                                     "type": {
                                         "type": "string",
@@ -800,9 +799,7 @@
                                         ]
                                     },
                                     "date": {
-                                        "type": "string",
-                                        "format": "date",
-                                        "pattern": "^(?:(?:\\d\\d[2468][048]|\\d\\d[13579][26]|\\d\\d0[48]|[02468][048]00|[13579][26]00)-02-29|\\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\\d|30)|(?:02)-(?:0[1-9]|1\\d|2[0-8])))$"
+                                        "type": "string"
                                     }
                                 },
                                 "required": [
@@ -852,6 +849,16 @@
                             "application/json": {
                                 "schema": {
                                     "$ref": "#/components/schemas/PayloadTooLarge"
+                                }
+                            }
+                        }
+                    },
+                    "422": {
+                        "description": "Default Response",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/UnprocessableContent"
                                 }
                             }
                         }
@@ -967,9 +974,7 @@
                 "parameters": [
                     {
                         "schema": {
-                            "type": "string",
-                            "minLength": 24,
-                            "maxLength": 24
+                            "type": "string"
                         },
                         "in": "path",
                         "name": "id",
@@ -1061,14 +1066,10 @@
                                 "type": "object",
                                 "properties": {
                                     "name": {
-                                        "type": "string",
-                                        "minLength": 1,
-                                        "maxLength": 99
+                                        "type": "string"
                                     },
                                     "value": {
-                                        "type": "number",
-                                        "minimum": 0.01,
-                                        "maximum": 999999999.99
+                                        "type": "number"
                                     },
                                     "type": {
                                         "type": "string",
@@ -1086,9 +1087,7 @@
                                         ]
                                     },
                                     "date": {
-                                        "type": "string",
-                                        "format": "date",
-                                        "pattern": "^(?:(?:\\d\\d[2468][048]|\\d\\d[13579][26]|\\d\\d0[48]|[02468][048]00|[13579][26]00)-02-29|\\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\\d|30)|(?:02)-(?:0[1-9]|1\\d|2[0-8])))$"
+                                        "type": "string"
                                     }
                                 },
                                 "required": [
@@ -1104,9 +1103,7 @@
                 "parameters": [
                     {
                         "schema": {
-                            "type": "string",
-                            "minLength": 24,
-                            "maxLength": 24
+                            "type": "string"
                         },
                         "in": "path",
                         "name": "id",
@@ -1174,6 +1171,16 @@
                             }
                         }
                     },
+                    "422": {
+                        "description": "Default Response",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/UnprocessableContent"
+                                }
+                            }
+                        }
+                    },
                     "429": {
                         "description": "Default Response",
                         "content": {
@@ -1203,9 +1210,7 @@
                 "parameters": [
                     {
                         "schema": {
-                            "type": "string",
-                            "minLength": 24,
-                            "maxLength": 24
+                            "type": "string"
                         },
                         "in": "path",
                         "name": "id",

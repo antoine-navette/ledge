@@ -23,9 +23,8 @@ export interface paths {
             requestBody: {
                 content: {
                     "application/json": {
-                        /** Format: email */
                         email: string;
-                        password: string & (unknown & unknown & unknown & unknown);
+                        password: string;
                     };
                 };
             };
@@ -64,6 +63,15 @@ export interface paths {
                     };
                     content: {
                         "application/json": components["schemas"]["PayloadTooLarge"];
+                    };
+                };
+                /** @description Default Response */
+                422: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["UnprocessableContent"];
                     };
                 };
                 /** @description Default Response */
@@ -111,7 +119,6 @@ export interface paths {
             requestBody: {
                 content: {
                     "application/json": {
-                        /** Format: email */
                         email: string;
                         password: string;
                     };
@@ -588,7 +595,6 @@ export interface paths {
                         type: "income" | "expense";
                         /** @enum {string} */
                         category?: "need" | "want" | "investment";
-                        /** Format: date */
                         date: string;
                     };
                 };
@@ -628,6 +634,15 @@ export interface paths {
                     };
                     content: {
                         "application/json": components["schemas"]["PayloadTooLarge"];
+                    };
+                };
+                /** @description Default Response */
+                422: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["UnprocessableContent"];
                     };
                 };
                 /** @description Default Response */
@@ -757,7 +772,6 @@ export interface paths {
                         type: "income" | "expense";
                         /** @enum {string} */
                         category?: "need" | "want" | "investment";
-                        /** Format: date */
                         date: string;
                     };
                 };
@@ -815,6 +829,15 @@ export interface paths {
                     };
                     content: {
                         "application/json": components["schemas"]["PayloadTooLarge"];
+                    };
+                };
+                /** @description Default Response */
+                422: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["UnprocessableContent"];
                     };
                 };
                 /** @description Default Response */
@@ -948,6 +971,10 @@ export interface components {
         PayloadTooLarge: {
             /** @constant */
             code: "PAYLOAD_TOO_LARGE";
+        };
+        UnprocessableContent: {
+            /** @constant */
+            code: "UNPROCESSABLE_CONTENT";
         };
         TooManyRequests: {
             /** @constant */
