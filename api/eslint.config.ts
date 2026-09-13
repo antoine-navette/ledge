@@ -1,7 +1,7 @@
 // npx eslint --init
 
-import js from '@eslint/js';
-import globals from 'globals';
+import * as js from '@eslint/js'; // Added "* as" to satisfies WebStorm
+import * as globals from 'globals'; // Added "* as" to satisfies WebStorm
 import tseslint from 'typescript-eslint';
 import { defineConfig } from 'eslint/config';
 
@@ -13,6 +13,5 @@ export default defineConfig([
         extends: ['js/recommended'],
         languageOptions: { globals: globals.node },
     },
-    { files: ['**/*.js'], languageOptions: { sourceType: 'commonjs' } },
     tseslint.configs.recommended,
 ]);

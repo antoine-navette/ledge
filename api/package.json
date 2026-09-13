@@ -27,7 +27,6 @@
         "dotenv": "^17.4.2",
         "fastify": "^5.10.0",
         "fastify-zod-openapi": "^5.6.1",
-        "jiti": "^2.6.1",
         "jsonwebtoken": "^9.0.2",
         "mongodb": "^6.20.0",
         "nodemailer": "^9.0.3",
@@ -37,7 +36,7 @@
         "zod": "^4.1.11"
     },
     "devDependencies": {
-        "@eslint/js": "^9.37.0",
+        "@eslint/js": "^9.39.5",
         "@types/bcrypt": "^5.0.2",
         "@types/jsonwebtoken": "^9.0.9",
         "@types/node": "^22.15.3",
@@ -45,13 +44,14 @@
         "@typescript-eslint/eslint-plugin": "^8.32.1",
         "@typescript-eslint/parser": "^8.32.1",
         "@vitest/coverage-v8": "^4.0.18",
-        "eslint": "^9.37.0",
-        "globals": "^16.4.0",
+        "eslint": "^9.39.5",
+        "globals": "^16.5.0",
+        "jiti": "^2.7.0",
         "prettier": "^3.5.3",
         "rimraf": "^6.0.1",
         "tsx": "^4.19.4",
         "typescript": "^5.8.3",
-        "typescript-eslint": "^8.46.1",
+        "typescript-eslint": "^8.70.0",
         "vitest": "^4.0.18"
     }
 }
