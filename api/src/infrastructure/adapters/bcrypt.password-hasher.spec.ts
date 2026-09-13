@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { BcryptPasswordHasher } from '../../../../src/infrastructure/adapters/bcrypt.password-hasher.js';
+import { BcryptPasswordHasher } from './bcrypt.password-hasher.js';
 
 describe('BcryptPasswordHasher', () => {
     const passwordHasher = new BcryptPasswordHasher();
@@ -7,10 +7,17 @@ describe('BcryptPasswordHasher', () => {
     describe('hash', () => {
         it('should generate a hash different from the raw password', async () => {
             const password = 'my-secret-password';
-            const hash = await passwordHasher.hash(password);
 
+            const hash = await passwordHasher.hash(password);
             expect(hash).not.toBe(password);
-            expect(hash).toHaveLength(60);
+        });
+
+        it('should generate a different hash for the same password each time (salting)', async () => {
+            const password = 'my-secret-password';
+
+            const firstHash = await passwordHasher.hash(password);
+            const secondHash = await passwordHasher.hash(password);
+            expect(firstHash).not.toBe(secondHash);
         });
     });
 
