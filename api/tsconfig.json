@@ -43,5 +43,5 @@
         "moduleDetection": "force",
         "skipLibCheck": true
     },
-    "include": ["./scripts", "./migrations", "./src", "./tests"] // Added by me
+    "include": ["./scripts", "./migrations", "./src"] // Added by me
 }
