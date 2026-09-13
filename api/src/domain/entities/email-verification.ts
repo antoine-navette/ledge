@@ -16,13 +16,7 @@ export class EmailVerification {
         return new EmailVerification(id, userId, token, new Date(now.getTime() + EmailVerification.DURATION), now);
     };
 
-    static reconstitute = (
-        id: string,
-        userId: string,
-        token: string,
-        expiresAt: Date,
-        createdAt: Date,
-    ) => {
+    static reconstitute = (id: string, userId: string, token: string, expiresAt: Date, createdAt: Date) => {
         return new EmailVerification(id, userId, token, expiresAt, createdAt);
     };
 }
