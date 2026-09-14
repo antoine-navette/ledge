@@ -22,11 +22,18 @@ export class MongoTransactionRepository implements TransactionRepository {
         const documents = await this.transactionCollection
             .find({
                 ...(criteria.userId ? { userId: new ObjectId(criteria.userId) } : {}),
+                // from/to are both inclusive: from is the first day, to is the last day.
+                // Comparing to with $lte (rather than $lt on the next day) only works
+                // because every stored date is exactly UTC midnight, guaranteed by
+                // Transaction's own create()/update() validation. If a document ever ends
+                // up with a non-midnight date, it wouldn't be caught here — but it means
+                // invalid data already got written, which is the actual bug to fix, not
+                // something this query should defend against.
                 ...(criteria.from || criteria.to
                     ? {
                           date: {
                               ...(criteria.from ? { $gte: criteria.from } : {}),
-                              ...(criteria.to ? { $lt: criteria.to } : {}),
+                              ...(criteria.to ? { $lte: criteria.to } : {}),
                           },
                       }
                     : {}),

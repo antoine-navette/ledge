@@ -28,10 +28,9 @@ const Month = () => {
         const fetchData = async () => {
             setState({ status: 'loading' });
 
-            // TODO: clean
             const from = `${year}-${String(month).padStart(2, '0')}-01`;
-            const [nextYear, nextMonth] = month === 12 ? [year + 1, 1] : [year, month + 1];
-            const to = `${nextYear}-${String(nextMonth).padStart(2, '0')}-01`;
+            const lastDay = new Date(year, month, 0).getDate();
+            const to = `${year}-${String(month).padStart(2, '0')}-${String(lastDay).padStart(2, '0')}`;
 
             const { data, error } = await TransactionService.read({ from, to });
             if (ignore) return;
