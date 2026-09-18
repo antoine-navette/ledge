@@ -3,9 +3,7 @@ import type { FastifyZodOpenApiSchema, FastifyZodOpenApiTypeProvider } from 'fas
 import z from 'zod';
 import type { VerifyEmailUseCase } from '../../../application/email-verification/verify-email.use-case.js';
 import { emailVerificationNotFoundSchema } from '../../schemas/email-verification-not-found.schema.js';
-import { userNotFoundSchema } from '../../schemas/user-not-found.schema.js';
 import { tokenExpiredSchema } from '../../schemas/token-expired.schema.js';
-import { emailAlreadyVerifiedSchema } from '../../schemas/email-already-verified.schema.js';
 import { badRequestSchema } from '../../schemas/bad-request.schema.js';
 import { payloadTooLargeSchema } from '../../schemas/payload-too-large.schema.js';
 import { tooManyRequestsSchema } from '../../schemas/too-many-requests.schema.js';
@@ -27,8 +25,7 @@ export const deleteEmailVerificationByTokenRoute: FastifyPluginAsync<Options> = 
             response: {
                 204: { description: 'Email verified successfully' },
                 400: badRequestSchema,
-                404: z.union([emailVerificationNotFoundSchema, userNotFoundSchema]),
-                409: emailAlreadyVerifiedSchema,
+                404: emailVerificationNotFoundSchema,
                 410: tokenExpiredSchema,
                 413: payloadTooLargeSchema,
                 429: tooManyRequestsSchema,
@@ -42,23 +39,14 @@ export const deleteEmailVerificationByTokenRoute: FastifyPluginAsync<Options> = 
                     case 'EMAIL_VERIFICATION_NOT_FOUND':
                         request.log.warn({ code: result.code }, 'Not found');
                         return reply.status(404).send({ code: 'EMAIL_VERIFICATION_NOT_FOUND' });
-                    case 'USER_NOT_FOUND':
-                        request.log.warn({ code: result.code }, 'Not found');
-                        return reply.status(404).send({ code: 'USER_NOT_FOUND' });
                     case 'TOKEN_EXPIRED':
                         request.log.warn({ code: result.code }, 'Gone');
                         return reply.status(410).send({ code: 'TOKEN_EXPIRED' });
-                    case 'EMAIL_ALREADY_VERIFIED':
-                        request.log.warn({ code: result.code }, 'Conflict');
-                        return reply.status(409).send({ code: 'EMAIL_ALREADY_VERIFIED' });
                 }
             }
-            const emailVerification = result.data;
+            const user = result.data;
 
-            request.log.info(
-                { emailVerificationId: emailVerification.id, userId: emailVerification.userId },
-                'Email verified',
-            );
+            request.log.info({ userId: user.id }, 'Email verified');
             return reply.status(204).send();
         },
     });

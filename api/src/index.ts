@@ -6,7 +6,6 @@ import { createApp } from './presentation/app.js';
 import { startServer } from './presentation/server.js';
 import { MongoUserRepository } from './infrastructure/mongo/repositories/mongo.user.repository.js';
 import { MongoSessionRepository } from './infrastructure/mongo/repositories/mongo.session.repository.js';
-import { MongoEmailVerificationRepository } from './infrastructure/mongo/repositories/mongo.email-verification.repository.js';
 import { NodemailerEmailSender } from './infrastructure/adapters/nodemailer.email-sender.js';
 import { MongoIdGenerator } from './infrastructure/adapters/mongo.id-generator.js';
 import { CryptoTokenGenerator } from './infrastructure/adapters/crypto.token-generator.js';
@@ -45,9 +44,6 @@ try {
 
     const userRepository = new MongoUserRepository(mongo.db.collection('users'));
     const sessionRepository = new MongoSessionRepository(mongo.db.collection('sessions'));
-    const emailVerificationRepository = new MongoEmailVerificationRepository(
-        mongo.db.collection('email_verifications'),
-    );
     const transactionRepository = new MongoTransactionRepository(mongo.db.collection('transactions'));
 
     const emailSender = new NodemailerEmailSender(smtp.transporter);
@@ -74,14 +70,12 @@ try {
     const getCurrentUserUseCase = new GetCurrentUserUseCase(userRepository);
     const requestEmailVerificationUseCase = new RequestEmailVerificationUseCase(
         userRepository,
-        emailVerificationRepository,
         emailSender,
-        idGenerator,
         tokenGenerator,
         emailFrom,
         webUrl,
     );
-    const verifyEmailUseCase = new VerifyEmailUseCase(userRepository, emailVerificationRepository);
+    const verifyEmailUseCase = new VerifyEmailUseCase(userRepository);
     const createTransactionUseCase = new CreateTransactionUseCase(transactionRepository, idGenerator);
     const getUserTransactionsUseCase = new GetUserTransactionsUseCase(transactionRepository);
     const getTransactionUseCase = new GetTransactionUseCase(transactionRepository);

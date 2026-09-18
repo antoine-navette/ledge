@@ -1,4 +1,5 @@
 import { User } from '../../../domain/entities/user.js';
+import { EmailVerification } from '../../../domain/entities/email-verification.js';
 import type { MongoUserDocument } from '../documents/mongo.user.document.js';
 import { ObjectId } from 'mongodb';
 
@@ -8,6 +9,13 @@ export const MongoUserMapper = {
         email: user.email,
         passwordHash: user.passwordHash,
         isEmailVerified: user.isEmailVerified,
+        emailVerification: user.emailVerification
+            ? {
+                  token: user.emailVerification.token,
+                  expiresAt: user.emailVerification.expiresAt,
+                  createdAt: user.emailVerification.createdAt,
+              }
+            : null,
         createdAt: user.createdAt,
         updatedAt: user.updatedAt,
     }),
@@ -18,6 +26,13 @@ export const MongoUserMapper = {
             document.email,
             document.passwordHash,
             document.isEmailVerified,
+            document.emailVerification
+                ? EmailVerification.reconstitute(
+                      document.emailVerification.token,
+                      document.emailVerification.expiresAt,
+                      document.emailVerification.createdAt,
+                  )
+                : null,
             document.createdAt,
             document.updatedAt,
         ),

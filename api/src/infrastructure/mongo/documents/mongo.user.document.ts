@@ -5,6 +5,11 @@ export type MongoUserDocument = Readonly<{
     email: string;
     passwordHash: string;
     isEmailVerified: boolean;
+    emailVerification: Readonly<{
+        token: string;
+        expiresAt: Date;
+        createdAt: Date;
+    }> | null;
     createdAt: Date;
     updatedAt: Date;
 }>;

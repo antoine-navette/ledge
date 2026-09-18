@@ -1,54 +1,36 @@
 import type { EmailSender } from '../../domain/ports/email-sender.js';
 import type { UserRepository } from '../../domain/repositories/user.repository.js';
-import type { EmailVerificationRepository } from '../../domain/repositories/email-verification.repository.js';
-import type { IdGenerator } from '../../domain/ports/id-generator.js';
 import type { TokenGenerator } from '../../domain/ports/token-generator.js';
 import { EmailVerification } from '../../domain/entities/email-verification.js';
 
 export class RequestEmailVerificationUseCase {
-    private readonly COOLDOWN_DURATION = 5 * 60 * 1000;
-
     constructor(
         private userRepository: UserRepository,
-        private emailVerificationRepository: EmailVerificationRepository,
         private emailSender: EmailSender,
-        private idGenerator: IdGenerator,
         private tokenGenerator: TokenGenerator,
         private emailFrom: string,
         private webUrl: string,
     ) {}
 
     execute = async (userId: string) => {
-        const now = new Date();
-
-        const [user, existing] = await Promise.all([
-            this.userRepository.findById(userId),
-            this.emailVerificationRepository.findByUserId(userId),
-        ]);
+        const user = await this.userRepository.findById(userId);
         if (!user) return { success: false, code: 'USER_NOT_FOUND' } as const;
-        if (user.isEmailVerified) return { success: false, code: 'EMAIL_ALREADY_VERIFIED' } as const;
-        if (existing) {
-            if (now.getTime() - existing.createdAt.getTime() < this.COOLDOWN_DURATION) {
-                return { success: false, code: 'ACTIVE_COOLDOWN' } as const;
-            }
 
-            await this.emailVerificationRepository.delete(existing);
-        }
+        const token = this.tokenGenerator.generate(EmailVerification.TOKEN_LENGTH);
 
-        const emailVerification = EmailVerification.create(
-            this.idGenerator.generate(),
-            user.id,
-            this.tokenGenerator.generate(EmailVerification.TOKEN_LENGTH),
-        );
-        await this.emailVerificationRepository.create(emailVerification);
+        const result = user.requestEmailVerification(token);
+        if (!result.success) return result;
+        const updated = result.data;
+
+        await this.userRepository.save(updated);
 
         await this.emailSender.send(
             this.emailFrom,
-            user.email,
+            updated.email,
             'Please verify your email address',
-            `Click here to verify your email address: <a href="${this.webUrl}/verify-email/${emailVerification.token}">verify email</a>. This link will expire in 1 hour.`,
+            `Click here to verify your email address: <a href="${this.webUrl}/verify-email/${token}">verify email</a>. This link will expire in 1 hour.`,
         );
 
-        return { success: true, data: emailVerification } as const;
+        return { success: true, data: updated } as const;
     };
 }

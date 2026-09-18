@@ -457,16 +457,7 @@ export interface paths {
                         [name: string]: unknown;
                     };
                     content: {
-                        "application/json": components["schemas"]["EmailVerificationNotFound"] | components["schemas"]["UserNotFound"];
-                    };
-                };
-                /** @description Default Response */
-                409: {
-                    headers: {
-                        [name: string]: unknown;
-                    };
-                    content: {
-                        "application/json": components["schemas"]["EmailAlreadyVerified"];
+                        "application/json": components["schemas"]["EmailVerificationNotFound"];
                     };
                 };
                 /** @description Default Response */
@@ -1005,10 +996,6 @@ export interface components {
         EmailVerificationNotFound: {
             /** @constant */
             code: "EMAIL_VERIFICATION_NOT_FOUND";
-        };
-        UserNotFound: {
-            /** @constant */
-            code: "USER_NOT_FOUND";
         };
         TokenExpired: {
             /** @constant */

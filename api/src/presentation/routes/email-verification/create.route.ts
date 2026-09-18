@@ -52,9 +52,8 @@ export const createEmailVerificationRoute: FastifyPluginAsync<Options> = async (
                         return reply.status(409).send({ code: 'EMAIL_ALREADY_VERIFIED' });
                 }
             }
-            const emailVerification = result.data;
 
-            request.log.info({ emailVerificationId: emailVerification.id }, 'Email verification requested');
+            request.log.info('Email verification requested');
             return reply.status(201).send();
         },
     });
