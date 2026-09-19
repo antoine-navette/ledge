@@ -1,6 +1,6 @@
 import type { ObjectId } from 'mongodb';
 
-export type MongoTransactionDocument = Readonly<{
+export type MongoTransactionDocument = {
     _id: ObjectId;
     userId: ObjectId;
     name: string;
@@ -10,4 +10,4 @@ export type MongoTransactionDocument = Readonly<{
     date: Date;
     createdAt: Date;
     updatedAt: Date;
-}>;
+};
