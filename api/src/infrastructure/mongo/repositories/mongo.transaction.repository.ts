@@ -17,10 +17,17 @@ export class MongoTransactionRepository implements TransactionRepository {
     };
 
     find = async (criteria: TransactionCriteria): Promise<Transaction[]> => {
+        // A plain truthy check isn't enough here: "" is falsy but !== undefined, and would
+        // otherwise silently be treated as "no userId filter", matching every user's
+        // transactions instead of failing. Checking !== undefined first, then validating the
+        // format, is what lets an explicitly-provided but malformed id be rejected below.
         if (criteria.userId !== undefined && !ObjectId.isValid(criteria.userId)) return [];
 
         const documents = await this.transactionCollection
             .find({
+                // Truthy check is safe here only because of the guard above: by this point
+                // criteria.userId can only be undefined or a valid ObjectId hex string, which
+                // is always truthy, so there's no falsy-but-defined value left to mishandle.
                 ...(criteria.userId ? { userId: new ObjectId(criteria.userId) } : {}),
                 // from/to are both inclusive: from is the first day, to is the last day.
                 // Comparing to with $lte (rather than $lt on the next day) only works
