@@ -54,15 +54,7 @@ export class MongoTransactionRepository implements TransactionRepository {
     save = async (transaction: Transaction): Promise<void> => {
         const { _id, ...rest } = MongoTransactionMapper.toDocument(transaction);
 
-        await this.transactionCollection.updateOne(
-            { _id },
-            {
-                $set: rest,
-                $unset: {
-                    ...(!('category' in rest) && { category: 1 }),
-                },
-            },
-        );
+        await this.transactionCollection.updateOne({ _id }, { $set: rest });
     };
 
     delete = async (transaction: Transaction): Promise<void> => {

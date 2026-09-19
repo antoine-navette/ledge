@@ -584,8 +584,7 @@ export interface paths {
                         value: number;
                         /** @enum {string} */
                         type: "income" | "expense";
-                        /** @enum {string} */
-                        category?: "need" | "want" | "investment";
+                        category: ("need" | "want" | "investment") | null;
                         /** Format: date */
                         date: string;
                     };
@@ -762,8 +761,7 @@ export interface paths {
                         value: number;
                         /** @enum {string} */
                         type: "income" | "expense";
-                        /** @enum {string} */
-                        category?: "need" | "want" | "investment";
+                        category: ("need" | "want" | "investment") | null;
                         /** Format: date */
                         date: string;
                     };
@@ -1008,8 +1006,7 @@ export interface components {
             value: number;
             /** @enum {string} */
             type: "income" | "expense";
-            /** @enum {string} */
-            category?: "need" | "want" | "investment";
+            category: ("need" | "want" | "investment") | null;
             date: string;
             createdAt: string;
             updatedAt: string;

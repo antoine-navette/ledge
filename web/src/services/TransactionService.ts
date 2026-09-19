@@ -5,7 +5,7 @@ export const TransactionService = {
         name: string,
         value: number,
         type: 'income' | 'expense',
-        category: 'need' | 'want' | 'investment' | undefined,
+        category: 'need' | 'want' | 'investment' | null,
         date: string,
     ) => {
         try {
@@ -36,7 +36,7 @@ export const TransactionService = {
         name: string,
         value: number,
         type: 'income' | 'expense',
-        category: 'need' | 'want' | 'investment' | undefined,
+        category: 'need' | 'want' | 'investment' | null,
         date: string,
     ) => {
         try {

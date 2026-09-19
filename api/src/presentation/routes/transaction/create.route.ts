@@ -31,7 +31,7 @@ export const createTransactionRoute: FastifyPluginAsync<Options> = async (
                 name: z.string(),
                 value: z.number(),
                 type: z.enum(['income', 'expense']),
-                category: z.enum(['need', 'want', 'investment']).optional(),
+                category: z.enum(['need', 'want', 'investment']).nullable(),
                 // Deliberately duplicates part of what Transaction.create() re-validates:
                 // this only rejects a string that isn't shaped like a date at all (400,
                 // a format/type problem), while the entity still fully re-checks format,

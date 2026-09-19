@@ -9,7 +9,7 @@ export const MongoTransactionMapper = {
         name: transaction.name,
         value: transaction.value,
         type: transaction.type,
-        ...(transaction.category ? { category: transaction.category } : {}),
+        category: transaction.category,
         date: transaction.date,
         createdAt: transaction.createdAt,
         updatedAt: transaction.updatedAt,

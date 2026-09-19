@@ -5,7 +5,7 @@ export class Transaction {
         public readonly name: string,
         public readonly value: number,
         public readonly type: 'income' | 'expense',
-        public readonly category: 'need' | 'want' | 'investment' | undefined,
+        public readonly category: 'need' | 'want' | 'investment' | null,
         public readonly date: Date,
         public readonly createdAt: Date,
         public readonly updatedAt: Date,
@@ -17,7 +17,7 @@ export class Transaction {
         name: string,
         value: number,
         type: 'income' | 'expense',
-        category: 'need' | 'want' | 'investment' | undefined,
+        category: 'need' | 'want' | 'investment' | null,
         date: Date,
     ) => {
         const now = new Date();
@@ -35,7 +35,7 @@ export class Transaction {
         name: string,
         value: number,
         type: 'income' | 'expense',
-        category: 'need' | 'want' | 'investment' | undefined,
+        category: 'need' | 'want' | 'investment' | null,
         date: Date,
     ) => {
         const now = new Date();
@@ -53,7 +53,7 @@ export class Transaction {
         name: string,
         value: number,
         type: 'income' | 'expense',
-        category: 'need' | 'want' | 'investment' | undefined,
+        category: 'need' | 'want' | 'investment' | null,
         date: Date,
         now: Date,
     ) => {
@@ -69,7 +69,7 @@ export class Transaction {
         }
 
         // category only makes sense for an expense, and even then it stays optional
-        if (type === 'income' && category !== undefined) {
+        if (type === 'income' && category !== null) {
             return { success: false, code: 'TRANSACTION_CATEGORY_INVALID' } as const;
         }
 
@@ -99,7 +99,7 @@ export class Transaction {
         name: string,
         value: number,
         type: 'income' | 'expense',
-        category: 'need' | 'want' | 'investment' | undefined,
+        category: 'need' | 'want' | 'investment' | null,
         date: Date,
         createdAt: Date,
         updatedAt: Date,

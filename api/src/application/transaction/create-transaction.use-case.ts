@@ -13,7 +13,7 @@ export class CreateTransactionUseCase {
         name: string,
         value: number,
         type: 'income' | 'expense',
-        category: 'need' | 'want' | 'investment' | undefined,
+        category: 'need' | 'want' | 'investment' | null,
         date: Date,
     ) => {
         const result = Transaction.create(this.idGenerator.generate(), userId, name, value, type, category, date);

@@ -213,11 +213,18 @@
                         ]
                     },
                     "category": {
-                        "type": "string",
-                        "enum": [
-                            "need",
-                            "want",
-                            "investment"
+                        "anyOf": [
+                            {
+                                "type": "string",
+                                "enum": [
+                                    "need",
+                                    "want",
+                                    "investment"
+                                ]
+                            },
+                            {
+                                "type": "null"
+                            }
                         ]
                     },
                     "date": {
@@ -236,6 +243,7 @@
                     "name",
                     "value",
                     "type",
+                    "category",
                     "date",
                     "createdAt",
                     "updatedAt"
@@ -761,11 +769,18 @@
                                         ]
                                     },
                                     "category": {
-                                        "type": "string",
-                                        "enum": [
-                                            "need",
-                                            "want",
-                                            "investment"
+                                        "anyOf": [
+                                            {
+                                                "type": "string",
+                                                "enum": [
+                                                    "need",
+                                                    "want",
+                                                    "investment"
+                                                ]
+                                            },
+                                            {
+                                                "type": "null"
+                                            }
                                         ]
                                     },
                                     "date": {
@@ -778,6 +793,7 @@
                                     "name",
                                     "value",
                                     "type",
+                                    "category",
                                     "date"
                                 ]
                             }
@@ -1051,11 +1067,18 @@
                                         ]
                                     },
                                     "category": {
-                                        "type": "string",
-                                        "enum": [
-                                            "need",
-                                            "want",
-                                            "investment"
+                                        "anyOf": [
+                                            {
+                                                "type": "string",
+                                                "enum": [
+                                                    "need",
+                                                    "want",
+                                                    "investment"
+                                                ]
+                                            },
+                                            {
+                                                "type": "null"
+                                            }
                                         ]
                                     },
                                     "date": {
@@ -1068,6 +1091,7 @@
                                     "name",
                                     "value",
                                     "type",
+                                    "category",
                                     "date"
                                 ]
                             }
