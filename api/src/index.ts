@@ -39,7 +39,7 @@ try {
     const mongo = await connectToMongo(mongoUrl);
     pino.logger.info('Mongo connected');
 
-    const smtp = connectToSmtp(smtpUrl);
+    const smtp = await connectToSmtp(smtpUrl);
     pino.logger.info('SMTP connected');
 
     const userRepository = new MongoUserRepository(mongo.db.collection('users'));
