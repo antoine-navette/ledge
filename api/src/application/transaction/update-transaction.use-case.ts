@@ -12,11 +12,13 @@ export class UpdateTransactionUseCase {
         category: 'need' | 'want' | 'investment' | null,
         date: Date,
     ) => {
+        const now = new Date();
+
         const transaction = await this.transactionRepository.findById(id);
         if (!transaction) return { success: false, code: 'TRANSACTION_NOT_FOUND' } as const;
         if (transaction.userId !== userId) return { success: false, code: 'TRANSACTION_NOT_OWNED' } as const;
 
-        const result = transaction.update(name, value, type, category, date);
+        const result = transaction.update(name, value, type, category, date, now);
         if (!result.success) return result;
         const updated = result.data;
 

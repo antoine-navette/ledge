@@ -1,5 +1,5 @@
 import { User } from '../../../domain/entities/user.js';
-import { EmailVerification } from '../../../domain/entities/email-verification.js';
+import { EmailVerification } from '../../../domain/value-objects/email-verification.js';
 import type { MongoUserDocument } from '../documents/mongo.user.document.js';
 import { ObjectId } from 'mongodb';
 

@@ -15,6 +15,8 @@ export class LoginUseCase {
     ) {}
 
     execute = async (email: string, password: string) => {
+        const now = new Date();
+
         const user = await this.userRepository.findByEmail(email);
         if (!user) return { success: false, code: 'USER_NOT_FOUND' } as const;
 
@@ -25,6 +27,7 @@ export class LoginUseCase {
             this.idGenerator.generate(),
             user.id,
             this.tokenGenerator.generate(Session.TOKEN_LENGTH),
+            now,
         );
         await this.sessionRepository.create(session);
 

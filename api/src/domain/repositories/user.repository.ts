@@ -1,5 +1,5 @@
 import type { User } from '../entities/user.js';
-import type { EmailVerification } from '../entities/email-verification.js';
+import type { EmailVerification } from '../value-objects/email-verification.js';
 
 export interface UserRepository {
     create: (user: User) => Promise<void>;

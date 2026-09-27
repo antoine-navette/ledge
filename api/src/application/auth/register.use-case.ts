@@ -16,10 +16,12 @@ export class RegisterUseCase {
     ) {}
 
     execute = async (email: string, password: string) => {
+        const now = new Date();
+
         const existing = await this.userRepository.findByEmail(email);
         if (existing) return { success: false, code: 'DUPLICATE_EMAIL' } as const;
 
-        const result = await User.register(this.idGenerator.generate(), email, password, this.passwordHasher);
+        const result = await User.register(this.idGenerator.generate(), email, password, this.passwordHasher, now);
         if (!result.success) return result;
         const user = result.data;
 
@@ -29,6 +31,7 @@ export class RegisterUseCase {
             this.idGenerator.generate(),
             user.id,
             this.tokenGenerator.generate(Session.TOKEN_LENGTH),
+            now,
         );
         await this.sessionRepository.create(session);
 

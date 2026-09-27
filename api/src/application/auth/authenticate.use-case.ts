@@ -10,7 +10,7 @@ export class AuthenticateUseCase {
         if (!session) return { success: false, code: 'SESSION_NOT_FOUND' } as const;
         if (session.expiresAt < now) return { success: false, code: 'SESSION_EXPIRED' } as const;
 
-        const extended = session.extend();
+        const extended = session.extend(now);
         await this.sessionRepository.save(extended);
 
         return { success: true, data: extended } as const;

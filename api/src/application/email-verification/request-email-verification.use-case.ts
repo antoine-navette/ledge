@@ -1,7 +1,7 @@
 import type { EmailSender } from '../../domain/ports/email-sender.js';
 import type { UserRepository } from '../../domain/repositories/user.repository.js';
 import type { TokenGenerator } from '../../domain/ports/token-generator.js';
-import { EmailVerification } from '../../domain/entities/email-verification.js';
+import { EmailVerification } from '../../domain/value-objects/email-verification.js';
 
 export class RequestEmailVerificationUseCase {
     constructor(
@@ -13,12 +13,14 @@ export class RequestEmailVerificationUseCase {
     ) {}
 
     execute = async (userId: string) => {
+        const now = new Date();
+
         const user = await this.userRepository.findById(userId);
         if (!user) return { success: false, code: 'USER_NOT_FOUND' } as const;
 
         const token = this.tokenGenerator.generate(EmailVerification.TOKEN_LENGTH);
 
-        const result = user.requestEmailVerification(token);
+        const result = user.requestEmailVerification(token, now);
         if (!result.success) return result;
         const updated = result.data;
 

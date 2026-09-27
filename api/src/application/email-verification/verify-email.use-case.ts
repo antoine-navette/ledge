@@ -4,10 +4,12 @@ export class VerifyEmailUseCase {
     constructor(private userRepository: UserRepository) {}
 
     execute = async (token: string) => {
+        const now = new Date();
+
         const user = await this.userRepository.findByEmailVerificationToken(token);
         if (!user) return { success: false, code: 'EMAIL_VERIFICATION_NOT_FOUND' } as const;
 
-        const result = user.verifyEmail();
+        const result = user.verifyEmail(now);
         if (!result.success) return result;
         const updated = result.data;
 

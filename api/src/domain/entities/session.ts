@@ -11,15 +11,20 @@ export class Session {
         public readonly updatedAt: Date,
     ) {}
 
-    static create = (id: string, userId: string, token: string) => {
-        const now = new Date();
+    static create = (id: string, userId: string, token: string, now: Date) => {
+        // Token length is a security property, not an incidental format detail: a token of
+        // the wrong length means the caller's TokenGenerator wiring is broken, which could
+        // silently weaken every session lookup (sessions are found by token alone, with no
+        // other authentication). That's a programmer error, not a legitimate outcome to
+        // report as a 4xx — let it throw and surface as a 500.
+        if (token.length !== Session.TOKEN_LENGTH) {
+            throw new Error(`Session.create called with a token of length ${token.length}, expected ${Session.TOKEN_LENGTH}`);
+        }
 
         return new Session(id, userId, token, new Date(now.getTime() + Session.DURATION), now, now);
     };
 
-    extend = () => {
-        const now = new Date();
-
+    extend = (now: Date) => {
         return new Session(
             this.id,
             this.userId,

@@ -1,7 +1,7 @@
 import { Collection, ObjectId } from 'mongodb';
 import type { UserRepository } from '../../../domain/repositories/user.repository.js';
 import type { User } from '../../../domain/entities/user.js';
-import type { EmailVerification } from '../../../domain/entities/email-verification.js';
+import type { EmailVerification } from '../../../domain/value-objects/email-verification.js';
 import type { MongoUserDocument } from '../documents/mongo.user.document.js';
 import { MongoUserMapper } from '../mappers/mongo.user.mapper.js';
 

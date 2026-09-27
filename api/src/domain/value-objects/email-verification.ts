@@ -9,8 +9,15 @@ export class EmailVerification {
         public readonly createdAt: Date,
     ) {}
 
-    static create = (token: string) => {
-        const now = new Date();
+    static create = (token: string, now: Date) => {
+        // Same reasoning as Session.create(): token length is a security property, not an
+        // incidental format detail — a wrong length means the caller's TokenGenerator wiring
+        // is broken, a programmer error, not a legitimate outcome to report as a 4xx.
+        if (token.length !== EmailVerification.TOKEN_LENGTH) {
+            throw new Error(
+                `EmailVerification.create called with a token of length ${token.length}, expected ${EmailVerification.TOKEN_LENGTH}`,
+            );
+        }
 
         return new EmailVerification(token, new Date(now.getTime() + EmailVerification.DURATION), now);
     };
