@@ -7,12 +7,12 @@ export class AuthenticateUseCase {
         const now = new Date();
 
         const session = await this.sessionRepository.findByToken(token);
-        if (!session) return { success: false, code: 'SESSION_NOT_FOUND' } as const;
-        if (session.expiresAt < now) return { success: false, code: 'SESSION_EXPIRED' } as const;
+        if (!session) return [null, 'SESSION_NOT_FOUND'] as const;
+        if (session.expiresAt < now) return [null, 'SESSION_EXPIRED'] as const;
 
         const extended = session.extend(now);
         await this.sessionRepository.save(extended);
 
-        return { success: true, data: extended } as const;
+        return [extended, null] as const;
     };
 }

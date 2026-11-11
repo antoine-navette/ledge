@@ -19,7 +19,7 @@ export class CreateTransactionUseCase {
     ) => {
         const now = new Date();
 
-        const result = Transaction.create(
+        const [transaction, code] = Transaction.create(
             this.idGenerator.generate() as TransactionId,
             userId,
             name,
@@ -29,11 +29,10 @@ export class CreateTransactionUseCase {
             date,
             now,
         );
-        if (!result.success) return result;
-        const transaction = result.data;
+        if (code) return [null, code] as const;
 
         await this.transactionRepository.create(transaction);
 
-        return { success: true, data: transaction } as const;
+        return [transaction, null] as const;
     };
 }

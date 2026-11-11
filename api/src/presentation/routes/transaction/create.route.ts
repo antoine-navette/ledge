@@ -53,7 +53,7 @@ export const createTransactionRoute: FastifyPluginAsync<Options> = async (
         handler: async (request, reply) => {
             const { name, value, type, category, date } = request.body;
 
-            const result = await createTransactionUseCase.execute(
+            const [transaction, code] = await createTransactionUseCase.execute(
                 request.session.userId,
                 name,
                 value,
@@ -61,17 +61,18 @@ export const createTransactionRoute: FastifyPluginAsync<Options> = async (
                 category,
                 date,
             );
-            if (!result.success) {
-                switch (result.code) {
-                    case 'TRANSACTION_NAME_INVALID':
-                    case 'TRANSACTION_VALUE_INVALID':
-                    case 'TRANSACTION_CATEGORY_INVALID':
-                    case 'TRANSACTION_DATE_INVALID':
-                        request.log.warn({ code: result.code }, 'Unprocessable content');
-                        return reply.status(422).send({ code: 'UNPROCESSABLE_CONTENT' });
+            if (code) {
+                if (
+                    code === 'TRANSACTION_NAME_INVALID' ||
+                    code === 'TRANSACTION_VALUE_INVALID' ||
+                    code === 'TRANSACTION_CATEGORY_INVALID' ||
+                    code === 'TRANSACTION_DATE_INVALID'
+                ) {
+                    request.log.warn({ code }, 'Unprocessable content');
+                    return reply.status(422).send({ code: 'UNPROCESSABLE_CONTENT' });
                 }
+                return code satisfies never;
             }
-            const transaction = result.data;
 
             request.log.info({ transactionId: transaction.id }, 'Transaction created');
             return reply.status(201).send(TransactionMapper.toSchema(transaction));

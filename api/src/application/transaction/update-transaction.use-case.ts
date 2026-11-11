@@ -17,15 +17,14 @@ export class UpdateTransactionUseCase {
         const now = new Date();
 
         const transaction = await this.transactionRepository.findById(id);
-        if (!transaction) return { success: false, code: 'TRANSACTION_NOT_FOUND' } as const;
-        if (transaction.userId !== userId) return { success: false, code: 'TRANSACTION_NOT_OWNED' } as const;
+        if (!transaction) return [null, 'TRANSACTION_NOT_FOUND'] as const;
+        if (transaction.userId !== userId) return [null, 'TRANSACTION_NOT_OWNED'] as const;
 
-        const result = transaction.update(name, value, type, category, date, now);
-        if (!result.success) return result;
-        const updated = result.data;
+        const [updated, code] = transaction.update(name, value, type, category, date, now);
+        if (code) return [null, code] as const;
 
         await this.transactionRepository.save(updated);
 
-        return { success: true, data: updated } as const;
+        return [updated, null] as const;
     };
 }

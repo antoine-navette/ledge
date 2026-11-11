@@ -7,14 +7,13 @@ export class VerifyEmailUseCase {
         const now = new Date();
 
         const user = await this.userRepository.findByEmailVerificationToken(token);
-        if (!user) return { success: false, code: 'EMAIL_VERIFICATION_NOT_FOUND' } as const;
+        if (!user) return [null, 'EMAIL_VERIFICATION_NOT_FOUND'] as const;
 
-        const result = user.verifyEmail(now);
-        if (!result.success) return result;
-        const updated = result.data;
+        const [updated, code] = user.verifyEmail(now);
+        if (code) return [null, code] as const;
 
         await this.userRepository.save(updated);
 
-        return { success: true, data: updated } as const;
+        return [updated, null] as const;
     };
 }

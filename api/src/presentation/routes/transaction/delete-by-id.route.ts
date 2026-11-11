@@ -43,21 +43,21 @@ export const deleteTransactionByIdRoute: FastifyPluginAsync<Options> = async (
         } satisfies FastifyZodOpenApiSchema,
         preHandler: isAuthenticated(authenticateUseCase),
         handler: async (request, reply) => {
-            const result = await deleteTransactionUseCase.execute(
+            const [transaction, code] = await deleteTransactionUseCase.execute(
                 request.params.id as TransactionId,
                 request.session.userId,
             );
-            if (!result.success) {
-                switch (result.code) {
-                    case 'TRANSACTION_NOT_OWNED':
-                        request.log.warn({ code: result.code }, 'Forbidden');
-                        return reply.status(403).send({ code: 'FORBIDDEN' });
-                    case 'TRANSACTION_NOT_FOUND':
-                        request.log.warn({ code: result.code }, 'Not found');
-                        return reply.status(404).send({ code: 'TRANSACTION_NOT_FOUND' });
+            if (code) {
+                if (code === 'TRANSACTION_NOT_OWNED') {
+                    request.log.warn({ code }, 'Forbidden');
+                    return reply.status(403).send({ code: 'FORBIDDEN' });
                 }
+                if (code === 'TRANSACTION_NOT_FOUND') {
+                    request.log.warn({ code }, 'Not found');
+                    return reply.status(404).send({ code: 'TRANSACTION_NOT_FOUND' });
+                }
+                return code satisfies never;
             }
-            const transaction = result.data;
 
             request.log.info({ transactionId: transaction.id }, 'Transaction deleted');
             return reply.status(204).send();

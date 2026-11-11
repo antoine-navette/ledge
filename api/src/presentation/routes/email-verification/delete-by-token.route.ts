@@ -33,18 +33,18 @@ export const deleteEmailVerificationByTokenRoute: FastifyPluginAsync<Options> = 
             },
         } satisfies FastifyZodOpenApiSchema,
         handler: async (request, reply) => {
-            const result = await verifyEmailUseCase.execute(request.params.token);
-            if (!result.success) {
-                switch (result.code) {
-                    case 'EMAIL_VERIFICATION_NOT_FOUND':
-                        request.log.warn({ code: result.code }, 'Not found');
-                        return reply.status(404).send({ code: 'EMAIL_VERIFICATION_NOT_FOUND' });
-                    case 'TOKEN_EXPIRED':
-                        request.log.warn({ code: result.code }, 'Gone');
-                        return reply.status(410).send({ code: 'TOKEN_EXPIRED' });
+            const [user, code] = await verifyEmailUseCase.execute(request.params.token);
+            if (code) {
+                if (code === 'EMAIL_VERIFICATION_NOT_FOUND') {
+                    request.log.warn({ code }, 'Not found');
+                    return reply.status(404).send({ code: 'EMAIL_VERIFICATION_NOT_FOUND' });
                 }
+                if (code === 'TOKEN_EXPIRED') {
+                    request.log.warn({ code }, 'Gone');
+                    return reply.status(410).send({ code: 'TOKEN_EXPIRED' });
+                }
+                return code satisfies never;
             }
-            const user = result.data;
 
             request.log.info({ userId: user.id }, 'Email verified');
             return reply.status(204).send();

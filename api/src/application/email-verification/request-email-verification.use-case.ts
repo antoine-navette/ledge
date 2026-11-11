@@ -16,13 +16,12 @@ export class RequestEmailVerificationUseCase {
         const now = new Date();
 
         const user = await this.userRepository.findById(userId);
-        if (!user) return { success: false, code: 'USER_NOT_FOUND' } as const;
+        if (!user) return [null, 'USER_NOT_FOUND'] as const;
 
         const token = this.tokenGenerator.generate(User.EMAIL_VERIFICATION_TOKEN_LENGTH);
 
-        const result = user.requestEmailVerification(token, now);
-        if (!result.success) return result;
-        const updated = result.data;
+        const [updated, code] = user.requestEmailVerification(token, now);
+        if (code) return [null, code] as const;
 
         await this.userRepository.save(updated);
 
@@ -33,6 +32,6 @@ export class RequestEmailVerificationUseCase {
             `Click here to verify your email address: <a href="${this.webUrl}/verify-email/${token}">verify email</a>. This link will expire in 1 hour.`,
         );
 
-        return { success: true, data: updated } as const;
+        return [updated, null] as const;
     };
 }

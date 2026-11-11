@@ -36,16 +36,14 @@ export const loginRoute: FastifyPluginAsync<Options> = async (app, { loginUseCas
         handler: async (request, reply) => {
             const { email, password } = request.body;
 
-            const result = await loginUseCase.execute(email, password);
-            if (!result.success) {
-                switch (result.code) {
-                    case 'USER_NOT_FOUND':
-                    case 'WRONG_PASSWORD':
-                        request.log.warn({ code: result.code }, 'Unauthorized');
-                        return reply.status(401).send({ code: 'INVALID_CREDENTIALS' });
+            const [session, code] = await loginUseCase.execute(email, password);
+            if (code) {
+                if (code === 'USER_NOT_FOUND' || code === 'WRONG_PASSWORD') {
+                    request.log.warn({ code }, 'Unauthorized');
+                    return reply.status(401).send({ code: 'INVALID_CREDENTIALS' });
                 }
+                return code satisfies never;
             }
-            const session = result.data;
 
             // Like isAuthenticated: the access log also gets them
             request.log = request.log.child({ sessionId: session.id, userId: session.user.id });

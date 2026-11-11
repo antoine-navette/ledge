@@ -19,17 +19,16 @@ export class RegisterUseCase {
         const now = new Date();
 
         const existing = await this.userRepository.findByEmail(email);
-        if (existing) return { success: false, code: 'DUPLICATE_EMAIL' } as const;
+        if (existing) return [null, 'DUPLICATE_EMAIL'] as const;
 
-        const result = await User.register(
+        const [user, code] = await User.register(
             this.idGenerator.generate() as UserId,
             email,
             password,
             this.passwordHasher,
             now,
         );
-        if (!result.success) return result;
-        const user = result.data;
+        if (code) return [null, code] as const;
 
         await this.userRepository.create(user);
 
@@ -41,6 +40,6 @@ export class RegisterUseCase {
         );
         await this.sessionRepository.create(session);
 
-        return { success: true, data: Object.assign(session, { user }) } as const;
+        return [Object.assign(session, { user }), null] as const;
     };
 }

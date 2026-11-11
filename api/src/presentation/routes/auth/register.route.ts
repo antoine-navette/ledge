@@ -38,19 +38,18 @@ export const registerRoute: FastifyPluginAsync<Options> = async (app, { register
         handler: async (request, reply) => {
             const { email, password } = request.body;
 
-            const result = await registerUseCase.execute(email, password);
-            if (!result.success) {
-                switch (result.code) {
-                    case 'DUPLICATE_EMAIL':
-                        request.log.warn({ code: result.code }, 'Conflict');
-                        return reply.status(409).send({ code: 'DUPLICATE_EMAIL' });
-                    case 'INVALID_EMAIL':
-                    case 'WEAK_PASSWORD':
-                        request.log.warn({ code: result.code }, 'Unprocessable content');
-                        return reply.status(422).send({ code: 'UNPROCESSABLE_CONTENT' });
+            const [session, code] = await registerUseCase.execute(email, password);
+            if (code) {
+                if (code === 'DUPLICATE_EMAIL') {
+                    request.log.warn({ code }, 'Conflict');
+                    return reply.status(409).send({ code: 'DUPLICATE_EMAIL' });
                 }
+                if (code === 'INVALID_EMAIL' || code === 'WEAK_PASSWORD') {
+                    request.log.warn({ code }, 'Unprocessable content');
+                    return reply.status(422).send({ code: 'UNPROCESSABLE_CONTENT' });
+                }
+                return code satisfies never;
             }
-            const session = result.data;
 
             // Like isAuthenticated: the access log also gets them
             request.log = request.log.child({ sessionId: session.id, userId: session.user.id });

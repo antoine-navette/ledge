@@ -11,12 +11,11 @@ export const isAuthenticated = (authenticateUseCase: AuthenticateUseCase) => {
             return reply.status(401).send({ code: 'UNAUTHORIZED' } satisfies UnauthorizedSchema);
         }
 
-        const result = await authenticateUseCase.execute(sessionToken);
-        if (!result.success) {
-            request.log.warn({ code: result.code }, 'Unauthorized');
+        const [session, code] = await authenticateUseCase.execute(sessionToken);
+        if (code) {
+            request.log.warn({ code }, 'Unauthorized');
             return reply.status(401).send({ code: 'UNAUTHORIZED' } satisfies UnauthorizedSchema);
         }
-        const session = result.data;
 
         request.session = session;
         request.log = request.log.child({ sessionId: session.id, userId: session.userId });

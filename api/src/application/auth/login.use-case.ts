@@ -18,10 +18,10 @@ export class LoginUseCase {
         const now = new Date();
 
         const user = await this.userRepository.findByEmail(email);
-        if (!user) return { success: false, code: 'USER_NOT_FOUND' } as const;
+        if (!user) return [null, 'USER_NOT_FOUND'] as const;
 
         const isPasswordCorrect = await this.passwordHasher.compare(password, user.passwordHash);
-        if (!isPasswordCorrect) return { success: false, code: 'WRONG_PASSWORD' } as const;
+        if (!isPasswordCorrect) return [null, 'WRONG_PASSWORD'] as const;
 
         const session = Session.create(
             this.idGenerator.generate() as SessionId,
@@ -31,6 +31,6 @@ export class LoginUseCase {
         );
         await this.sessionRepository.create(session);
 
-        return { success: true, data: Object.assign(session, { user }) } as const;
+        return [Object.assign(session, { user }), null] as const;
     };
 }

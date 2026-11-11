@@ -38,19 +38,21 @@ export const createEmailVerificationRoute: FastifyPluginAsync<Options> = async (
         } satisfies FastifyZodOpenApiSchema,
         preHandler: isAuthenticated(authenticateUseCase),
         handler: async (request, reply) => {
-            const result = await requestEmailVerificationUseCase.execute(request.session.userId);
-            if (!result.success) {
-                switch (result.code) {
-                    case 'USER_NOT_FOUND':
-                        request.log.warn({ code: result.code }, 'Unauthorized');
-                        return reply.status(401).send({ code: 'UNAUTHORIZED' });
-                    case 'ACTIVE_COOLDOWN':
-                        request.log.warn({ code: result.code }, 'Conflict');
-                        return reply.status(409).send({ code: 'ACTIVE_COOLDOWN' });
-                    case 'EMAIL_ALREADY_VERIFIED':
-                        request.log.warn({ code: result.code }, 'Conflict');
-                        return reply.status(409).send({ code: 'EMAIL_ALREADY_VERIFIED' });
+            const [, code] = await requestEmailVerificationUseCase.execute(request.session.userId);
+            if (code) {
+                if (code === 'USER_NOT_FOUND') {
+                    request.log.warn({ code }, 'Unauthorized');
+                    return reply.status(401).send({ code: 'UNAUTHORIZED' });
                 }
+                if (code === 'ACTIVE_COOLDOWN') {
+                    request.log.warn({ code }, 'Conflict');
+                    return reply.status(409).send({ code: 'ACTIVE_COOLDOWN' });
+                }
+                if (code === 'EMAIL_ALREADY_VERIFIED') {
+                    request.log.warn({ code }, 'Conflict');
+                    return reply.status(409).send({ code: 'EMAIL_ALREADY_VERIFIED' });
+                }
+                return code satisfies never;
             }
 
             request.log.info('Email verification requested');

@@ -29,13 +29,10 @@ export class Transaction {
         date: Date,
         now: Date,
     ) => {
-        const result = Transaction.validate(name, value, type, category, date, now);
-        if (!result.success) return result;
+        const code = Transaction.validate(name, value, type, category, date, now);
+        if (code) return [null, code] as const;
 
-        return {
-            success: true,
-            data: new Transaction(id, userId, name, value, type, category, date, now, now),
-        } as const;
+        return [new Transaction(id, userId, name, value, type, category, date, now, now), null] as const;
     };
 
     update = (
@@ -46,13 +43,13 @@ export class Transaction {
         date: Date,
         now: Date,
     ) => {
-        const result = Transaction.validate(name, value, type, category, date, now);
-        if (!result.success) return result;
+        const code = Transaction.validate(name, value, type, category, date, now);
+        if (code) return [null, code] as const;
 
-        return {
-            success: true,
-            data: new Transaction(this.id, this.userId, name, value, type, category, date, this.createdAt, now),
-        } as const;
+        return [
+            new Transaction(this.id, this.userId, name, value, type, category, date, this.createdAt, now),
+            null,
+        ] as const;
     };
 
     private static validate = (
@@ -64,19 +61,19 @@ export class Transaction {
         now: Date,
     ) => {
         if (name.length < 1 || name.length > 99) {
-            return { success: false, code: 'TRANSACTION_NAME_INVALID' } as const;
+            return 'TRANSACTION_NAME_INVALID' as const;
         }
 
         // We cannot check Number.isInteger(value * 100)
         // It doesn't work with some values (ex.: 542.42) due to binary conversions
         const decimals = value.toString().split('.')[1];
         if (value < 0.01 || value > 999999999.99 || (decimals && decimals.length > 2)) {
-            return { success: false, code: 'TRANSACTION_VALUE_INVALID' } as const;
+            return 'TRANSACTION_VALUE_INVALID' as const;
         }
 
         // category only makes sense for an expense, and even then it stays optional
         if (type === 'income' && category !== null) {
-            return { success: false, code: 'TRANSACTION_CATEGORY_INVALID' } as const;
+            return 'TRANSACTION_CATEGORY_INVALID' as const;
         }
 
         // date must be a valid, UTC-midnight day between the epoch and today. The format
@@ -93,10 +90,10 @@ export class Transaction {
             date.getTime() < 0 ||
             date.getTime() > now.getTime()
         ) {
-            return { success: false, code: 'TRANSACTION_DATE_INVALID' } as const;
+            return 'TRANSACTION_DATE_INVALID' as const;
         }
 
-        return { success: true } as const;
+        return null;
     };
 
     static reconstitute = (

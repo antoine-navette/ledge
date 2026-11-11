@@ -62,33 +62,29 @@ export class User {
         passwordHasher: PasswordHasher,
         now: Date,
     ) => {
-        const emailResult = User.validateEmail(email);
-        if (!emailResult.success) return emailResult;
+        const emailCode = User.validateEmail(email);
+        if (emailCode) return [null, emailCode] as const;
 
-        const passwordResult = User.validatePassword(password);
-        if (!passwordResult.success) return passwordResult;
+        const passwordCode = User.validatePassword(password);
+        if (passwordCode) return [null, passwordCode] as const;
 
         const passwordHash = await passwordHasher.hash(password);
 
-        return {
-            success: true,
-            data: new User(id, email, passwordHash, false, null, now, now),
-        } as const;
+        return [new User(id, email, passwordHash, false, null, now, now), null] as const;
     };
 
     requestEmailVerification = (token: string, now: Date) => {
-        if (this.isEmailVerified) return { success: false, code: 'EMAIL_ALREADY_VERIFIED' } as const;
+        if (this.isEmailVerified) return [null, 'EMAIL_ALREADY_VERIFIED'] as const;
 
         if (
             this.emailVerification &&
             now.getTime() - this.emailVerification.createdAt.getTime() < EmailVerification.COOLDOWN_DURATION
         ) {
-            return { success: false, code: 'ACTIVE_COOLDOWN' } as const;
+            return [null, 'ACTIVE_COOLDOWN'] as const;
         }
 
-        return {
-            success: true,
-            data: new User(
+        return [
+            new User(
                 this.id,
                 this.email,
                 this.passwordHash,
@@ -97,7 +93,8 @@ export class User {
                 this.createdAt,
                 now,
             ),
-        } as const;
+            null,
+        ] as const;
     };
 
     // No token argument here, on purpose: whether the caller actually supplied the right
@@ -115,20 +112,17 @@ export class User {
             throw new Error('User.verifyEmail called without a pending email verification');
         }
 
-        if (this.emailVerification.expiresAt < now) return { success: false, code: 'TOKEN_EXPIRED' } as const;
+        if (this.emailVerification.expiresAt < now) return [null, 'TOKEN_EXPIRED'] as const;
 
-        return {
-            success: true,
-            data: new User(this.id, this.email, this.passwordHash, true, null, this.createdAt, now),
-        } as const;
+        return [new User(this.id, this.email, this.passwordHash, true, null, this.createdAt, now), null] as const;
     };
 
     private static validateEmail = (email: string) => {
         if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
-            return { success: false, code: 'INVALID_EMAIL' } as const;
+            return 'INVALID_EMAIL' as const;
         }
 
-        return { success: true } as const;
+        return null;
     };
 
     private static validatePassword = (password: string) => {
@@ -139,10 +133,10 @@ export class User {
             !/\d/.test(password) ||
             !/[!@#$%^&*(),.?":{}|<>]/.test(password)
         ) {
-            return { success: false, code: 'WEAK_PASSWORD' } as const;
+            return 'WEAK_PASSWORD' as const;
         }
 
-        return { success: true } as const;
+        return null;
     };
 
     static reconstitute = (

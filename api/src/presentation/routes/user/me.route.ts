@@ -29,15 +29,14 @@ export const meRoute: FastifyPluginAsync<Options> = async (app, { getCurrentUser
         } satisfies FastifyZodOpenApiSchema,
         preHandler: isAuthenticated(authenticateUseCase),
         handler: async (request, reply) => {
-            const result = await getCurrentUserUseCase.execute(request.session.userId);
-            if (!result.success) {
-                switch (result.code) {
-                    case 'USER_NOT_FOUND':
-                        request.log.warn({ code: result.code }, 'Unauthorized');
-                        return reply.status(401).send({ code: 'UNAUTHORIZED' });
+            const [user, code] = await getCurrentUserUseCase.execute(request.session.userId);
+            if (code) {
+                if (code === 'USER_NOT_FOUND') {
+                    request.log.warn({ code }, 'Unauthorized');
+                    return reply.status(401).send({ code: 'UNAUTHORIZED' });
                 }
+                return code satisfies never;
             }
-            const user = result.data;
 
             return reply.status(200).send(UserMapper.toSchema(user));
         },
