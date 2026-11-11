@@ -11,6 +11,10 @@ termine.
   `{ success, data | code }`.
 - **Inscription atomique** : c'est le repository qui signale que l'email existe déjà (index unique), au lieu d'une
   vérification préalable dans le use case. Un seul appel en base au lieu de deux.
+- **Prolonger la session au plus une fois par jour** (`EXTENSION_INTERVAL`, comme dans Saffy), au lieu d'une écriture en
+  base à chaque requête authentifiée.
+- **Reader CQRS pour l'authentification**, si besoin d'optimiser : charger la session et son user en une seule requête,
+  au lieu de deux lectures dans `AuthenticateUseCase`.
 - **`if` + `satisfies never` dans les routes** à la place des `switch` sur les codes d'erreur des use cases.
 - **Séparer `Transaction` en deux entités** (revenu et dépense) grâce au polymorphisme.
 - **Logs** :
