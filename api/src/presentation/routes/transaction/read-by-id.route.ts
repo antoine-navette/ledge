@@ -3,6 +3,7 @@ import type { FastifyZodOpenApiSchema, FastifyZodOpenApiTypeProvider } from 'fas
 import z from 'zod';
 import type { GetTransactionUseCase } from '../../../application/transaction/get-transaction.use-case.js';
 import type { AuthenticateUseCase } from '../../../application/auth/authenticate.use-case.js';
+import type { TransactionId } from '../../../domain/entities/transaction.js';
 import { isAuthenticated } from '../../middlewares/is-authenticated.middleware.js';
 import { transactionSchema } from '../../schemas/transaction.schema.js';
 import { badRequestSchema } from '../../schemas/bad-request.schema.js';
@@ -42,7 +43,10 @@ export const readTransactionByIdRoute: FastifyPluginAsync<Options> = async (
         } satisfies FastifyZodOpenApiSchema,
         preHandler: isAuthenticated(authenticateUseCase),
         handler: async (request, reply) => {
-            const result = await getTransactionUseCase.execute(request.params.id, request.session.userId);
+            const result = await getTransactionUseCase.execute(
+                request.params.id as TransactionId,
+                request.session.userId,
+            );
             if (!result.success) {
                 switch (result.code) {
                     case 'TRANSACTION_NOT_OWNED':

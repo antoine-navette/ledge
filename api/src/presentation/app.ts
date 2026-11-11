@@ -24,7 +24,7 @@ import type { GetTransactionUseCase } from '../application/transaction/get-trans
 import type { UpdateTransactionUseCase } from '../application/transaction/update-transaction.use-case.js';
 import type { DeleteTransactionUseCase } from '../application/transaction/delete-transaction.use-case.js';
 import type { Session } from '../domain/entities/session.js';
-import { SESSION_COOKIE_NAME, SESSION_COOKIE_OPTIONS } from './constants/session-cookie.js';
+import { SESSION_COOKIE_NAME } from './constants/session-cookie.js';
 import { registerRoute } from './routes/auth/register.route.js';
 import { loginRoute } from './routes/auth/login.route.js';
 import { logoutRoute } from './routes/auth/logout.route.js';
@@ -108,10 +108,17 @@ export const createApp = (
 
     // Session cookie
     app.decorateReply('setSessionCookie', function (session: Session) {
-        this.setCookie(SESSION_COOKIE_NAME, session.token, { ...SESSION_COOKIE_OPTIONS, expires: session.expiresAt });
+        this.setCookie(SESSION_COOKIE_NAME, session.token, {
+            path: '/',
+            httpOnly: true,
+            // Also works in development: browsers treat http://localhost as a secure context
+            secure: true,
+            sameSite: 'strict',
+            expires: session.expiresAt,
+        });
     });
     app.decorateReply('clearSessionCookie', function () {
-        this.clearCookie(SESSION_COOKIE_NAME, SESSION_COOKIE_OPTIONS);
+        this.clearCookie(SESSION_COOKIE_NAME, { path: '/' });
     });
 
     // OpenAPI (validation, serialization — needed in every env)

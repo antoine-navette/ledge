@@ -50,11 +50,13 @@ export const registerRoute: FastifyPluginAsync<Options> = async (app, { register
                         return reply.status(422).send({ code: 'UNPROCESSABLE_CONTENT' });
                 }
             }
-            const { user, ...session } = result.data;
+            const session = result.data;
 
-            request.log.info({ sessionId: session.id, userId: user.id }, 'User registered');
+            // Like isAuthenticated: the access log also gets them
+            request.log = request.log.child({ sessionId: session.id, userId: session.user.id });
+            request.log.info('User registered');
             reply.setSessionCookie(session);
-            return reply.status(201).send(UserMapper.toSchema(user));
+            return reply.status(201).send(UserMapper.toSchema(session.user));
         },
     });
 };

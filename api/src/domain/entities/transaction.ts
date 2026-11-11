@@ -1,7 +1,15 @@
+import type { UserId } from './user.js';
+
+export type TransactionId = string & { readonly __brand: 'TransactionId' };
+
 export class Transaction {
+    // Never set at runtime: only makes the class nominal, so a plain object can't be passed off as a Transaction without
+    // going through its factories
+    declare private readonly brand: 'Transaction';
+
     private constructor(
-        public readonly id: string,
-        public readonly userId: string,
+        public readonly id: TransactionId,
+        public readonly userId: UserId,
         public readonly name: string,
         public readonly value: number,
         public readonly type: 'income' | 'expense',
@@ -12,8 +20,8 @@ export class Transaction {
     ) {}
 
     static create = (
-        id: string,
-        userId: string,
+        id: TransactionId,
+        userId: UserId,
         name: string,
         value: number,
         type: 'income' | 'expense',
@@ -92,8 +100,8 @@ export class Transaction {
     };
 
     static reconstitute = (
-        id: string,
-        userId: string,
+        id: TransactionId,
+        userId: UserId,
         name: string,
         value: number,
         type: 'income' | 'expense',

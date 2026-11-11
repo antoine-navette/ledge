@@ -11,13 +11,6 @@ termine.
   `{ success, data | code }`.
 - **Inscription atomique** : c'est le repository qui signale que l'email existe déjà (index unique), au lieu d'une
   vérification préalable dans le use case. Un seul appel en base au lieu de deux.
-- **`EmailVerification` dans `user.ts`**, comme `Employee` dans Saffy, pour qu'on ne puisse plus l'importer depuis
-  n'importe où.
-- **Brand privé sur toutes les entités** (`declare private readonly brand`) et **IDs brandés** (`UserId`, `SessionId`,
-  `TransactionId`).
-- **Inliner `SESSION_COOKIE_OPTIONS`**, qui ne sert à rien en tant qu'export.
-- **Child logger dans register et login**, comme le fait le middleware `isAuthenticated`, pour que l'access log ait
-  `sessionId` et `userId`.
 - **`if` + `satisfies never` dans les routes** à la place des `switch` sur les codes d'erreur des use cases.
 - **Séparer `Transaction` en deux entités** (revenu et dépense) grâce au polymorphisme.
 - **Logs** :

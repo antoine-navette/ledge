@@ -1,7 +1,6 @@
 import { Collection, ObjectId } from 'mongodb';
 import type { UserRepository } from '../../../domain/repositories/user.repository.js';
 import type { User } from '../../../domain/entities/user.js';
-import type { EmailVerification } from '../../../domain/value-objects/email-verification.js';
 import type { MongoUserDocument } from '../documents/mongo.user.document.js';
 import { MongoUserMapper } from '../mappers/mongo.user.mapper.js';
 
@@ -28,7 +27,9 @@ export class MongoUserRepository implements UserRepository {
         return document ? MongoUserMapper.toEntity(document) : null;
     };
 
-    findByEmailVerificationToken = async (token: EmailVerification['token']): Promise<User | null> => {
+    findByEmailVerificationToken = async (
+        token: NonNullable<User['emailVerification']>['token'],
+    ): Promise<User | null> => {
         const document = await this.userCollection.findOne({ 'emailVerification.token': token });
 
         return document ? MongoUserMapper.toEntity(document) : null;

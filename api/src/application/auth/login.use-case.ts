@@ -3,7 +3,7 @@ import type { SessionRepository } from '../../domain/repositories/session.reposi
 import type { PasswordHasher } from '../../domain/ports/password-hasher.js';
 import type { IdGenerator } from '../../domain/ports/id-generator.js';
 import type { TokenGenerator } from '../../domain/ports/token-generator.js';
-import { Session } from '../../domain/entities/session.js';
+import { Session, type SessionId } from '../../domain/entities/session.js';
 
 export class LoginUseCase {
     constructor(
@@ -24,13 +24,13 @@ export class LoginUseCase {
         if (!isPasswordCorrect) return { success: false, code: 'WRONG_PASSWORD' } as const;
 
         const session = Session.create(
-            this.idGenerator.generate(),
+            this.idGenerator.generate() as SessionId,
             user.id,
             this.tokenGenerator.generate(Session.TOKEN_LENGTH),
             now,
         );
         await this.sessionRepository.create(session);
 
-        return { success: true, data: { ...session, user } } as const;
+        return { success: true, data: Object.assign(session, { user }) } as const;
     };
 }

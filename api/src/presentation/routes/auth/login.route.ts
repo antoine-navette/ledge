@@ -45,11 +45,13 @@ export const loginRoute: FastifyPluginAsync<Options> = async (app, { loginUseCas
                         return reply.status(401).send({ code: 'INVALID_CREDENTIALS' });
                 }
             }
-            const { user, ...session } = result.data;
+            const session = result.data;
 
-            request.log.info({ sessionId: session.id, userId: user.id }, 'User logged in');
+            // Like isAuthenticated: the access log also gets them
+            request.log = request.log.child({ sessionId: session.id, userId: session.user.id });
+            request.log.info('User logged in');
             reply.setSessionCookie(session);
-            return reply.status(200).send(UserMapper.toSchema(user));
+            return reply.status(200).send(UserMapper.toSchema(session.user));
         },
     });
 };

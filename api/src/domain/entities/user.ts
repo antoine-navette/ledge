@@ -1,9 +1,49 @@
 import type { PasswordHasher } from '../ports/password-hasher.js';
-import { EmailVerification } from '../value-objects/email-verification.js';
+
+// Not exported: an email verification only exists through its User, which is the only one able to create or rebuild it
+class EmailVerification {
+    // Never set at runtime: only makes the class nominal, so a plain object can't be passed off as an EmailVerification
+    declare private readonly brand: 'EmailVerification';
+
+    static readonly TOKEN_LENGTH = 64;
+    static readonly COOLDOWN_DURATION = 5 * 60 * 1000;
+    private static readonly DURATION = 60 * 60 * 1000;
+
+    private constructor(
+        public readonly token: string,
+        public readonly expiresAt: Date,
+        public readonly createdAt: Date,
+    ) {}
+
+    static create = (token: string, now: Date) => {
+        // Same reasoning as Session.create(): token length is a security property, not an
+        // incidental format detail — a wrong length means the caller's TokenGenerator wiring
+        // is broken, a programmer error, not a legitimate outcome to report as a 4xx.
+        if (token.length !== EmailVerification.TOKEN_LENGTH) {
+            throw new Error(
+                `EmailVerification.create called with a token of length ${token.length}, expected ${EmailVerification.TOKEN_LENGTH}`,
+            );
+        }
+
+        return new EmailVerification(token, new Date(now.getTime() + EmailVerification.DURATION), now);
+    };
+
+    static reconstitute = (token: string, expiresAt: Date, createdAt: Date) => {
+        return new EmailVerification(token, expiresAt, createdAt);
+    };
+}
+
+export type UserId = string & { readonly __brand: 'UserId' };
 
 export class User {
+    // Never set at runtime: only makes the class nominal, so a plain object can't be passed off as a User without
+    // going through its factories
+    declare private readonly brand: 'User';
+
+    static readonly EMAIL_VERIFICATION_TOKEN_LENGTH = EmailVerification.TOKEN_LENGTH;
+
     private constructor(
-        public readonly id: string,
+        public readonly id: UserId,
         public readonly email: string,
         public readonly passwordHash: string,
         public readonly isEmailVerified: boolean,
@@ -16,7 +56,7 @@ export class User {
     // so validation and hashing always happen in order, atomically, in a single call — a
     // caller has no way to hash an invalid password by forgetting to validate it first.
     static register = async (
-        id: string,
+        id: UserId,
         email: string,
         password: string,
         passwordHasher: PasswordHasher,
@@ -106,7 +146,7 @@ export class User {
     };
 
     static reconstitute = (
-        id: string,
+        id: UserId,
         email: string,
         passwordHash: string,
         isEmailVerified: boolean,
@@ -116,4 +156,7 @@ export class User {
     ) => {
         return new User(id, email, passwordHash, isEmailVerified, emailVerification, createdAt, updatedAt);
     };
+
+    // Only exposes how to rebuild an email verification from the database: creating one stays reserved to User
+    static reconstituteEmailVerification = EmailVerification.reconstitute;
 }

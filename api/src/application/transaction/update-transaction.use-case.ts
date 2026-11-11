@@ -1,11 +1,13 @@
+import type { UserId } from '../../domain/entities/user.js';
+import type { TransactionId } from '../../domain/entities/transaction.js';
 import type { TransactionRepository } from '../../domain/repositories/transaction.repository.js';
 
 export class UpdateTransactionUseCase {
     constructor(private transactionRepository: TransactionRepository) {}
 
     execute = async (
-        id: string,
-        userId: string,
+        id: TransactionId,
+        userId: UserId,
         name: string,
         value: number,
         type: 'income' | 'expense',
