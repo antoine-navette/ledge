@@ -19,6 +19,7 @@ termine.
   - En dev : `console` + `pretty`. En prod : `console` + `betterstack`, en `json`, pour envoyer aux deux à la fois.
   - Améliorer `pino.ts` en conséquence.
 - **Simplifier `env.ts`** (à voir une fois `LOG_TARGETS` en place, et avec les valeurs passées en dur côté Docker).
+- **`tsconfig.json`** : activer toutes les « Style Options » (`noImplicitReturns`, `noUnusedLocals`…).
 - **`scripts/`** :
   - Sous-dossiers `docs/generate.ts` et `migrations/run.ts`, avec des fonctions `generate()` et `run()` à la place de
     `main()`.
@@ -41,6 +42,7 @@ termine.
   `api/.dockerignore` en conséquence.
 - **Ne plus exposer MongoDB** : binder sur `127.0.0.1`.
 - **Healthchecks** : revoir le système actuel.
+- **`npm audit`** sur l'API et le web, et corriger ce qui peut l'être.
 - **CI/CD** : tout revoir pour que ce soit cohérent, et mettre en place un vrai versionnage des images (plutôt que le
   SHA + `latest`).
 
