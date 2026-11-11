@@ -51,12 +51,12 @@
                 ],
                 "additionalProperties": false
             },
-            "DuplicateEmail": {
+            "EmailAlreadyInUse": {
                 "type": "object",
                 "properties": {
                     "code": {
                         "type": "string",
-                        "const": "DUPLICATE_EMAIL"
+                        "const": "EMAIL_ALREADY_IN_USE"
                     }
                 },
                 "required": [
@@ -342,7 +342,7 @@
                         "content": {
                             "application/json": {
                                 "schema": {
-                                    "$ref": "#/components/schemas/DuplicateEmail"
+                                    "$ref": "#/components/schemas/EmailAlreadyInUse"
                                 }
                             }
                         }

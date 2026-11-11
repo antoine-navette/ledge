@@ -3,7 +3,7 @@ import type { FastifyZodOpenApiSchema, FastifyZodOpenApiTypeProvider } from 'fas
 import z from 'zod';
 import type { RegisterUseCase } from '../../../application/auth/register.use-case.js';
 import { userSchema } from '../../schemas/user.schema.js';
-import { duplicateEmailSchema } from '../../schemas/duplicate-email.schema.js';
+import { emailAlreadyInUseSchema } from '../../schemas/email-already-in-use.schema.js';
 import { badRequestSchema } from '../../schemas/bad-request.schema.js';
 import { payloadTooLargeSchema } from '../../schemas/payload-too-large.schema.js';
 import { tooManyRequestsSchema } from '../../schemas/too-many-requests.schema.js';
@@ -28,7 +28,7 @@ export const registerRoute: FastifyPluginAsync<Options> = async (app, { register
             response: {
                 201: userSchema,
                 400: badRequestSchema,
-                409: duplicateEmailSchema,
+                409: emailAlreadyInUseSchema,
                 413: payloadTooLargeSchema,
                 422: unprocessableContentSchema,
                 429: tooManyRequestsSchema,
@@ -40,9 +40,9 @@ export const registerRoute: FastifyPluginAsync<Options> = async (app, { register
 
             const [session, code] = await registerUseCase.execute(email, password);
             if (code) {
-                if (code === 'DUPLICATE_EMAIL') {
+                if (code === 'EMAIL_ALREADY_IN_USE') {
                     request.log.warn({ code }, 'Conflict');
-                    return reply.status(409).send({ code: 'DUPLICATE_EMAIL' });
+                    return reply.status(409).send({ code: 'EMAIL_ALREADY_IN_USE' });
                 }
                 if (code === 'INVALID_EMAIL' || code === 'WEAK_PASSWORD') {
                     request.log.warn({ code }, 'Unprocessable content');

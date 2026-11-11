@@ -16,7 +16,7 @@ export class MongoUserRepository implements UserRepository {
         } catch (err) {
             // Duplicate key on the unique email index: the email is already in use
             if (err instanceof MongoServerError && err.code === 11000 && err['keyPattern']?.email) {
-                return 'DUPLICATE_EMAIL' as const;
+                return 'EMAIL_ALREADY_IN_USE' as const;
             }
             throw err;
         }

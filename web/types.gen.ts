@@ -53,7 +53,7 @@ export interface paths {
                         [name: string]: unknown;
                     };
                     content: {
-                        "application/json": components["schemas"]["DuplicateEmail"];
+                        "application/json": components["schemas"]["EmailAlreadyInUse"];
                     };
                 };
                 /** @description Default Response */
@@ -957,9 +957,9 @@ export interface components {
             /** @constant */
             code: "BAD_REQUEST";
         };
-        DuplicateEmail: {
+        EmailAlreadyInUse: {
             /** @constant */
-            code: "DUPLICATE_EMAIL";
+            code: "EMAIL_ALREADY_IN_USE";
         };
         PayloadTooLarge: {
             /** @constant */
