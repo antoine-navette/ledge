@@ -13,6 +13,12 @@ termine.
 - **Reader CQRS pour l'authentification**, si besoin d'optimiser : charger la session et son user en une seule requête,
   au lieu de deux lectures dans `AuthenticateUseCase`.
 - **Séparer `Transaction` en deux entités** (revenu et dépense) grâce au polymorphisme.
+- **Type dédié pour `Transaction.date`**, un jour calendaire sans heure ni fuseau, au lieu d'une `Date` à minuit UTC.
+  Piste privilégiée : une chaîne brandée `CalendarDate` (`"YYYY-MM-DD"`) avec un module de fonctions, comme les IDs
+  brandés, côté API et front. Stockée telle quelle en base (l'ordre alphabétique est chronologique, donc les requêtes
+  par période marchent toujours), avec une migration. Alternatives : un value object (classe) si la date porte un jour
+  de vraies règles, ou `Temporal.PlainDate` quand Temporal sera disponible partout. À faire avec la séparation de
+  `Transaction`.
 - **Logs** :
   - `LOG_TARGETS` : `console`, `betterstack`, ou les deux. `LOG_FORMAT` (`json` ou `pretty`) n'est obligatoire qu'avec
     `console`, la source et le token Better Stack qu'avec `betterstack`.
