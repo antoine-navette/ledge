@@ -26,9 +26,9 @@ import 'dotenv/config';
 
 // .env is not verified yet, but we need a logger now
 const pino = createPino({
-    pinoTarget: process.env.PINO_TARGET,
-    betterStackToken: process.env.BETTERSTACK_TOKEN,
-    betterStackUrl: process.env.BETTERSTACK_URL,
+    pinoTarget: process.env['PINO_TARGET'],
+    betterStackToken: process.env['BETTERSTACK_TOKEN'],
+    betterStackUrl: process.env['BETTERSTACK_URL'],
 } as Env);
 
 try {

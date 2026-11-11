@@ -23,7 +23,6 @@ termine.
   - En dev : `console` + `pretty`. En prod : `console` + `betterstack`, en `json`, pour envoyer aux deux à la fois.
   - Améliorer `pino.ts` en conséquence.
 - **Simplifier `env.ts`** (à voir une fois `LOG_TARGETS` en place, et avec les valeurs passées en dur côté Docker).
-- **`tsconfig.json`** : activer toutes les « Style Options » (`noImplicitReturns`, `noUnusedLocals`…).
 - **Migrations** : à terme, se passer d'Umzug et passer à des migrations datées plutôt qu'à un numéro incrémenté à la
   main.
 
