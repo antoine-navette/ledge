@@ -18,19 +18,18 @@ export class RegisterUseCase {
     execute = async (email: string, password: string) => {
         const now = new Date();
 
-        const existing = await this.userRepository.findByEmail(email);
-        if (existing) return [null, 'DUPLICATE_EMAIL'] as const;
-
-        const [user, code] = await User.register(
+        const [user, userCode] = await User.register(
             this.idGenerator.generate() as UserId,
             email,
             password,
             this.passwordHasher,
             now,
         );
-        if (code) return [null, code] as const;
-
-        await this.userRepository.create(user);
+        if (userCode) return [null, userCode] as const;
+        // Checked by the unique index on insert rather than with a lookup beforehand, which two concurrent
+        // registrations could both pass
+        const createCode = await this.userRepository.create(user);
+        if (createCode) return [null, createCode] as const;
 
         const session = Session.create(
             this.idGenerator.generate() as SessionId,
