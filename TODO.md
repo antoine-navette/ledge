@@ -30,6 +30,8 @@ termine.
 - **`config/api.ts` → `http.ts`**, comme dans Saffy.
 - **Services en fonctions à plat**, nommées comme les routes de l'API (donc comme les use cases), au lieu d'objets.
 - **Tuples pour les retours des services**, comme côté API.
+- **Messages d'erreur lisibles** : traduire les codes d'erreur en messages (comme `constants/errors.ts` dans Saffy) au
+  lieu d'afficher le code brut.
 
 ## Infra
 
