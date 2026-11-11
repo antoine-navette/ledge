@@ -41,5 +41,5 @@ jobs:
         run: |
           cd "$TARGET_PATH"
           docker compose pull
-          docker compose run --rm --no-deps api node dist/scripts/migrate.js
+          docker compose run --rm --no-deps api npm run migrations:run
           docker compose up -d --remove-orphans

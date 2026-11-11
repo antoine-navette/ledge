@@ -20,10 +20,8 @@ termine.
   - Améliorer `pino.ts` en conséquence.
 - **Simplifier `env.ts`** (à voir une fois `LOG_TARGETS` en place, et avec les valeurs passées en dur côté Docker).
 - **`tsconfig.json`** : activer toutes les « Style Options » (`noImplicitReturns`, `noUnusedLocals`…).
-- **`scripts/`** :
-  - Sous-dossiers `docs/generate.ts` et `migrations/run.ts`, avec des fonctions `generate()` et `run()` à la place de
-    `main()`.
-  - À terme : se passer d'Umzug et passer à des migrations datées plutôt qu'à un numéro incrémenté à la main.
+- **Migrations** : à terme, se passer d'Umzug et passer à des migrations datées plutôt qu'à un numéro incrémenté à la
+  main.
 
 ## Web
 

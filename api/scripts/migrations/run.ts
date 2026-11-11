@@ -2,9 +2,9 @@ import { fileURLToPath } from 'node:url';
 import path from 'node:path';
 import { MongoDBStorage, Umzug } from 'umzug';
 import type { Db } from 'mongodb';
-import { createPino } from '../src/infrastructure/config/pino.js';
-import { connectToMongo } from '../src/infrastructure/config/mongo.js';
-import { loadEnv, type Env } from '../src/infrastructure/config/env.js';
+import { createPino } from '../../src/infrastructure/config/pino.js';
+import { connectToMongo } from '../../src/infrastructure/config/mongo.js';
+import { loadEnv, type Env } from '../../src/infrastructure/config/env.js';
 import 'dotenv/config';
 
 export type Context = { mongo: { db: Db } };
@@ -19,7 +19,7 @@ const pino = createPino({
 // Wrapped in an async function (not awaited at the top level) so the pino transport's
 // unref'd worker thread can't make Node think the module has nothing left to settle and
 // force-exit with "Detected unsettled top-level await" (exit code 13) before flush() resolves.
-const main = async () => {
+const run = async () => {
     try {
         const { mongoUrl } = loadEnv();
         pino.logger.info('Environment loaded');
@@ -31,7 +31,7 @@ const main = async () => {
         const __dirname = path.dirname(__filename);
         const umzug = new Umzug<Context>({
             migrations: {
-                glob: [path.join(__dirname, '../migrations', '*.{js,ts}'), { ignore: '**/*.d.ts' }],
+                glob: [path.join(__dirname, '../../migrations', '*.{js,ts}'), { ignore: '**/*.d.ts' }],
             },
             context: { mongo },
             storage: new MongoDBStorage({ connection: mongo.db }),
@@ -53,4 +53,4 @@ const main = async () => {
     }
 };
 
-void main();
+void run();
