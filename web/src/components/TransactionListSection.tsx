@@ -76,7 +76,7 @@ const TransactionListSection = ({ transactions, total, year, month, type, onUpse
                                         <h4 className="text-gray-800 font-medium select-none">{transaction.name}</h4>
 
                                         <p className="text-gray-400 text-xs mt-0.5 select-none">
-                                            {new Date(transaction.date).toLocaleDateString('en-UK')}
+                                            {transaction.date.toLocaleDateString('en-UK', { timeZone: 'UTC' })}
                                         </p>
                                     </div>
 

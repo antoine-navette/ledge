@@ -3,7 +3,7 @@ import { Navigate, useNavigate, useParams } from 'react-router-dom';
 import Navbar from '../components/Navbar';
 import TransactionsOverview from '../components/TransactionsOverview.tsx';
 import DateNavigator from '../components/DateNavigator';
-import { TransactionService } from '../services/TransactionService';
+import { getUserTransactions } from '../services/transaction.ts';
 import type { Transaction } from '../entities/Transaction';
 
 const Month = () => {
@@ -29,18 +29,18 @@ const Month = () => {
             setState({ status: 'loading' });
 
             // TODO: clean
-            const from = `${year}-${String(month).padStart(2, '0')}-01`;
-            const lastDay = new Date(year, month, 0).getDate();
-            const to = `${year}-${String(month).padStart(2, '0')}-${String(lastDay).padStart(2, '0')}`;
+            // Calendar days at midnight UTC, like transaction dates: day 0 of the next month is the last of this one
+            const from = new Date(Date.UTC(year, month - 1, 1));
+            const to = new Date(Date.UTC(year, month, 0));
 
-            const { data, error } = await TransactionService.read({ from, to });
+            const [transactions, code] = await getUserTransactions(from, to);
             if (ignore) return;
-            if (error) {
-                setState({ status: 'error', message: error.code });
+            if (code) {
+                setState({ status: 'error', message: code });
                 return;
             }
 
-            setState({ status: 'success', transactions: data });
+            setState({ status: 'success', transactions });
         };
 
         void fetchData();

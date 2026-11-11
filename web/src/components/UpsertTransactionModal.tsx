@@ -1,5 +1,5 @@
 import { useState, FormEvent } from 'react';
-import { TransactionService } from '../services/TransactionService';
+import { createTransaction, updateTransaction } from '../services/transaction.ts';
 import type { Transaction } from '../entities/Transaction';
 import Modal from './Modal.tsx';
 
@@ -30,7 +30,7 @@ const UpsertTransactionModal = ({ onClose, transaction, type, year, month, onUps
         name: transaction ? transaction.name : '',
         value: transaction ? String(transaction.value) : '',
         category: transaction ? transaction.category : null,
-        date: transaction ? transaction.date.slice(0, 10) : '',
+        date: transaction ? transaction.date.toISOString().slice(0, 10) : '',
     });
 
     const handleSubmit = async (e: FormEvent) => {
@@ -38,22 +38,17 @@ const UpsertTransactionModal = ({ onClose, transaction, type, year, month, onUps
 
         setState({ status: 'loading' });
 
-        const { data, error } = transaction
-            ? await TransactionService.updateById(
-                  transaction.id,
-                  form.name,
-                  Number(form.value),
-                  type,
-                  form.category,
-                  form.date,
-              )
-            : await TransactionService.create(form.name, Number(form.value), type, form.category, form.date);
-        if (error) {
-            setState({ status: 'error', message: error.code });
+        // The date input gives a calendar day ("2026-11-11"), parsed as midnight UTC like transaction dates
+        const date = new Date(form.date);
+        const [upserted, code] = transaction
+            ? await updateTransaction(transaction.id, form.name, Number(form.value), type, form.category, date)
+            : await createTransaction(form.name, Number(form.value), type, form.category, date);
+        if (code) {
+            setState({ status: 'error', message: code });
             return;
         }
 
-        onUpsert(data);
+        onUpsert(upserted);
         onClose();
     };
 

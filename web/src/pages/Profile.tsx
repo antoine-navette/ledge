@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { EmailVerificationService } from '../services/EmailVerificationService';
+import { requestEmailVerification } from '../services/email-verification.ts';
 import Navbar from '../components/Navbar.tsx';
 import { useAuth } from '../hooks/useAuth.ts';
 
@@ -9,14 +9,15 @@ const Profile = () => {
     >({ status: 'idle' });
 
     const auth = useAuth();
-    if (auth.state.status !== 'success' || !auth.state.user) return;
+    // Always nested in RequireAuth
+    if (!auth.user) return;
 
     const handleClick = async () => {
         setState({ status: 'loading' });
 
-        const { error } = await EmailVerificationService.create();
-        if (error) {
-            setState({ status: 'error', message: error.code });
+        const code = await requestEmailVerification();
+        if (code) {
+            setState({ status: 'error', message: code });
             return;
         }
 
@@ -29,7 +30,7 @@ const Profile = () => {
             <div className="flex flex-col flex-1 items-center justify-center p-4">
                 <h1 className="text-4xl font-bold mb-4">Profile page</h1>
                 <p className="text-lg mb-6">This is the profile page.</p>
-                {!auth.state.user.isEmailVerified && (
+                {!auth.user.isEmailVerified && (
                     <>
                         <button
                             className="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700 transition cursor-pointer disabled:opacity-50"
