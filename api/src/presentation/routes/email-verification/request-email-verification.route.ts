@@ -38,12 +38,8 @@ export const requestEmailVerificationRoute: FastifyPluginAsync<Options> = async 
         } satisfies FastifyZodOpenApiSchema,
         preHandler: isAuthenticated(authenticateUseCase),
         handler: async (request, reply) => {
-            const [, code] = await requestEmailVerificationUseCase.execute(request.session.userId);
+            const [, code] = await requestEmailVerificationUseCase.execute(request.session.user);
             if (code) {
-                if (code === 'USER_NOT_FOUND') {
-                    request.log.warn({ code }, 'Unauthorized');
-                    return reply.status(401).send({ code: 'UNAUTHORIZED' });
-                }
                 if (code === 'ACTIVE_COOLDOWN') {
                     request.log.warn({ code }, 'Conflict');
                     return reply.status(409).send({ code: 'ACTIVE_COOLDOWN' });

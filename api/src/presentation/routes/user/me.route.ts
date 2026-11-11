@@ -1,6 +1,5 @@
 import type { FastifyPluginAsync } from 'fastify';
 import type { FastifyZodOpenApiSchema, FastifyZodOpenApiTypeProvider } from 'fastify-zod-openapi';
-import type { GetCurrentUserUseCase } from '../../../application/user/get-current-user.use-case.js';
 import type { AuthenticateUseCase } from '../../../application/auth/authenticate.use-case.js';
 import { isAuthenticated } from '../../middlewares/is-authenticated.middleware.js';
 import { userSchema } from '../../schemas/user.schema.js';
@@ -10,11 +9,10 @@ import { internalServerErrorSchema } from '../../schemas/internal-server-error.s
 import { UserMapper } from '../../mappers/user.mapper.js';
 
 type Options = {
-    getCurrentUserUseCase: GetCurrentUserUseCase;
     authenticateUseCase: AuthenticateUseCase;
 };
 
-export const meRoute: FastifyPluginAsync<Options> = async (app, { getCurrentUserUseCase, authenticateUseCase }) => {
+export const meRoute: FastifyPluginAsync<Options> = async (app, { authenticateUseCase }) => {
     app.withTypeProvider<FastifyZodOpenApiTypeProvider>().route({
         method: 'GET',
         url: '/users/me',
@@ -29,16 +27,7 @@ export const meRoute: FastifyPluginAsync<Options> = async (app, { getCurrentUser
         } satisfies FastifyZodOpenApiSchema,
         preHandler: isAuthenticated(authenticateUseCase),
         handler: async (request, reply) => {
-            const [user, code] = await getCurrentUserUseCase.execute(request.session.userId);
-            if (code) {
-                if (code === 'USER_NOT_FOUND') {
-                    request.log.warn({ code }, 'Unauthorized');
-                    return reply.status(401).send({ code: 'UNAUTHORIZED' });
-                }
-                return code satisfies never;
-            }
-
-            return reply.status(200).send(UserMapper.toSchema(user));
+            return reply.status(200).send(UserMapper.toSchema(request.session.user));
         },
     });
 };

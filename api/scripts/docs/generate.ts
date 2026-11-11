@@ -6,7 +6,6 @@ import type { AuthenticateUseCase } from '../../src/application/auth/authenticat
 import type { LogoutUseCase } from '../../src/application/auth/logout.use-case.js';
 import type { LoginUseCase } from '../../src/application/auth/login.use-case.js';
 import type { RegisterUseCase } from '../../src/application/auth/register.use-case.js';
-import type { GetCurrentUserUseCase } from '../../src/application/user/get-current-user.use-case.js';
 import type { RequestEmailVerificationUseCase } from '../../src/application/email-verification/request-email-verification.use-case.js';
 import type { VerifyEmailUseCase } from '../../src/application/email-verification/verify-email.use-case.js';
 import type { CreateTransactionUseCase } from '../../src/application/transaction/create-transaction.use-case.js';
@@ -38,7 +37,6 @@ const generate = async () => {
             {} as LogoutUseCase,
             {} as LoginUseCase,
             {} as RegisterUseCase,
-            {} as GetCurrentUserUseCase,
             {} as RequestEmailVerificationUseCase,
             {} as VerifyEmailUseCase,
             {} as CreateTransactionUseCase,

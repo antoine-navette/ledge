@@ -14,7 +14,6 @@ import { AuthenticateUseCase } from './application/auth/authenticate.use-case.js
 import { LogoutUseCase } from './application/auth/logout.use-case.js';
 import { LoginUseCase } from './application/auth/login.use-case.js';
 import { RegisterUseCase } from './application/auth/register.use-case.js';
-import { GetCurrentUserUseCase } from './application/user/get-current-user.use-case.js';
 import { RequestEmailVerificationUseCase } from './application/email-verification/request-email-verification.use-case.js';
 import { VerifyEmailUseCase } from './application/email-verification/verify-email.use-case.js';
 import { MongoTransactionRepository } from './infrastructure/mongo/repositories/mongo.transaction.repository.js';
@@ -51,7 +50,7 @@ try {
     const tokenGenerator = new CryptoTokenGenerator();
     const passwordHasher = new BcryptPasswordHasher();
 
-    const authenticateUseCase = new AuthenticateUseCase(sessionRepository);
+    const authenticateUseCase = new AuthenticateUseCase(sessionRepository, userRepository);
     const logoutUseCase = new LogoutUseCase(sessionRepository);
     const loginUseCase = new LoginUseCase(
         userRepository,
@@ -67,7 +66,6 @@ try {
         idGenerator,
         tokenGenerator,
     );
-    const getCurrentUserUseCase = new GetCurrentUserUseCase(userRepository);
     const requestEmailVerificationUseCase = new RequestEmailVerificationUseCase(
         userRepository,
         emailSender,
@@ -88,7 +86,6 @@ try {
         logoutUseCase,
         loginUseCase,
         registerUseCase,
-        getCurrentUserUseCase,
         requestEmailVerificationUseCase,
         verifyEmailUseCase,
         createTransactionUseCase,

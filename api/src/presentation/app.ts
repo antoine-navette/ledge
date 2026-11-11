@@ -15,7 +15,6 @@ import type { AuthenticateUseCase } from '../application/auth/authenticate.use-c
 import type { LogoutUseCase } from '../application/auth/logout.use-case.js';
 import type { LoginUseCase } from '../application/auth/login.use-case.js';
 import type { RegisterUseCase } from '../application/auth/register.use-case.js';
-import type { GetCurrentUserUseCase } from '../application/user/get-current-user.use-case.js';
 import type { RequestEmailVerificationUseCase } from '../application/email-verification/request-email-verification.use-case.js';
 import type { VerifyEmailUseCase } from '../application/email-verification/verify-email.use-case.js';
 import type { CreateTransactionUseCase } from '../application/transaction/create-transaction.use-case.js';
@@ -24,6 +23,7 @@ import type { GetTransactionUseCase } from '../application/transaction/get-trans
 import type { UpdateTransactionUseCase } from '../application/transaction/update-transaction.use-case.js';
 import type { DeleteTransactionUseCase } from '../application/transaction/delete-transaction.use-case.js';
 import type { Session } from '../domain/entities/session.js';
+import type { User } from '../domain/entities/user.js';
 import { SESSION_COOKIE_NAME } from './constants/session-cookie.js';
 import { registerRoute } from './routes/auth/register.route.js';
 import { loginRoute } from './routes/auth/login.route.js';
@@ -44,7 +44,7 @@ import type { InternalServerErrorSchema } from './schemas/internal-server-error.
 
 declare module 'fastify' {
     interface FastifyRequest {
-        session: Session;
+        session: Session & { user: User };
     }
 
     interface FastifyReply {
@@ -59,7 +59,6 @@ export const createApp = (
     logoutUseCase: LogoutUseCase,
     loginUseCase: LoginUseCase,
     registerUseCase: RegisterUseCase,
-    getCurrentUserUseCase: GetCurrentUserUseCase,
     requestEmailVerificationUseCase: RequestEmailVerificationUseCase,
     verifyEmailUseCase: VerifyEmailUseCase,
     createTransactionUseCase: CreateTransactionUseCase,
@@ -143,7 +142,7 @@ export const createApp = (
     app.register(registerRoute, { registerUseCase });
     app.register(loginRoute, { loginUseCase });
     app.register(logoutRoute, { authenticateUseCase, logoutUseCase });
-    app.register(meRoute, { getCurrentUserUseCase, authenticateUseCase });
+    app.register(meRoute, { authenticateUseCase });
     app.register(requestEmailVerificationRoute, { requestEmailVerificationUseCase, authenticateUseCase });
     app.register(verifyEmailRoute, { verifyEmailUseCase });
     app.register(createTransactionRoute, { createTransactionUseCase, authenticateUseCase });
