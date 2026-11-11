@@ -116,7 +116,7 @@ try {
             await pino.flush();
             process.exit(0);
         } catch (err) {
-            pino.logger.fatal({ err }, 'Error during graceful shutdown');
+            pino.logger.fatal({ err }, 'Failed to shut down gracefully');
 
             await pino.flush();
             process.exit(1);
@@ -125,7 +125,7 @@ try {
     process.on('SIGINT', () => gracefulShutdown('SIGINT'));
     process.on('SIGTERM', () => gracefulShutdown('SIGTERM'));
 } catch (err) {
-    pino.logger.fatal({ err }, err instanceof Error ? err.message : 'Unknown error');
+    pino.logger.fatal({ err }, 'Failed to start server');
 
     await pino.flush();
     process.exit(1);

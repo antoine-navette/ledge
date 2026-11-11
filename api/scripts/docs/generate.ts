@@ -55,7 +55,7 @@ const generate = async () => {
         await pino.flush();
         process.exit(0);
     } catch (err) {
-        pino.logger.fatal({ err }, err instanceof Error ? err.message : 'Unknown error');
+        pino.logger.fatal({ err }, 'Failed to generate OpenAPI docs');
 
         await pino.flush();
         process.exit(1);
