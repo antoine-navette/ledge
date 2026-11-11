@@ -27,7 +27,7 @@ export const requestEmailVerificationRoute: FastifyPluginAsync<Options> = async 
         schema: {
             tags: ['EmailVerification'],
             response: {
-                201: { description: 'Verification email sent successfully' },
+                204: {},
                 400: badRequestSchema,
                 401: unauthorizedSchema,
                 409: z.union([activeCooldownSchema, emailAlreadyVerifiedSchema]),
@@ -52,7 +52,7 @@ export const requestEmailVerificationRoute: FastifyPluginAsync<Options> = async 
             }
 
             request.log.info('Email verification requested');
-            return reply.status(201).send();
+            return reply.status(204).send();
         },
     });
 };

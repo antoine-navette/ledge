@@ -6,7 +6,7 @@ import { userSchema } from '../../schemas/user.schema.js';
 import { unauthorizedSchema } from '../../schemas/unauthorized.schema.js';
 import { tooManyRequestsSchema } from '../../schemas/too-many-requests.schema.js';
 import { internalServerErrorSchema } from '../../schemas/internal-server-error.schema.js';
-import { UserMapper } from '../../mappers/user.mapper.js';
+import { UserPresenter } from '../../presenters/user.presenter.js';
 
 type Options = {
     authenticateUseCase: AuthenticateUseCase;
@@ -27,7 +27,7 @@ export const meRoute: FastifyPluginAsync<Options> = async (app, { authenticateUs
         } satisfies FastifyZodOpenApiSchema,
         preHandler: isAuthenticated(authenticateUseCase),
         handler: async (request, reply) => {
-            return reply.status(200).send(UserMapper.toSchema(request.session.user));
+            return reply.status(200).send(UserPresenter.toSchema(request.session.user));
         },
     });
 };

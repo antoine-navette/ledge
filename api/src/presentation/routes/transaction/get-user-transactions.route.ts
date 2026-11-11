@@ -9,7 +9,7 @@ import { badRequestSchema } from '../../schemas/bad-request.schema.js';
 import { unauthorizedSchema } from '../../schemas/unauthorized.schema.js';
 import { tooManyRequestsSchema } from '../../schemas/too-many-requests.schema.js';
 import { internalServerErrorSchema } from '../../schemas/internal-server-error.schema.js';
-import { TransactionMapper } from '../../mappers/transaction.mapper.js';
+import { TransactionPresenter } from '../../presenters/transaction.presenter.js';
 
 type Options = {
     getUserTransactionsUseCase: GetUserTransactionsUseCase;
@@ -51,7 +51,7 @@ export const getUserTransactionsRoute: FastifyPluginAsync<Options> = async (
 
             const transactions = await getUserTransactionsUseCase.execute(request.session.userId, from, to);
 
-            return reply.status(200).send(transactions.map(TransactionMapper.toSchema));
+            return reply.status(200).send(transactions.map(TransactionPresenter.toSchema));
         },
     });
 };

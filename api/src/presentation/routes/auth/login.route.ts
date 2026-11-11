@@ -8,7 +8,7 @@ import { badRequestSchema } from '../../schemas/bad-request.schema.js';
 import { payloadTooLargeSchema } from '../../schemas/payload-too-large.schema.js';
 import { tooManyRequestsSchema } from '../../schemas/too-many-requests.schema.js';
 import { internalServerErrorSchema } from '../../schemas/internal-server-error.schema.js';
-import { UserMapper } from '../../mappers/user.mapper.js';
+import { UserPresenter } from '../../presenters/user.presenter.js';
 
 type Options = {
     loginUseCase: LoginUseCase;
@@ -49,7 +49,7 @@ export const loginRoute: FastifyPluginAsync<Options> = async (app, { loginUseCas
             request.log = request.log.child({ sessionId: session.id, userId: session.user.id });
             request.log.info('User logged in');
             reply.setSessionCookie(session);
-            return reply.status(200).send(UserMapper.toSchema(session.user));
+            return reply.status(200).send(UserPresenter.toSchema(session.user));
         },
     });
 };

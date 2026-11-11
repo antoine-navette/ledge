@@ -21,7 +21,7 @@ export const logoutRoute: FastifyPluginAsync<Options> = async (app, { authentica
         schema: {
             tags: ['Auth'],
             response: {
-                204: { description: 'User logged out successfully' },
+                204: {},
                 400: badRequestSchema,
                 401: unauthorizedSchema,
                 413: payloadTooLargeSchema,

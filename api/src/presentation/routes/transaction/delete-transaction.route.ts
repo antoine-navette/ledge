@@ -31,7 +31,7 @@ export const deleteTransactionRoute: FastifyPluginAsync<Options> = async (
                 id: z.string(),
             }),
             response: {
-                204: { description: 'Transaction deleted successfully' },
+                204: {},
                 400: badRequestSchema,
                 401: unauthorizedSchema,
                 403: forbiddenSchema,

@@ -13,7 +13,7 @@ import { transactionNotFoundSchema } from '../../schemas/transaction-not-found.s
 import { payloadTooLargeSchema } from '../../schemas/payload-too-large.schema.js';
 import { tooManyRequestsSchema } from '../../schemas/too-many-requests.schema.js';
 import { internalServerErrorSchema } from '../../schemas/internal-server-error.schema.js';
-import { TransactionMapper } from '../../mappers/transaction.mapper.js';
+import { TransactionPresenter } from '../../presenters/transaction.presenter.js';
 import { unprocessableContentSchema } from '../../schemas/unprocessable-content.schema.js';
 
 type Options = {
@@ -92,7 +92,7 @@ export const updateTransactionRoute: FastifyPluginAsync<Options> = async (
             }
 
             request.log.info({ transactionId: transaction.id }, 'Transaction updated');
-            return reply.status(200).send(TransactionMapper.toSchema(transaction));
+            return reply.status(200).send(TransactionPresenter.toSchema(transaction));
         },
     });
 };

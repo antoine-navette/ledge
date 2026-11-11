@@ -23,7 +23,7 @@ export const verifyEmailRoute: FastifyPluginAsync<Options> = async (app, { verif
                 token: z.string(),
             }),
             response: {
-                204: { description: 'Email verified successfully' },
+                204: {},
                 400: badRequestSchema,
                 404: emailVerificationNotFoundSchema,
                 410: tokenExpiredSchema,

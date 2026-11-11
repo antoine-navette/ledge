@@ -205,7 +205,7 @@ export interface paths {
             };
             requestBody?: never;
             responses: {
-                /** @description User logged out successfully */
+                /** @description Default Response */
                 204: {
                     headers: {
                         [name: string]: unknown;
@@ -345,8 +345,8 @@ export interface paths {
             };
             requestBody?: never;
             responses: {
-                /** @description Verification email sent successfully */
-                201: {
+                /** @description Default Response */
+                204: {
                     headers: {
                         [name: string]: unknown;
                     };
@@ -434,7 +434,7 @@ export interface paths {
             };
             requestBody?: never;
             responses: {
-                /** @description Email verified successfully */
+                /** @description Default Response */
                 204: {
                     headers: {
                         [name: string]: unknown;
@@ -863,7 +863,7 @@ export interface paths {
             };
             requestBody?: never;
             responses: {
-                /** @description Transaction deleted successfully */
+                /** @description Default Response */
                 204: {
                     headers: {
                         [name: string]: unknown;
@@ -948,7 +948,9 @@ export interface components {
             id: string;
             email: string;
             isEmailVerified: boolean;
+            /** Format: date-time */
             createdAt: string;
+            /** Format: date-time */
             updatedAt: string;
         };
         BadRequest: {
@@ -1007,8 +1009,11 @@ export interface components {
             /** @enum {string} */
             type: "income" | "expense";
             category: ("need" | "want" | "investment") | null;
+            /** Format: date */
             date: string;
+            /** Format: date-time */
             createdAt: string;
+            /** Format: date-time */
             updatedAt: string;
         };
         Forbidden: {

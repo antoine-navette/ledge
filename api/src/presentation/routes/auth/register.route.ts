@@ -9,7 +9,7 @@ import { payloadTooLargeSchema } from '../../schemas/payload-too-large.schema.js
 import { tooManyRequestsSchema } from '../../schemas/too-many-requests.schema.js';
 import { internalServerErrorSchema } from '../../schemas/internal-server-error.schema.js';
 import { unprocessableContentSchema } from '../../schemas/unprocessable-content.schema.js';
-import { UserMapper } from '../../mappers/user.mapper.js';
+import { UserPresenter } from '../../presenters/user.presenter.js';
 
 type Options = {
     registerUseCase: RegisterUseCase;
@@ -55,7 +55,7 @@ export const registerRoute: FastifyPluginAsync<Options> = async (app, { register
             request.log = request.log.child({ sessionId: session.id, userId: session.user.id });
             request.log.info('User registered');
             reply.setSessionCookie(session);
-            return reply.status(201).send(UserMapper.toSchema(session.user));
+            return reply.status(201).send(UserPresenter.toSchema(session.user));
         },
     });
 };

@@ -10,7 +10,7 @@ import { unauthorizedSchema } from '../../schemas/unauthorized.schema.js';
 import { payloadTooLargeSchema } from '../../schemas/payload-too-large.schema.js';
 import { tooManyRequestsSchema } from '../../schemas/too-many-requests.schema.js';
 import { internalServerErrorSchema } from '../../schemas/internal-server-error.schema.js';
-import { TransactionMapper } from '../../mappers/transaction.mapper.js';
+import { TransactionPresenter } from '../../presenters/transaction.presenter.js';
 import { unprocessableContentSchema } from '../../schemas/unprocessable-content.schema.js';
 
 type Options = {
@@ -75,7 +75,7 @@ export const createTransactionRoute: FastifyPluginAsync<Options> = async (
             }
 
             request.log.info({ transactionId: transaction.id }, 'Transaction created');
-            return reply.status(201).send(TransactionMapper.toSchema(transaction));
+            return reply.status(201).send(TransactionPresenter.toSchema(transaction));
         },
     });
 };
