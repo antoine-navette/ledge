@@ -11,7 +11,7 @@ export const EmailVerificationService = {
 
     deleteByToken: async (token: string) => {
         try {
-            return await api.client.DELETE('/email-verifications/{token}', { params: { path: { token } } });
+            return await api.client.POST('/email-verifications/{token}/verify', { params: { path: { token } } });
         } catch {
             return { data: undefined, error: { code: 'NETWORK_ERROR' as const } };
         }

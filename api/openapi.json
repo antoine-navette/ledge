@@ -661,8 +661,8 @@
                 }
             }
         },
-        "/email-verifications/{token}": {
-            "delete": {
+        "/email-verifications/{token}/verify": {
+            "post": {
                 "tags": [
                     "EmailVerification"
                 ],

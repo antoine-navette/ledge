@@ -17,7 +17,7 @@ type Options = {
     authenticateUseCase: AuthenticateUseCase;
 };
 
-export const createEmailVerificationRoute: FastifyPluginAsync<Options> = async (
+export const requestEmailVerificationRoute: FastifyPluginAsync<Options> = async (
     app,
     { requestEmailVerificationUseCase, authenticateUseCase },
 ) => {

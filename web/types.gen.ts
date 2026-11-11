@@ -414,7 +414,7 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
-    "/email-verifications/{token}": {
+    "/email-verifications/{token}/verify": {
         parameters: {
             query?: never;
             header?: never;
@@ -423,8 +423,7 @@ export interface paths {
         };
         get?: never;
         put?: never;
-        post?: never;
-        delete: {
+        post: {
             parameters: {
                 query?: never;
                 header?: never;
@@ -498,6 +497,7 @@ export interface paths {
                 };
             };
         };
+        delete?: never;
         options?: never;
         head?: never;
         patch?: never;

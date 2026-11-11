@@ -6,7 +6,6 @@ termine.
 
 ## API
 
-- **Routes nommées d'après les use cases** plutôt qu'en CRUD. Le front s'aligne ensuite dessus (voir Web).
 - **Inscription atomique** : c'est le repository qui signale que l'email existe déjà (index unique), au lieu d'une
   vérification préalable dans le use case. Un seul appel en base au lieu de deux.
 - **Prolonger la session au plus une fois par jour** (`EXTENSION_INTERVAL`, comme dans Saffy), au lieu d'une écriture en
