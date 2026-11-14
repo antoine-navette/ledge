@@ -1,6 +1,8 @@
 import type { createApp } from './app.js';
-import type { Env } from '../infrastructure/config/env.js';
 
-export const startServer = async (app: ReturnType<typeof createApp>, port: Env['port']): Promise<void> => {
-    await app.listen({ port, host: '0.0.0.0' });
+// Internal port: Docker exposes the API to the web container only, so there is no reason to change it
+const PORT = 3000;
+
+export const startServer = async (app: ReturnType<typeof createApp>): Promise<void> => {
+    await app.listen({ port: PORT, host: '0.0.0.0' });
 };

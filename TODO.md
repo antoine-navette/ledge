@@ -27,9 +27,6 @@ termine.
 
 ## Infra
 
-- **Projet uniquement sous Docker** :
-  - Supprimer `web/.env.example` et passer ses valeurs en dur. Même chose pour certaines valeurs de l'API.
-  - En profiter pour simplifier la config nginx.
 - **`.env` et `.env.example`** : mieux les gérer, moins déléguer à Docker en dev, ajouter `dotenv`. Mettre à jour
   `api/.dockerignore` en conséquence.
 - **Ne plus exposer MongoDB** : binder sur `127.0.0.1`.
@@ -45,6 +42,8 @@ termine.
   - Ajouter `LOG_TARGETS="console,betterstack"`, `LOG_LEVEL="info"`, `CONSOLE_LOG_FORMAT="json"`,
     `BETTERSTACK_LOGS_URL` et `BETTERSTACK_LOGS_TOKEN` (les anciennes valeurs de `BETTERSTACK_URL` et
     `BETTERSTACK_TOKEN`).
+- **Nettoyer les `.env` devenus inutiles sur le serveur** (prod et staging) : supprimer `web/.env`, et retirer `PORT` de
+  `api/.env` (ignoré désormais).
 - **Faire un backup de Mongo avant de merger** : les migrations 013 à 015 tournent au déploiement et ne se rejouent pas
   en arrière.
 

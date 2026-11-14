@@ -1,7 +1,6 @@
 import z from 'zod';
 
 const schema = z.object({
-    port: z.coerce.number(),
     mongoUrl: z.url(),
     smtpUrl: z.url(),
     emailFrom: z.string().min(1),
@@ -27,7 +26,6 @@ export const loadEnv = (): Env => {
     const logTargets = process.env['LOG_TARGETS']?.split(',') ?? [];
 
     return schema.parse({
-        port: process.env['PORT'],
         mongoUrl: process.env['MONGO_URL'],
         smtpUrl: process.env['SMTP_URL'],
         emailFrom: process.env['EMAIL_FROM'],

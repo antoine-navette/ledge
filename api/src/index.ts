@@ -95,7 +95,7 @@ try {
         deleteTransactionUseCase,
     );
 
-    await startServer(app, env.port);
+    await startServer(app);
     pino.logger.info('Server started');
 
     const gracefulShutdown = async (signal: NodeJS.Signals) => {

@@ -3,11 +3,6 @@ services:
     build:
       context: web
       dockerfile: Dockerfile.dev
-    env_file:
-      - path: web/.env.example
-        required: true
-      - path: web/.env
-        required: false
     ports:
       - "${WEB_PORT:-5173}:5173"
     volumes:
