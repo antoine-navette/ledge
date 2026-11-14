@@ -3,8 +3,9 @@ services:
     build:
       context: web
       dockerfile: Dockerfile.dev
+    # Not reachable from the local network: localhost is also the only secure context over plain HTTP
     ports:
-      - "${WEB_PORT:-5173}:5173"
+      - "127.0.0.1:${WEB_PORT:-5173}:5173"
     volumes:
       - ./web:/app
 
@@ -24,25 +25,30 @@ services:
         condition: service_healthy
 
   mongo:
+    # Not reachable from the local network, which would otherwise expose the default credentials
     ports:
-      - "${MONGO_PORT:-27017}:27017"
+      - "127.0.0.1:${MONGO_PORT:-27017}:27017"
     environment:
       MONGO_INITDB_ROOT_USERNAME: ${MONGO_USER:-user}
       MONGO_INITDB_ROOT_PASSWORD: ${MONGO_PASSWORD:-password}
 
   mailpit:
     image: axllent/mailpit:v1.27
+    # Not reachable from the local network, where anyone could read the emails sent in development
     ports:
-      - "${MAILPIT_PORT:-8025}:8025"
+      - "127.0.0.1:${MAILPIT_PORT:-8025}:8025"
     environment:
       MP_DATABASE: /data/mailpit.db
     volumes:
       - mailpit:/data
+    # Same probing as Mongo, so the API starts as soon as Mailpit is ready
     healthcheck:
       test: ["CMD", "/mailpit", "readyz"]
-      interval: 5s
-      timeout: 3s
-      retries: 5
+      start_period: 30s
+      start_interval: 1s
+      interval: 30s
+      timeout: 5s
+      retries: 3
 
 volumes:
   mailpit:

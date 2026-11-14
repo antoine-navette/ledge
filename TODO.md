@@ -29,8 +29,6 @@ termine.
 
 - **`.env` et `.env.example`** : mieux les gérer, moins déléguer à Docker en dev, ajouter `dotenv`. Mettre à jour
   `api/.dockerignore` en conséquence.
-- **Ne plus exposer MongoDB** : binder sur `127.0.0.1`.
-- **Healthchecks** : revoir le système actuel.
 - **`npm audit`** sur l'API et le web, et corriger ce qui peut l'être.
 - **CI/CD** : tout revoir pour que ce soit cohérent, et mettre en place un vrai versionnage des images (plutôt que le
   SHA + `latest`).

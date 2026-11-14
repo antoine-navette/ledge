@@ -10,11 +10,15 @@ services:
       - mongo:/data/db
     tmpfs:
       - /data/configdb
+    # Probed every second while starting, so the API starts as soon as Mongo is ready, then every 30 seconds once it
+    # is (start_interval needs Docker Engine 25+). Failures during start_period don't count toward the retries
     healthcheck:
-      test: mongosh --quiet --eval "db.adminCommand('ping')"
-      interval: 5s
-      timeout: 3s
-      retries: 5
+      test: ["CMD", "mongosh", "--quiet", "--eval", "db.adminCommand('ping')"]
+      start_period: 30s
+      start_interval: 1s
+      interval: 30s
+      timeout: 5s
+      retries: 3
 
 volumes:
   mongo:
