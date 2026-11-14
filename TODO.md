@@ -27,7 +27,10 @@ termine.
 
 ## Infra
 
-- **`npm audit`** sur l'API et le web, et corriger ce qui peut l'être.
+- **Relancer `npm audit fix`** (sans `--force`) sur l'API et le web quand les correctifs des outils de dev seront
+  disponibles : `vitest` et `minimatch` (via `typescript-eslint`). Ne concerne pas l'image de prod (`--omit=dev`).
+- **Passer `mongodb` en v7** : corrige CVE-2026-126837 (connexion `mongodb+srv://`) et CVE-2026-126835 (authentification
+  OIDC), qui ne nous concernent pas aujourd'hui. Montée de version majeure du driver, à faire à part.
 - **CI/CD** : tout revoir pour que ce soit cohérent, et mettre en place un vrai versionnage des images (plutôt que le
   SHA + `latest`).
 

@@ -15,17 +15,15 @@
     "license": "ISC",
     "type": "module",
     "dependencies": {
-        "@tailwindcss/vite": "^4.1.4",
         "lucide-react": "^0.503.0",
         "openapi-fetch": "^0.17.0",
         "react": "^19.0.0",
         "react-dom": "^19.0.0",
-        "react-router-dom": "^7.5.2",
-        "tailwindcss": "^4.1.4",
-        "zod": "^4.3.6"
+        "react-router-dom": "^7.5.2"
     },
     "devDependencies": {
         "@eslint/js": "^9.22.0",
+        "@tailwindcss/vite": "^4.3.5",
         "@types/node": "^22.15.3",
         "@types/react": "^19.0.10",
         "@types/react-dom": "^19.0.4",
@@ -36,6 +34,7 @@
         "globals": "^16.0.0",
         "openapi-typescript": "^7.13.0",
         "prettier": "^3.7.4",
+        "tailwindcss": "^4.3.5",
         "typescript": "~5.7.2",
         "typescript-eslint": "^8.26.1",
         "vite": "^6.3.1"
