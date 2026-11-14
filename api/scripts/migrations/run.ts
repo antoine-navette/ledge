@@ -2,29 +2,29 @@ import { fileURLToPath } from 'node:url';
 import path from 'node:path';
 import { MongoDBStorage, Umzug } from 'umzug';
 import type { Db } from 'mongodb';
-import { createPino } from '../../src/infrastructure/config/pino.js';
+import { initPino } from '../../src/infrastructure/config/pino.js';
 import { connectToMongo } from '../../src/infrastructure/config/mongo.js';
-import { loadEnv, type Env } from '../../src/infrastructure/config/env.js';
+import { loadEnv } from '../../src/infrastructure/config/env.js';
 import 'dotenv/config';
 
 export type Context = { mongo: { db: Db } };
 
-// .env is not verified yet, but we need a logger now
-const pino = createPino({
-    pinoTarget: process.env['PINO_TARGET'],
-    betterStackToken: process.env['BETTERSTACK_TOKEN'],
-    betterStackUrl: process.env['BETTERSTACK_URL'],
-} as Env);
+// No logger yet: the logs config itself may be what's wrong. A config error is deterministic and also makes the
+// migrations fail during deployment, so it doesn't need to reach Better Stack, unlike a startup failure below (e.g.
+// Mongo unreachable)
+const env = await Promise.try(loadEnv).catch((err: unknown) => {
+    console.error('Failed to load the environment', err);
+    process.exit(1);
+});
+
+const pino = initPino(env.logs);
 
 // Wrapped in an async function (not awaited at the top level) so the pino transport's
 // unref'd worker thread can't make Node think the module has nothing left to settle and
 // force-exit with "Detected unsettled top-level await" (exit code 13) before flush() resolves.
 const run = async () => {
     try {
-        const { mongoUrl } = loadEnv();
-        pino.logger.info('Environment loaded');
-
-        const mongo = await connectToMongo(mongoUrl);
+        const mongo = await connectToMongo(env.mongoUrl);
         pino.logger.info('Mongo connected');
 
         const __filename = fileURLToPath(import.meta.url);

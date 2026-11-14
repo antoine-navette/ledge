@@ -1,5 +1,5 @@
-import { loadEnv, type Env } from './infrastructure/config/env.js';
-import { createPino } from './infrastructure/config/pino.js';
+import { loadEnv } from './infrastructure/config/env.js';
+import { initPino } from './infrastructure/config/pino.js';
 import { connectToMongo } from './infrastructure/config/mongo.js';
 import { connectToSmtp } from './infrastructure/config/nodemailer.js';
 import { createApp } from './presentation/app.js';
@@ -24,21 +24,21 @@ import { UpdateTransactionUseCase } from './application/transaction/update-trans
 import { DeleteTransactionUseCase } from './application/transaction/delete-transaction.use-case.js';
 import 'dotenv/config';
 
-// .env is not verified yet, but we need a logger now
-const pino = createPino({
-    pinoTarget: process.env['PINO_TARGET'],
-    betterStackToken: process.env['BETTERSTACK_TOKEN'],
-    betterStackUrl: process.env['BETTERSTACK_URL'],
-} as Env);
+// No logger yet: the logs config itself may be what's wrong. A config error is deterministic and also makes the
+// migrations fail during deployment, so it doesn't need to reach Better Stack, unlike a startup failure below (e.g.
+// Mongo unreachable)
+const env = await Promise.try(loadEnv).catch((err: unknown) => {
+    console.error('Failed to load the environment', err);
+    process.exit(1);
+});
+
+const pino = initPino(env.logs);
 
 try {
-    const { mongoUrl, smtpUrl, port, emailFrom, webUrl } = loadEnv();
-    pino.logger.info('Environment loaded');
-
-    const mongo = await connectToMongo(mongoUrl);
+    const mongo = await connectToMongo(env.mongoUrl);
     pino.logger.info('Mongo connected');
 
-    const smtp = await connectToSmtp(smtpUrl);
+    const smtp = await connectToSmtp(env.smtpUrl);
     pino.logger.info('SMTP connected');
 
     const userRepository = new MongoUserRepository(mongo.db.collection('users'));
@@ -70,8 +70,8 @@ try {
         userRepository,
         emailSender,
         tokenGenerator,
-        emailFrom,
-        webUrl,
+        env.emailFrom,
+        env.webUrl,
     );
     const verifyEmailUseCase = new VerifyEmailUseCase(userRepository);
     const createTransactionUseCase = new CreateTransactionUseCase(transactionRepository, idGenerator);
@@ -95,7 +95,7 @@ try {
         deleteTransactionUseCase,
     );
 
-    await startServer(app, port);
+    await startServer(app, env.port);
     pino.logger.info('Server started');
 
     const gracefulShutdown = async (signal: NodeJS.Signals) => {
