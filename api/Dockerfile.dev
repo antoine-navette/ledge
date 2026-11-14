@@ -4,4 +4,4 @@ WORKDIR /app
 
 USER node
 EXPOSE 3000
-CMD ["sh", "-c", "npm install && npm run migrations:run:dev && exec node_modules/.bin/tsx watch src/index.ts"]
+CMD ["sh", "-c", "npm install && npm run migrations:run:dev && exec node_modules/.bin/tsx watch --env-file-if-exists=.env.example --env-file-if-exists=.env src/index.ts"]

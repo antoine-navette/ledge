@@ -22,7 +22,6 @@ import { GetUserTransactionsUseCase } from './application/transaction/get-user-t
 import { GetTransactionUseCase } from './application/transaction/get-transaction.use-case.js';
 import { UpdateTransactionUseCase } from './application/transaction/update-transaction.use-case.js';
 import { DeleteTransactionUseCase } from './application/transaction/delete-transaction.use-case.js';
-import 'dotenv/config';
 
 // No logger yet: the logs config itself may be what's wrong. A config error is deterministic and also makes the
 // migrations fail during deployment, so it doesn't need to reach Better Stack, unlike a startup failure below (e.g.

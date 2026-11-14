@@ -5,7 +5,6 @@ import type { Db } from 'mongodb';
 import { initPino } from '../../src/infrastructure/config/pino.js';
 import { connectToMongo } from '../../src/infrastructure/config/mongo.js';
 import { loadEnv } from '../../src/infrastructure/config/env.js';
-import 'dotenv/config';
 
 export type Context = { mongo: { db: Db } };
 

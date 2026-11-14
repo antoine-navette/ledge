@@ -13,11 +13,7 @@ services:
     build:
       context: api
       dockerfile: Dockerfile.dev
-    env_file:
-      - path: api/.env.example
-        required: true
-      - path: api/.env
-        required: false
+    # No env_file: the dev scripts read .env.example then .env themselves, through the bind mount
     volumes:
       - ./api:/app
     depends_on:
