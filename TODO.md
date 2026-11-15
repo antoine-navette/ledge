@@ -30,25 +30,11 @@ de référence pour les conventions. Une entrée terminée est retirée dans le 
   disponibles : `vitest` et `minimatch` (via `typescript-eslint`). Ne concerne pas l'image de prod (`--omit=dev`).
 - **Passer `mongodb` en v7** : corrige CVE-2026-126837 (connexion `mongodb+srv://`) et CVE-2026-126835 (authentification
   OIDC), qui ne nous concernent pas aujourd'hui. Montée de version majeure du driver, à faire à part.
-- **Refonte CI/CD**, GitHub Flow et « construire une fois, déployer partout » :
-  - **`main` protégée** : PR obligatoire, checks de la CI obligatoires, branche à jour avec `main` avant le merge, sans
-    exception (pas de push direct).
-  - **`ci.yaml`** : uniquement les vérifications des PR, sur les runners GitHub. Plus aucun déploiement depuis une PR,
-    donc le runner auto-hébergé n'exécute plus jamais de code de PR. Réutilisable (`workflow_call`) par le build.
-  - **`build.yaml`** : relance les vérifications, puis construit l'image ARM64 nativement sur le runner GitHub
-    `ubuntu-24.04-arm` (plus de QEMU) et la pousse sur GHCR avec un tag immuable `sha-<commit>`. Automatique à chaque
-    merge sur `main`. Lançable à la main sur une branche pour la tester en staging avant de la merger (facultatif).
-    Cache Docker de GitHub Actions (`--cache-from type=gha --cache-to type=gha,mode=max`), pour ne pas réinstaller les
-    dépendances quand les lockfiles n'ont pas changé.
-  - **`deploy.yaml`** : déploie une image existante (environnement + tag), sans rien construire. Après un build de
-    `main` : staging automatiquement, puis prod via un Environment GitHub avec approbation manuelle, avec la même image.
-    La prod refuse une image dont le commit n'est pas dans `main` (`git merge-base --is-ancestor`). Rollback =
-    redéployer un ancien tag.
-  - **Nettoyer les images** : `docker image prune -af --filter "label=app=ledge"` sur le serveur (avec un `LABEL` dans
-    les Dockerfiles), et une politique de rétention sur GHCR.
-  - **Backup de Mongo automatique avant les migrations**, comme dans Saffy : seul moyen de revenir en arrière après une
-    migration.
-  - Plus tard : des tests d'intégration avec un Mongo jetable (`services: mongo`) dans `ci.yaml`, et des tests E2E
+- **CI/CD** :
+  - **Backup de Mongo automatique avant les migrations** dans `deploy.yaml`, comme dans Saffy : seul moyen de revenir en
+    arrière après une migration.
+  - **Politique de rétention sur GHCR** : chaque build y pousse deux images, jamais supprimées.
+  - Plus tard : des tests d'intégration avec un Mongo jetable (`services: mongo`) dans `checks.yaml`, et des tests E2E
     après le build, contre les images lancées dans le runner, avant tout déploiement.
   - À terme : déployer depuis un runner GitHub par SSH à travers un tunnel (Cloudflare Access ou Tailscale, sans port
     ouvert), pour ne plus avoir de runner auto-hébergé sur le serveur, risqué pour un repo public.

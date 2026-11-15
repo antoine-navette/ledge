@@ -1,0 +1,66 @@
+name: Checks
+
+on:
+  pull_request:
+    branches: [main]
+  # Also run by the build, so that no image is built from code that doesn't pass these checks
+  workflow_call:
+
+permissions:
+  contents: read
+
+# A new push to a pull request cancels its previous run, which is outdated anyway. Never on main, where every merge must
+# be checked before its build
+concurrency:
+  group: checks-${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: ${{ github.event_name == 'pull_request' }}
+
+jobs:
+  web:
+    name: Web checks (format, lint, types, generated types)
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: web
+    steps:
+      - uses: actions/checkout@v7
+      - uses: actions/setup-node@v7
+        with:
+          # Same major version as the Docker images
+          node-version: 24
+          # Keeps npm's download cache between runs, keyed on the lockfile
+          cache: npm
+          cache-dependency-path: web/package-lock.json
+      - run: npm ci
+      - run: npm run format:check
+      - run: npm run lint
+      # Build mode, since the web config only references the app and Vite configs
+      - run: npx tsc -b
+      # The types must match the committed spec, which the API job checks against the code
+      - run: npm run api:generate
+      - run: git diff --exit-code types.gen.ts
+
+  api:
+    name: API checks (format, lint, types, unit tests, OpenAPI spec)
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: api
+    steps:
+      - uses: actions/checkout@v7
+      - uses: actions/setup-node@v7
+        with:
+          # Same major version as the Docker images
+          node-version: 24
+          # Keeps npm's download cache between runs, keyed on the lockfile
+          cache: npm
+          cache-dependency-path: api/package-lock.json
+      - run: npm ci
+      - run: npm run format:check
+      - run: npm run lint
+      # --noEmit: the config has an outDir, a plain tsc would build into dist
+      - run: npx tsc --noEmit
+      - run: npm run test:unit
+      # The committed spec must match the routes: run docs:generate after changing one
+      - run: npm run docs:generate
+      - run: git diff --exit-code openapi.json
