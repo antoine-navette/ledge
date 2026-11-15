@@ -1,6 +1,6 @@
 import { FormEvent, useState } from 'react';
 import { Link } from 'react-router-dom';
-import { AuthService } from '../services/AuthService';
+import { login } from '../services/auth.ts';
 import { useAuth } from '../hooks/useAuth.ts';
 
 const Login = () => {
@@ -17,13 +17,13 @@ const Login = () => {
 
         setState({ status: 'loading' });
 
-        const { data, error } = await AuthService.login(form.email, form.password);
-        if (error) {
-            setState({ status: 'error', message: error.code });
+        const [user, code] = await login(form.email, form.password);
+        if (code) {
+            setState({ status: 'error', message: code });
             return;
         }
 
-        auth.setUser(data); // RequireGuest will redirect us to home
+        auth.setUser(user); // RequireGuest will redirect us to home
     };
 
     return (

@@ -17,14 +17,30 @@ export class MongoTransactionRepository implements TransactionRepository {
     };
 
     find = async (criteria: TransactionCriteria): Promise<Transaction[]> => {
+        // A plain truthy check isn't enough here: "" is falsy but !== undefined, and would
+        // otherwise silently be treated as "no userId filter", matching every user's
+        // transactions instead of failing. Checking !== undefined first, then validating the
+        // format, is what lets an explicitly-provided but malformed id be rejected below.
+        if (criteria.userId !== undefined && !ObjectId.isValid(criteria.userId)) return [];
+
         const documents = await this.transactionCollection
             .find({
+                // Truthy check is safe here only because of the guard above: by this point
+                // criteria.userId can only be undefined or a valid ObjectId hex string, which
+                // is always truthy, so there's no falsy-but-defined value left to mishandle.
                 ...(criteria.userId ? { userId: new ObjectId(criteria.userId) } : {}),
+                // from/to are both inclusive: from is the first day, to is the last day.
+                // Comparing to with $lte (rather than $lt on the next day) only works
+                // because every stored date is exactly UTC midnight, guaranteed by
+                // Transaction's own create()/update() validation. If a document ever ends
+                // up with a non-midnight date, it wouldn't be caught here — but it means
+                // invalid data already got written, which is the actual bug to fix, not
+                // something this query should defend against.
                 ...(criteria.from || criteria.to
                     ? {
                           date: {
                               ...(criteria.from ? { $gte: criteria.from } : {}),
-                              ...(criteria.to ? { $lt: criteria.to } : {}),
+                              ...(criteria.to ? { $lte: criteria.to } : {}),
                           },
                       }
                     : {}),
@@ -35,6 +51,8 @@ export class MongoTransactionRepository implements TransactionRepository {
     };
 
     findById = async (id: Transaction['id']): Promise<Transaction | null> => {
+        if (!ObjectId.isValid(id)) return null;
+
         const document = await this.transactionCollection.findOne({ _id: new ObjectId(id) });
 
         return document ? MongoTransactionMapper.toEntity(document) : null;
@@ -43,15 +61,7 @@ export class MongoTransactionRepository implements TransactionRepository {
     save = async (transaction: Transaction): Promise<void> => {
         const { _id, ...rest } = MongoTransactionMapper.toDocument(transaction);
 
-        await this.transactionCollection.updateOne(
-            { _id },
-            {
-                $set: rest,
-                $unset: {
-                    ...(!('category' in rest) && { category: 1 }),
-                },
-            },
-        );
+        await this.transactionCollection.updateOne({ _id }, { $set: rest });
     };
 
     delete = async (transaction: Transaction): Promise<void> => {

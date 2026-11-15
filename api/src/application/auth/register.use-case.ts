@@ -3,13 +3,10 @@ import type { SessionRepository } from '../../domain/repositories/session.reposi
 import type { PasswordHasher } from '../../domain/ports/password-hasher.js';
 import type { IdGenerator } from '../../domain/ports/id-generator.js';
 import type { TokenGenerator } from '../../domain/ports/token-generator.js';
-import type { User } from '../../domain/entities/user.js';
-import type { Session } from '../../domain/entities/session.js';
+import { User, type UserId } from '../../domain/entities/user.js';
+import { Session, type SessionId } from '../../domain/entities/session.js';
 
 export class RegisterUseCase {
-    private readonly SESSION_DURATION = 30 * 24 * 60 * 60 * 1000;
-    private readonly SESSION_TOKEN_LENGTH = 64;
-
     constructor(
         private userRepository: UserRepository,
         private sessionRepository: SessionRepository,
@@ -21,29 +18,27 @@ export class RegisterUseCase {
     execute = async (email: string, password: string) => {
         const now = new Date();
 
-        const existing = await this.userRepository.findByEmail(email);
-        if (existing) return { success: false, code: 'DUPLICATE_EMAIL' } as const;
-
-        const user: User = {
-            id: this.idGenerator.generate(),
+        const [user, userCode] = await User.register(
+            this.idGenerator.generate() as UserId,
             email,
-            passwordHash: await this.passwordHasher.hash(password),
-            isEmailVerified: false,
-            createdAt: now,
-            updatedAt: now,
-        };
-        await this.userRepository.create(user);
+            password,
+            this.passwordHasher,
+            now,
+        );
+        if (userCode) return [null, userCode] as const;
+        // Checked by the unique index on insert rather than with a lookup beforehand, which two concurrent
+        // registrations could both pass
+        const createCode = await this.userRepository.create(user);
+        if (createCode) return [null, createCode] as const;
 
-        const session: Session = {
-            id: this.idGenerator.generate(),
-            userId: user.id,
-            token: this.tokenGenerator.generate(this.SESSION_TOKEN_LENGTH),
-            expiresAt: new Date(now.getTime() + this.SESSION_DURATION),
-            createdAt: now,
-            updatedAt: now,
-        };
+        const session = Session.create(
+            this.idGenerator.generate() as SessionId,
+            user.id,
+            this.tokenGenerator.generate(Session.TOKEN_LENGTH),
+            now,
+        );
         await this.sessionRepository.create(session);
 
-        return { success: true, data: { ...session, user } } as const;
+        return [Object.assign(session, { user }), null] as const;
     };
 }

@@ -15,7 +15,6 @@ import type { AuthenticateUseCase } from '../application/auth/authenticate.use-c
 import type { LogoutUseCase } from '../application/auth/logout.use-case.js';
 import type { LoginUseCase } from '../application/auth/login.use-case.js';
 import type { RegisterUseCase } from '../application/auth/register.use-case.js';
-import type { GetCurrentUserUseCase } from '../application/user/get-current-user.use-case.js';
 import type { RequestEmailVerificationUseCase } from '../application/email-verification/request-email-verification.use-case.js';
 import type { VerifyEmailUseCase } from '../application/email-verification/verify-email.use-case.js';
 import type { CreateTransactionUseCase } from '../application/transaction/create-transaction.use-case.js';
@@ -23,22 +22,36 @@ import type { GetUserTransactionsUseCase } from '../application/transaction/get-
 import type { GetTransactionUseCase } from '../application/transaction/get-transaction.use-case.js';
 import type { UpdateTransactionUseCase } from '../application/transaction/update-transaction.use-case.js';
 import type { DeleteTransactionUseCase } from '../application/transaction/delete-transaction.use-case.js';
+import type { Session } from '../domain/entities/session.js';
+import type { User } from '../domain/entities/user.js';
+import { SESSION_COOKIE_NAME } from './constants/session-cookie.js';
 import { registerRoute } from './routes/auth/register.route.js';
 import { loginRoute } from './routes/auth/login.route.js';
 import { logoutRoute } from './routes/auth/logout.route.js';
 import { meRoute } from './routes/user/me.route.js';
-import { createEmailVerificationRoute } from './routes/email-verification/create.route.js';
-import { deleteEmailVerificationByTokenRoute } from './routes/email-verification/delete-by-token.route.js';
-import { createTransactionRoute } from './routes/transaction/create.route.js';
-import { readTransactionsRoute } from './routes/transaction/read.route.js';
-import { readTransactionByIdRoute } from './routes/transaction/read-by-id.route.js';
-import { updateTransactionByIdRoute } from './routes/transaction/update-by-id.route.js';
-import { deleteTransactionByIdRoute } from './routes/transaction/delete-by-id.route.js';
+import { requestEmailVerificationRoute } from './routes/email-verification/request-email-verification.route.js';
+import { verifyEmailRoute } from './routes/email-verification/verify-email.route.js';
+import { createTransactionRoute } from './routes/transaction/create-transaction.route.js';
+import { getUserTransactionsRoute } from './routes/transaction/get-user-transactions.route.js';
+import { getTransactionRoute } from './routes/transaction/get-transaction.route.js';
+import { updateTransactionRoute } from './routes/transaction/update-transaction.route.js';
+import { deleteTransactionRoute } from './routes/transaction/delete-transaction.route.js';
 import type { RouteNotFoundSchema } from './schemas/route-not-found.schema.js';
 import type { BadRequestSchema } from './schemas/bad-request.schema.js';
 import type { PayloadTooLargeSchema } from './schemas/payload-too-large.schema.js';
 import type { TooManyRequestsSchema } from './schemas/too-many-requests.schema.js';
 import type { InternalServerErrorSchema } from './schemas/internal-server-error.schema.js';
+
+declare module 'fastify' {
+    interface FastifyRequest {
+        session: Session & { user: User };
+    }
+
+    interface FastifyReply {
+        setSessionCookie(session: Session): void;
+        clearSessionCookie(): void;
+    }
+}
 
 export const createApp = (
     logger: Logger,
@@ -46,7 +59,6 @@ export const createApp = (
     logoutUseCase: LogoutUseCase,
     loginUseCase: LoginUseCase,
     registerUseCase: RegisterUseCase,
-    getCurrentUserUseCase: GetCurrentUserUseCase,
     requestEmailVerificationUseCase: RequestEmailVerificationUseCase,
     verifyEmailUseCase: VerifyEmailUseCase,
     createTransactionUseCase: CreateTransactionUseCase,
@@ -93,6 +105,21 @@ export const createApp = (
     // Parsing
     app.register(fastifyCookie);
 
+    // Session cookie
+    app.decorateReply('setSessionCookie', function (session: Session) {
+        this.setCookie(SESSION_COOKIE_NAME, session.token, {
+            path: '/',
+            httpOnly: true,
+            // Also works in development: browsers treat http://localhost as a secure context
+            secure: true,
+            sameSite: 'strict',
+            expires: session.expiresAt,
+        });
+    });
+    app.decorateReply('clearSessionCookie', function () {
+        this.clearCookie(SESSION_COOKIE_NAME, { path: '/' });
+    });
+
     // OpenAPI (validation, serialization — needed in every env)
     app.setValidatorCompiler(validatorCompiler);
     app.setSerializerCompiler(serializerCompiler);
@@ -115,14 +142,14 @@ export const createApp = (
     app.register(registerRoute, { registerUseCase });
     app.register(loginRoute, { loginUseCase });
     app.register(logoutRoute, { authenticateUseCase, logoutUseCase });
-    app.register(meRoute, { getCurrentUserUseCase, authenticateUseCase });
-    app.register(createEmailVerificationRoute, { requestEmailVerificationUseCase, authenticateUseCase });
-    app.register(deleteEmailVerificationByTokenRoute, { verifyEmailUseCase });
+    app.register(meRoute, { authenticateUseCase });
+    app.register(requestEmailVerificationRoute, { requestEmailVerificationUseCase, authenticateUseCase });
+    app.register(verifyEmailRoute, { verifyEmailUseCase });
     app.register(createTransactionRoute, { createTransactionUseCase, authenticateUseCase });
-    app.register(readTransactionsRoute, { getUserTransactionsUseCase, authenticateUseCase });
-    app.register(readTransactionByIdRoute, { getTransactionUseCase, authenticateUseCase });
-    app.register(updateTransactionByIdRoute, { updateTransactionUseCase, authenticateUseCase });
-    app.register(deleteTransactionByIdRoute, { deleteTransactionUseCase, authenticateUseCase });
+    app.register(getUserTransactionsRoute, { getUserTransactionsUseCase, authenticateUseCase });
+    app.register(getTransactionRoute, { getTransactionUseCase, authenticateUseCase });
+    app.register(updateTransactionRoute, { updateTransactionUseCase, authenticateUseCase });
+    app.register(deleteTransactionRoute, { deleteTransactionUseCase, authenticateUseCase });
 
     // Not found
     app.setNotFoundHandler(async (request, reply) => {

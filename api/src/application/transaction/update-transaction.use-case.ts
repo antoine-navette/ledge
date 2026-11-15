@@ -1,35 +1,30 @@
+import type { UserId } from '../../domain/entities/user.js';
+import type { TransactionId } from '../../domain/entities/transaction.js';
 import type { TransactionRepository } from '../../domain/repositories/transaction.repository.js';
-import type { Transaction } from '../../domain/entities/transaction.js';
 
 export class UpdateTransactionUseCase {
     constructor(private transactionRepository: TransactionRepository) {}
 
     execute = async (
-        id: string,
-        userId: string,
+        id: TransactionId,
+        userId: UserId,
         name: string,
         value: number,
         type: 'income' | 'expense',
-        category: 'need' | 'want' | 'investment' | undefined,
+        category: 'need' | 'want' | 'investment' | null,
         date: Date,
     ) => {
-        const transaction = await this.transactionRepository.findById(id);
-        if (!transaction) return { success: false, code: 'TRANSACTION_NOT_FOUND' } as const;
-        if (transaction.userId !== userId) return { success: false, code: 'TRANSACTION_NOT_OWNED' } as const;
+        const now = new Date();
 
-        const updated: Transaction = {
-            id: transaction.id,
-            userId: transaction.userId,
-            name,
-            value,
-            type,
-            ...(type === 'expense' && category ? { category } : {}),
-            date,
-            createdAt: transaction.createdAt,
-            updatedAt: new Date(),
-        };
+        const transaction = await this.transactionRepository.findById(id);
+        if (!transaction) return [null, 'TRANSACTION_NOT_FOUND'] as const;
+        if (transaction.userId !== userId) return [null, 'TRANSACTION_NOT_OWNED'] as const;
+
+        const [updated, code] = transaction.update(name, value, type, category, date, now);
+        if (code) return [null, code] as const;
+
         await this.transactionRepository.save(updated);
 
-        return { success: true, data: updated } as const;
+        return [updated, null] as const;
     };
 }

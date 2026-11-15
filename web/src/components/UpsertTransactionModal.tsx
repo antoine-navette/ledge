@@ -1,5 +1,5 @@
 import { useState, FormEvent } from 'react';
-import { TransactionService } from '../services/TransactionService';
+import { createTransaction, updateTransaction } from '../services/transaction.ts';
 import type { Transaction } from '../entities/Transaction';
 import Modal from './Modal.tsx';
 
@@ -29,8 +29,8 @@ const UpsertTransactionModal = ({ onClose, transaction, type, year, month, onUps
     const [form, setForm] = useState({
         name: transaction ? transaction.name : '',
         value: transaction ? String(transaction.value) : '',
-        category: transaction ? transaction.category : undefined,
-        date: transaction ? transaction.date.slice(0, 10) : '',
+        category: transaction ? transaction.category : null,
+        date: transaction ? transaction.date.toISOString().slice(0, 10) : '',
     });
 
     const handleSubmit = async (e: FormEvent) => {
@@ -38,22 +38,17 @@ const UpsertTransactionModal = ({ onClose, transaction, type, year, month, onUps
 
         setState({ status: 'loading' });
 
-        const { data, error } = transaction
-            ? await TransactionService.updateById(
-                  transaction.id,
-                  form.name,
-                  Number(form.value),
-                  type,
-                  form.category,
-                  form.date,
-              )
-            : await TransactionService.create(form.name, Number(form.value), type, form.category, form.date);
-        if (error) {
-            setState({ status: 'error', message: error.code });
+        // The date input gives a calendar day ("2026-11-11"), parsed as midnight UTC like transaction dates
+        const date = new Date(form.date);
+        const [upserted, code] = transaction
+            ? await updateTransaction(transaction.id, form.name, Number(form.value), type, form.category, date)
+            : await createTransaction(form.name, Number(form.value), type, form.category, date);
+        if (code) {
+            setState({ status: 'error', message: code });
             return;
         }
 
-        onUpsert(data);
+        onUpsert(upserted);
         onClose();
     };
 
@@ -129,7 +124,7 @@ const UpsertTransactionModal = ({ onClose, transaction, type, year, month, onUps
                                 onClick={() =>
                                     setForm((prev) => ({
                                         ...prev,
-                                        category: prev.category === 'need' ? undefined : ('need' as const),
+                                        category: prev.category === 'need' ? null : ('need' as const),
                                     }))
                                 }
                                 className={`px-3 py-1 rounded-full text-white text-sm cursor-pointer transition select-none bg-blue-500
@@ -144,7 +139,7 @@ const UpsertTransactionModal = ({ onClose, transaction, type, year, month, onUps
                                 onClick={() =>
                                     setForm((prev) => ({
                                         ...prev,
-                                        category: prev.category === 'want' ? undefined : ('want' as const),
+                                        category: prev.category === 'want' ? null : ('want' as const),
                                     }))
                                 }
                                 className={`px-3 py-1 rounded-full text-white text-sm cursor-pointer transition select-none bg-red-500
@@ -159,7 +154,7 @@ const UpsertTransactionModal = ({ onClose, transaction, type, year, month, onUps
                                 onClick={() =>
                                     setForm((prev) => ({
                                         ...prev,
-                                        category: prev.category === 'investment' ? undefined : ('investment' as const),
+                                        category: prev.category === 'investment' ? null : ('investment' as const),
                                     }))
                                 }
                                 className={`px-3 py-1 rounded-full text-white text-sm cursor-pointer transition select-none bg-green-500

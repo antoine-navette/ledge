@@ -8,7 +8,7 @@ import { badRequestSchema } from '../../schemas/bad-request.schema.js';
 import { payloadTooLargeSchema } from '../../schemas/payload-too-large.schema.js';
 import { tooManyRequestsSchema } from '../../schemas/too-many-requests.schema.js';
 import { internalServerErrorSchema } from '../../schemas/internal-server-error.schema.js';
-import { UserMapper } from '../../mappers/user.mapper.js';
+import { UserPresenter } from '../../presenters/user.presenter.js';
 
 type Options = {
     loginUseCase: LoginUseCase;
@@ -21,8 +21,8 @@ export const loginRoute: FastifyPluginAsync<Options> = async (app, { loginUseCas
         schema: {
             tags: ['Auth'],
             body: z.object({
-                email: z.email(),
-                password: z.string().min(1),
+                email: z.string(),
+                password: z.string(),
             }),
             response: {
                 200: userSchema,
@@ -36,27 +36,20 @@ export const loginRoute: FastifyPluginAsync<Options> = async (app, { loginUseCas
         handler: async (request, reply) => {
             const { email, password } = request.body;
 
-            const result = await loginUseCase.execute(email, password);
-            if (!result.success) {
-                switch (result.code) {
-                    case 'USER_NOT_FOUND':
-                    case 'INVALID_PASSWORD':
-                        request.log.warn({ code: result.code }, 'Unauthorized');
-                        return reply.status(401).send({ code: 'INVALID_CREDENTIALS' });
+            const [session, code] = await loginUseCase.execute(email, password);
+            if (code) {
+                if (code === 'USER_NOT_FOUND' || code === 'WRONG_PASSWORD') {
+                    request.log.warn({ code }, 'Unauthorized');
+                    return reply.status(401).send({ code: 'INVALID_CREDENTIALS' });
                 }
+                return code satisfies never;
             }
 
-            const { user, ...session } = result.data;
-
-            reply.setCookie('session_token', session.token, {
-                expires: session.expiresAt,
-                path: '/',
-                httpOnly: true,
-                secure: true,
-                sameSite: 'strict',
-            });
-            request.log.info({ sessionId: session.id, userId: user.id }, 'User logged in');
-            return reply.status(200).send(UserMapper.toSchema(user));
+            // Like isAuthenticated: the access log also gets them
+            request.log = request.log.child({ sessionId: session.id, userId: session.user.id });
+            request.log.info('User logged in');
+            reply.setSessionCookie(session);
+            return reply.status(200).send(UserPresenter.toSchema(session.user));
         },
     });
 };

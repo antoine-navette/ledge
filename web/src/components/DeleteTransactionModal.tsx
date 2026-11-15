@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { TransactionService } from '../services/TransactionService';
+import { deleteTransaction } from '../services/transaction.ts';
 import type { Transaction } from '../entities/Transaction';
 import Modal from './Modal.tsx';
 
@@ -17,9 +17,9 @@ const DeleteTransactionModal = ({ onClose, transaction, onDelete }: Props) => {
     const handleDelete = async () => {
         setState({ status: 'loading' });
 
-        const { error } = await TransactionService.deleteById(transaction.id);
-        if (error) {
-            setState({ status: 'error', message: error.code });
+        const code = await deleteTransaction(transaction.id);
+        if (code) {
+            setState({ status: 'error', message: code });
             return;
         }
 

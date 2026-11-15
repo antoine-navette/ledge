@@ -1,5 +1,5 @@
 import { NavLink } from 'react-router-dom';
-import { AuthService } from '../services/AuthService';
+import { logout } from '../services/auth.ts';
 import { useState } from 'react';
 import { useAuth } from '../hooks/useAuth.ts';
 
@@ -11,7 +11,7 @@ const Navbar = () => {
     const handleLogout = async () => {
         setState({ status: 'loading' });
 
-        await AuthService.logout(); // We don't really care if an error occurred
+        await logout(); // We don't really care if an error occurred
 
         auth.setUser(null); // RequireAuth will redirect us to login
     };

@@ -7,10 +7,10 @@ export const transactionSchema = z
         name: z.string(),
         value: z.number(),
         type: z.enum(['income', 'expense']),
-        category: z.enum(['need', 'want', 'investment']).optional(),
-        date: z.date(),
-        createdAt: z.date(),
-        updatedAt: z.date(),
+        category: z.enum(['need', 'want', 'investment']).nullable(),
+        date: z.iso.date(),
+        createdAt: z.iso.datetime(),
+        updatedAt: z.iso.datetime(),
     })
     .meta({ id: 'Transaction' });
 

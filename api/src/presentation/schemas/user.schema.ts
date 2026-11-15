@@ -5,8 +5,8 @@ export const userSchema = z
         id: z.string(),
         email: z.string(),
         isEmailVerified: z.boolean(),
-        createdAt: z.date(),
-        updatedAt: z.date(),
+        createdAt: z.iso.datetime(),
+        updatedAt: z.iso.datetime(),
     })
     .meta({ id: 'User' });
 

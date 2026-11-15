@@ -1,0 +1,98 @@
+import type { FastifyPluginAsync } from 'fastify';
+import type { FastifyZodOpenApiSchema, FastifyZodOpenApiTypeProvider } from 'fastify-zod-openapi';
+import z from 'zod';
+import type { UpdateTransactionUseCase } from '../../../application/transaction/update-transaction.use-case.js';
+import type { AuthenticateUseCase } from '../../../application/auth/authenticate.use-case.js';
+import type { TransactionId } from '../../../domain/entities/transaction.js';
+import { isAuthenticated } from '../../middlewares/is-authenticated.middleware.js';
+import { transactionSchema } from '../../schemas/transaction.schema.js';
+import { badRequestSchema } from '../../schemas/bad-request.schema.js';
+import { unauthorizedSchema } from '../../schemas/unauthorized.schema.js';
+import { forbiddenSchema } from '../../schemas/forbidden.schema.js';
+import { transactionNotFoundSchema } from '../../schemas/transaction-not-found.schema.js';
+import { payloadTooLargeSchema } from '../../schemas/payload-too-large.schema.js';
+import { tooManyRequestsSchema } from '../../schemas/too-many-requests.schema.js';
+import { internalServerErrorSchema } from '../../schemas/internal-server-error.schema.js';
+import { TransactionPresenter } from '../../presenters/transaction.presenter.js';
+import { unprocessableContentSchema } from '../../schemas/unprocessable-content.schema.js';
+
+type Options = {
+    updateTransactionUseCase: UpdateTransactionUseCase;
+    authenticateUseCase: AuthenticateUseCase;
+};
+
+export const updateTransactionRoute: FastifyPluginAsync<Options> = async (
+    app,
+    { updateTransactionUseCase, authenticateUseCase },
+) => {
+    app.withTypeProvider<FastifyZodOpenApiTypeProvider>().route({
+        method: 'PUT',
+        url: '/transactions/:id',
+        schema: {
+            tags: ['Transaction'],
+            params: z.object({
+                id: z.string(),
+            }),
+            body: z.object({
+                name: z.string(),
+                value: z.number(),
+                type: z.enum(['income', 'expense']),
+                category: z.enum(['need', 'want', 'investment']).nullable(),
+                // Deliberately duplicates part of what Transaction.update() re-validates:
+                // this only rejects a string that isn't shaped like a date at all (400,
+                // a format/type problem), while the entity still fully re-checks format,
+                // midnight and range regardless (422 for a well-formed but business-invalid
+                // date) — it has to stay safe for any caller, not just this route.
+                date: z.iso.date().transform((value) => new Date(value)),
+            }),
+            response: {
+                200: transactionSchema,
+                400: badRequestSchema,
+                401: unauthorizedSchema,
+                403: forbiddenSchema,
+                404: transactionNotFoundSchema,
+                413: payloadTooLargeSchema,
+                422: unprocessableContentSchema,
+                429: tooManyRequestsSchema,
+                500: internalServerErrorSchema,
+            },
+        } satisfies FastifyZodOpenApiSchema,
+        preHandler: isAuthenticated(authenticateUseCase),
+        handler: async (request, reply) => {
+            const { name, value, type, category, date } = request.body;
+
+            const [transaction, code] = await updateTransactionUseCase.execute(
+                request.params.id as TransactionId,
+                request.session.userId,
+                name,
+                value,
+                type,
+                category,
+                date,
+            );
+            if (code) {
+                if (code === 'TRANSACTION_NOT_OWNED') {
+                    request.log.warn({ code }, 'Forbidden');
+                    return reply.status(403).send({ code: 'FORBIDDEN' });
+                }
+                if (code === 'TRANSACTION_NOT_FOUND') {
+                    request.log.warn({ code }, 'Not found');
+                    return reply.status(404).send({ code: 'TRANSACTION_NOT_FOUND' });
+                }
+                if (
+                    code === 'TRANSACTION_NAME_INVALID' ||
+                    code === 'TRANSACTION_VALUE_INVALID' ||
+                    code === 'TRANSACTION_CATEGORY_INVALID' ||
+                    code === 'TRANSACTION_DATE_INVALID'
+                ) {
+                    request.log.warn({ code }, 'Unprocessable content');
+                    return reply.status(422).send({ code: 'UNPROCESSABLE_CONTENT' });
+                }
+                return code satisfies never;
+            }
+
+            request.log.info({ transactionId: transaction.id }, 'Transaction updated');
+            return reply.status(200).send(TransactionPresenter.toSchema(transaction));
+        },
+    });
+};

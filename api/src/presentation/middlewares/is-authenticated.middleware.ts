@@ -1,29 +1,24 @@
 import type { FastifyReply, FastifyRequest } from 'fastify';
 import type { AuthenticateUseCase } from '../../application/auth/authenticate.use-case.js';
-import type { Session } from '../../domain/entities/session.js';
+import { SESSION_COOKIE_NAME } from '../constants/session-cookie.js';
 import type { UnauthorizedSchema } from '../schemas/unauthorized.schema.js';
-
-declare module 'fastify' {
-    interface FastifyRequest {
-        session: Session;
-    }
-}
 
 export const isAuthenticated = (authenticateUseCase: AuthenticateUseCase) => {
     return async (request: FastifyRequest, reply: FastifyReply) => {
-        const sessionToken = request.cookies['session_token'];
+        const sessionToken = request.cookies[SESSION_COOKIE_NAME];
         if (!sessionToken) {
             request.log.warn('Unauthorized');
             return reply.status(401).send({ code: 'UNAUTHORIZED' } satisfies UnauthorizedSchema);
         }
 
-        const result = await authenticateUseCase.execute(sessionToken);
-        if (!result.success) {
-            request.log.warn({ code: result.code }, 'Unauthorized');
+        const [session, code] = await authenticateUseCase.execute(sessionToken);
+        if (code) {
+            request.log.warn({ code }, 'Unauthorized');
             return reply.status(401).send({ code: 'UNAUTHORIZED' } satisfies UnauthorizedSchema);
         }
 
-        request.session = result.data;
-        request.log = request.log.child({ sessionId: result.data.id, userId: result.data.userId });
+        request.session = session;
+        request.log = request.log.child({ sessionId: session.id, userId: session.userId });
+        reply.setSessionCookie(session);
     };
 };

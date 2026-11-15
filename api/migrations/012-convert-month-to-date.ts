@@ -1,4 +1,4 @@
-import type { Context } from '../scripts/migrate.js';
+import type { Context } from '../scripts/migrations/run.js';
 
 export const up = async ({ context: { mongo } }: { context: Context }) => {
     await mongo.db.collection('transactions').updateMany({}, [
@@ -9,7 +9,6 @@ export const up = async ({ context: { mongo } }: { context: Context }) => {
         },
         { $unset: 'month' },
     ]);
-
     await mongo.db.collection('transactions').dropIndex('userId_1');
     await mongo.db.collection('transactions').createIndex({ userId: 1, date: 1 });
 };

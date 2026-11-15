@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { EmailVerificationService } from '../services/EmailVerificationService';
+import { verifyEmail } from '../services/email-verification.ts';
 import { useParams } from 'react-router-dom';
 
 export default function VerifyEmail() {
@@ -13,9 +13,9 @@ export default function VerifyEmail() {
     const handleClick = async () => {
         setState({ status: 'loading' });
 
-        const { error } = await EmailVerificationService.deleteByToken(token);
-        if (error) {
-            setState({ status: 'error', message: error.code });
+        const code = await verifyEmail(token);
+        if (code) {
+            setState({ status: 'error', message: code });
             return;
         }
 

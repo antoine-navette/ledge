@@ -23,9 +23,8 @@ export interface paths {
             requestBody: {
                 content: {
                     "application/json": {
-                        /** Format: email */
                         email: string;
-                        password: string & (unknown & unknown & unknown & unknown);
+                        password: string;
                     };
                 };
             };
@@ -54,7 +53,7 @@ export interface paths {
                         [name: string]: unknown;
                     };
                     content: {
-                        "application/json": components["schemas"]["DuplicateEmail"];
+                        "application/json": components["schemas"]["EmailAlreadyInUse"];
                     };
                 };
                 /** @description Default Response */
@@ -64,6 +63,15 @@ export interface paths {
                     };
                     content: {
                         "application/json": components["schemas"]["PayloadTooLarge"];
+                    };
+                };
+                /** @description Default Response */
+                422: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["UnprocessableContent"];
                     };
                 };
                 /** @description Default Response */
@@ -111,7 +119,6 @@ export interface paths {
             requestBody: {
                 content: {
                     "application/json": {
-                        /** Format: email */
                         email: string;
                         password: string;
                     };
@@ -198,7 +205,7 @@ export interface paths {
             };
             requestBody?: never;
             responses: {
-                /** @description User logged out successfully */
+                /** @description Default Response */
                 204: {
                     headers: {
                         [name: string]: unknown;
@@ -338,8 +345,8 @@ export interface paths {
             };
             requestBody?: never;
             responses: {
-                /** @description Verification email sent successfully */
-                201: {
+                /** @description Default Response */
+                204: {
                     headers: {
                         [name: string]: unknown;
                     };
@@ -407,7 +414,7 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
-    "/email-verifications/{token}": {
+    "/email-verifications/{token}/verify": {
         parameters: {
             query?: never;
             header?: never;
@@ -416,8 +423,7 @@ export interface paths {
         };
         get?: never;
         put?: never;
-        post?: never;
-        delete: {
+        post: {
             parameters: {
                 query?: never;
                 header?: never;
@@ -428,7 +434,7 @@ export interface paths {
             };
             requestBody?: never;
             responses: {
-                /** @description Email verified successfully */
+                /** @description Default Response */
                 204: {
                     headers: {
                         [name: string]: unknown;
@@ -450,16 +456,7 @@ export interface paths {
                         [name: string]: unknown;
                     };
                     content: {
-                        "application/json": components["schemas"]["EmailVerificationNotFound"] | components["schemas"]["UserNotFound"];
-                    };
-                };
-                /** @description Default Response */
-                409: {
-                    headers: {
-                        [name: string]: unknown;
-                    };
-                    content: {
-                        "application/json": components["schemas"]["EmailAlreadyVerified"];
+                        "application/json": components["schemas"]["EmailVerificationNotFound"];
                     };
                 };
                 /** @description Default Response */
@@ -500,6 +497,7 @@ export interface paths {
                 };
             };
         };
+        delete?: never;
         options?: never;
         head?: never;
         patch?: never;
@@ -586,8 +584,7 @@ export interface paths {
                         value: number;
                         /** @enum {string} */
                         type: "income" | "expense";
-                        /** @enum {string} */
-                        category?: "need" | "want" | "investment";
+                        category: ("need" | "want" | "investment") | null;
                         /** Format: date */
                         date: string;
                     };
@@ -628,6 +625,15 @@ export interface paths {
                     };
                     content: {
                         "application/json": components["schemas"]["PayloadTooLarge"];
+                    };
+                };
+                /** @description Default Response */
+                422: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["UnprocessableContent"];
                     };
                 };
                 /** @description Default Response */
@@ -755,8 +761,7 @@ export interface paths {
                         value: number;
                         /** @enum {string} */
                         type: "income" | "expense";
-                        /** @enum {string} */
-                        category?: "need" | "want" | "investment";
+                        category: ("need" | "want" | "investment") | null;
                         /** Format: date */
                         date: string;
                     };
@@ -818,6 +823,15 @@ export interface paths {
                     };
                 };
                 /** @description Default Response */
+                422: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["UnprocessableContent"];
+                    };
+                };
+                /** @description Default Response */
                 429: {
                     headers: {
                         [name: string]: unknown;
@@ -849,7 +863,7 @@ export interface paths {
             };
             requestBody?: never;
             responses: {
-                /** @description Transaction deleted successfully */
+                /** @description Default Response */
                 204: {
                     headers: {
                         [name: string]: unknown;
@@ -934,20 +948,26 @@ export interface components {
             id: string;
             email: string;
             isEmailVerified: boolean;
+            /** Format: date-time */
             createdAt: string;
+            /** Format: date-time */
             updatedAt: string;
         };
         BadRequest: {
             /** @constant */
             code: "BAD_REQUEST";
         };
-        DuplicateEmail: {
+        EmailAlreadyInUse: {
             /** @constant */
-            code: "DUPLICATE_EMAIL";
+            code: "EMAIL_ALREADY_IN_USE";
         };
         PayloadTooLarge: {
             /** @constant */
             code: "PAYLOAD_TOO_LARGE";
+        };
+        UnprocessableContent: {
+            /** @constant */
+            code: "UNPROCESSABLE_CONTENT";
         };
         TooManyRequests: {
             /** @constant */
@@ -977,10 +997,6 @@ export interface components {
             /** @constant */
             code: "EMAIL_VERIFICATION_NOT_FOUND";
         };
-        UserNotFound: {
-            /** @constant */
-            code: "USER_NOT_FOUND";
-        };
         TokenExpired: {
             /** @constant */
             code: "TOKEN_EXPIRED";
@@ -992,10 +1008,12 @@ export interface components {
             value: number;
             /** @enum {string} */
             type: "income" | "expense";
-            /** @enum {string} */
-            category?: "need" | "want" | "investment";
+            category: ("need" | "want" | "investment") | null;
+            /** Format: date */
             date: string;
+            /** Format: date-time */
             createdAt: string;
+            /** Format: date-time */
             updatedAt: string;
         };
         Forbidden: {

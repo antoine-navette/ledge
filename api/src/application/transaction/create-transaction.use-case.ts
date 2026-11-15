@@ -1,5 +1,6 @@
+import type { UserId } from '../../domain/entities/user.js';
 import type { TransactionRepository } from '../../domain/repositories/transaction.repository.js';
-import type { Transaction } from '../../domain/entities/transaction.js';
+import { Transaction, type TransactionId } from '../../domain/entities/transaction.js';
 import type { IdGenerator } from '../../domain/ports/id-generator.js';
 
 export class CreateTransactionUseCase {
@@ -9,28 +10,29 @@ export class CreateTransactionUseCase {
     ) {}
 
     execute = async (
-        userId: string,
+        userId: UserId,
         name: string,
         value: number,
         type: 'income' | 'expense',
-        category: 'need' | 'want' | 'investment' | undefined,
+        category: 'need' | 'want' | 'investment' | null,
         date: Date,
     ) => {
         const now = new Date();
 
-        const transaction: Transaction = {
-            id: this.idGenerator.generate(),
+        const [transaction, code] = Transaction.create(
+            this.idGenerator.generate() as TransactionId,
             userId,
             name,
             value,
             type,
-            ...(type === 'expense' && category ? { category } : {}),
+            category,
             date,
-            createdAt: now,
-            updatedAt: now,
-        };
+            now,
+        );
+        if (code) return [null, code] as const;
+
         await this.transactionRepository.create(transaction);
 
-        return transaction;
+        return [transaction, null] as const;
     };
 }

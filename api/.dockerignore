@@ -1,4 +1,7 @@
 coverage/
 dist/
 node_modules/
+# Only the dev scripts read these files (--env-file-if-exists in package.json): in production the environment comes from
+# env_file alone. Keeping them out of the image also makes sure a dev value can never be picked up by mistake
 .env
+.env.example
