@@ -31,8 +31,24 @@ termine.
   disponibles : `vitest` et `minimatch` (via `typescript-eslint`). Ne concerne pas l'image de prod (`--omit=dev`).
 - **Passer `mongodb` en v7** : corrige CVE-2026-126837 (connexion `mongodb+srv://`) et CVE-2026-126835 (authentification
   OIDC), qui ne nous concernent pas aujourd'hui. Montée de version majeure du driver, à faire à part.
-- **CI/CD** : tout revoir pour que ce soit cohérent, et mettre en place un vrai versionnage des images (plutôt que le
-  SHA + `latest`).
+- **Refonte CI/CD** (prochaine branche), GitHub Flow et « construire une fois, déployer partout » :
+  - **`main` protégée** : PR obligatoire, checks de la CI obligatoires, branche à jour avec `main` avant le merge, sans
+    exception (pas de push direct).
+  - **`ci.yaml`** : uniquement les vérifications des PR, sur les runners GitHub. Plus aucun déploiement depuis une PR,
+    donc le runner auto-hébergé n'exécute plus jamais de code de PR. Réutilisable (`workflow_call`) par le build.
+  - **`build.yaml`** : relance les vérifications, puis construit l'image ARM64 nativement sur le runner GitHub
+    `ubuntu-24.04-arm` (plus de QEMU) et la pousse sur GHCR avec un tag immuable `sha-<commit>`. Automatique à chaque
+    merge sur `main`. Lançable à la main sur une branche pour la tester en staging avant de la merger (facultatif).
+  - **`deploy.yaml`** : déploie une image existante (environnement + tag), sans rien construire. Après un build de
+    `main` : staging automatiquement, puis prod via un Environment GitHub avec approbation manuelle, avec la même image.
+    La prod refuse une image dont le commit n'est pas dans `main` (`git merge-base --is-ancestor`). Rollback =
+    redéployer un ancien tag.
+  - **Nettoyer les images** : `docker image prune -af --filter "label=app=ledge"` sur le serveur (avec un `LABEL` dans
+    les Dockerfiles), et une politique de rétention sur GHCR.
+  - **Backup de Mongo automatique avant les migrations**, comme dans Saffy : seul moyen de revenir en arrière après une
+    migration.
+  - Plus tard : des tests d'intégration avec un Mongo jetable (`services: mongo`) dans `ci.yaml`, et des tests E2E
+    après le build, contre les images lancées dans le runner, avant tout déploiement.
 
 ## Déploiement
 
@@ -43,6 +59,9 @@ termine.
     `BETTERSTACK_TOKEN`).
 - **Nettoyer les `.env` devenus inutiles sur le serveur** (prod et staging) : supprimer `web/.env`, et retirer `PORT` de
   `api/.env` (ignoré désormais).
+- **Après le premier déploiement sans `latest`** : supprimer les anciennes images `ledge-api:latest` et `ledge-web:latest`
+  du serveur. Une commande `docker compose` manuelle en prod demande désormais `IMAGE_TAG=<sha>`, le tag affiché par
+  `docker ps`.
 - **Faire un backup de Mongo avant de merger** : les migrations 013 à 015 tournent au déploiement et ne se rejouent pas
   en arrière.
 

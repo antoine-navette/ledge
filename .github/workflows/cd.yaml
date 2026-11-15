@@ -7,30 +7,25 @@ on:
 
 permissions:
   contents: read
-  packages: write
+  # Only pulls the images built for the pull request
+  packages: read
 
 jobs:
   deploy_prod:
     name: Deploy to Production
     if: github.event.pull_request.merged == true
     runs-on: [self-hosted, ledge]
+    # One deployment at a time: a new one waits for the current one instead of interrupting it (e.g. during a migration)
+    concurrency:
+      group: deploy-prod
+      cancel-in-progress: false
     env:
       TARGET_PATH: /srv/apps/ledge/prod
-      HEAD_SHA: ${{ github.event.pull_request.head.sha }}
-      IMAGE_TAG: latest
+      # The images built and deployed to staging for the pull request's last commit
+      IMAGE_TAG: ${{ github.event.pull_request.head.sha }}
     steps:
       - name: Login to GHCR
         run: echo "${{ secrets.GITHUB_TOKEN }}" | docker login ghcr.io -u antoine-navette --password-stdin
-
-      - name: Retag images to latest
-        run: |
-          docker buildx imagetools create \
-            ghcr.io/antoine-navette/ledge-api:$HEAD_SHA \
-            --tag ghcr.io/antoine-navette/ledge-api:latest
-
-          docker buildx imagetools create \
-            ghcr.io/antoine-navette/ledge-web:$HEAD_SHA \
-            --tag ghcr.io/antoine-navette/ledge-web:latest
 
       - name: Pull latest code
         run: |
