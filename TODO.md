@@ -72,5 +72,4 @@ termine.
 
 ## Documentation
 
-- **Supprimer `api/README.md`**, obsolète.
 - **Écrire une vraie doc**, à l'occasion (voir `docs/` dans Saffy).
