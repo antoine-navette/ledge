@@ -21,3 +21,18 @@ services:
       MONGO_INITDB_ROOT_USERNAME: ${MONGO_USER}
       MONGO_INITDB_ROOT_PASSWORD: ${MONGO_PASSWORD}
     restart: unless-stopped
+
+  # Dumps the database every night into ./dumps, and before each deployment's migrations (see backup/backup.sh)
+  backup:
+    image: ghcr.io/antoine-navette/ledge-backup:${IMAGE_TAG}
+    # The deployment's dump also starts Mongo first if it isn't running yet, e.g. on a new environment
+    depends_on:
+      mongo:
+        condition: service_healthy
+    environment:
+      MONGO_USER: ${MONGO_USER}
+      MONGO_PASSWORD: ${MONGO_PASSWORD}
+    # Outside Mongo's volume, so that a docker compose down -v doesn't remove them
+    volumes:
+      - ./dumps:/dumps
+    restart: unless-stopped

@@ -80,6 +80,11 @@ jobs:
         working-directory: ${{ env.TARGET_PATH }}
         run: docker compose pull
 
+      # The only way back if a migration damages the data. A failed dump stops the deployment before the migrations
+      - name: Dump the database
+        working-directory: ${{ env.TARGET_PATH }}
+        run: docker compose run --rm backup /backup.sh deploy
+
       - name: Run migrations
         working-directory: ${{ env.TARGET_PATH }}
         run: docker compose run --rm --no-deps api npm run migrations:run
