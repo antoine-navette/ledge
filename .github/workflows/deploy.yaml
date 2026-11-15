@@ -1,0 +1,94 @@
+name: Deploy
+
+on:
+  # Called by the build: staging after every build, production after an approval, for builds of main only
+  workflow_call:
+    inputs:
+      environment:
+        type: string
+        required: true
+      tag:
+        type: string
+        required: true
+  # Redeploys an existing image, e.g. an older tag to roll production back
+  workflow_dispatch:
+    inputs:
+      environment:
+        type: choice
+        options: [staging, production]
+        required: true
+      tag:
+        description: Image tag, e.g. sha-1a2b3c4
+        type: string
+        required: true
+
+permissions:
+  contents: read
+  # Only pulls the images, which the build pushed
+  packages: read
+
+# One deployment at a time per environment: a new one waits for the current one instead of interrupting it (e.g. during a
+# migration)
+concurrency:
+  group: deploy-${{ inputs.environment }}
+  cancel-in-progress: false
+
+jobs:
+  deploy:
+    name: Deploy ${{ inputs.tag }} to ${{ inputs.environment }}
+    runs-on: [self-hosted, ledge]
+    # GitHub environment: production requires an approval (set in the repository settings), and both keep the history
+    # of their deployments, which tells which tag to redeploy to roll back
+    environment: ${{ inputs.environment }}
+    # Inputs only reach the scripts through variables, never pasted into them, so a crafted value can't inject commands
+    env:
+      ENVIRONMENT: ${{ inputs.environment }}
+      IMAGE_TAG: ${{ inputs.tag }}
+    steps:
+      - name: Check the inputs
+        run: |
+          case "$ENVIRONMENT" in
+            staging) echo "TARGET_PATH=/srv/apps/ledge/staging" >> "$GITHUB_ENV" ;;
+            production) echo "TARGET_PATH=/srv/apps/ledge/prod" >> "$GITHUB_ENV" ;;
+            *) echo "Unknown environment: $ENVIRONMENT" >&2; exit 1 ;;
+          esac
+          if ! [[ "$IMAGE_TAG" =~ ^sha-[0-9a-f]{7}$ ]]; then
+            echo "Invalid image tag: $IMAGE_TAG (expected sha-<7 hexadecimal characters>)" >&2
+            exit 1
+          fi
+
+      # The server copy (compose files, nginx config...) must match the image's commit, found from the tag
+      - name: Check out the image's commit
+        run: |
+          cd "$TARGET_PATH"
+          git fetch --prune origin
+          COMMIT=$(git rev-parse --verify --quiet "${IMAGE_TAG#sha-}^{commit}") || {
+            echo "No commit matches $IMAGE_TAG" >&2
+            exit 1
+          }
+          # Only what was merged goes to production: never an image built from a branch to try it on staging
+          if [ "$ENVIRONMENT" = production ] && ! git merge-base --is-ancestor "$COMMIT" origin/main; then
+            echo "$IMAGE_TAG is not on main: it can't be deployed to production" >&2
+            exit 1
+          fi
+          git checkout --detach "$COMMIT"
+
+      - name: Log in to GHCR
+        run: echo "${{ secrets.GITHUB_TOKEN }}" | docker login ghcr.io -u "${{ github.actor }}" --password-stdin
+
+      - name: Pull the images
+        working-directory: ${{ env.TARGET_PATH }}
+        run: docker compose pull
+
+      - name: Run migrations
+        working-directory: ${{ env.TARGET_PATH }}
+        run: docker compose run --rm --no-deps api npm run migrations:run
+
+      - name: Restart containers
+        working-directory: ${{ env.TARGET_PATH }}
+        run: docker compose up -d --remove-orphans
+
+      # Every deployment leaves the previous images behind, still tagged. Only Ledge's (labelled by the build), and never
+      # the ones a container uses, e.g. the other environment's
+      - name: Remove unused images
+        run: docker image prune -af --filter "label=app=ledge"
