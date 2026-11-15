@@ -30,9 +30,9 @@ jobs:
       packages: write
     strategy:
       matrix:
-        app: [api, web]
+        app: [api, web, backup]
     outputs:
-      # Identical for both apps, so it doesn't matter which one sets it
+      # Identical for every app, so it doesn't matter which one sets it
       tag: ${{ steps.tag.outputs.tag }}
     steps:
       - uses: actions/checkout@v7

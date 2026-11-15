@@ -30,10 +30,15 @@ de référence pour les conventions. Une entrée terminée est retirée dans le 
   disponibles : `vitest` et `minimatch` (via `typescript-eslint`). Ne concerne pas l'image de prod (`--omit=dev`).
 - **Passer `mongodb` en v7** : corrige CVE-2026-126837 (connexion `mongodb+srv://`) et CVE-2026-126835 (authentification
   OIDC), qui ne nous concernent pas aujourd'hui. Montée de version majeure du driver, à faire à part.
+- **Sauvegardes de Mongo** :
+  - Les copier hors du serveur, chiffrées (par exemple une étape `rclone` à la fin de `backup/backup.sh`) : elles ne
+    protègent aujourd'hui que d'une erreur ou d'une migration ratée, pas d'une panne du serveur ni de son disque.
+  - Être prévenu si celle de la nuit échoue (par exemple un heartbeat Better Stack).
 - **CI/CD** :
-  - **Backup de Mongo automatique avant les migrations** dans `deploy.yaml`, comme dans Saffy : seul moyen de revenir en
-    arrière après une migration.
-  - **Politique de rétention sur GHCR** : chaque build y pousse deux images, jamais supprimées.
+  - **Politique de rétention sur GHCR** : chaque build y pousse trois images (API, web, backup), jamais supprimées.
+    Chacune y apparaît en trois versions : l'index taggé `sha-…`, l'image `linux/arm64` et l'attestation de provenance
+    (`unknown/unknown`). Désactiver les attestations (`provenance: false` dans `build.yaml`) diviserait par trois le
+    nombre de versions et simplifierait le nettoyage ; à trancher, personne ne les lit aujourd'hui.
   - Plus tard : des tests d'intégration avec un Mongo jetable (`services: mongo`) dans `checks.yaml`, et des tests E2E
     après le build, contre les images lancées dans le runner, avant tout déploiement.
   - À terme : déployer depuis un runner GitHub par SSH à travers un tunnel (Cloudflare Access ou Tailscale, sans port
