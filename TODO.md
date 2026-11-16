@@ -16,8 +16,6 @@ de référence pour les conventions. Une entrée terminée est retirée dans le 
   par période marchent toujours), avec une migration. Alternatives : un value object (classe) si la date porte un jour
   de vraies règles, ou `Temporal.PlainDate` quand Temporal sera disponible partout. À faire avec la séparation de
   `Transaction`.
-- **Migrations** : à terme, se passer d'Umzug et passer à des migrations datées plutôt qu'à un numéro incrémenté à la
-  main. Umzug passe au logger des objets sans texte (`{ event: 'migrating', name }`), d'où des logs sans message.
 
 ## Web
 
