@@ -1,12 +1,41 @@
 # TODO
 
-Ce qu'il reste à faire sur le projet, par catégorie. Saffy (`../saffy`), qui utilise quasiment les mêmes technos, sert
-de référence pour les conventions. Une entrée terminée est retirée dans le commit qui la termine.
+Ce qu'il reste à faire sur le projet, par catégorie. Les conventions sont celles des plugins `api-conventions`,
+`web-conventions` et `docker-conventions` (`antoine-navette/claude-plugins`, déclarés dans `.claude/settings.json`). Une
+entrée terminée est retirée dans le commit qui la termine.
+
+## Alignement sur les conventions
+
+Dans cet ordre, une étape par branche ou par commit :
+
+1. **Sécurité** :
+   - Ne stocker que le hash (SHA-256, port `TokenHasher`) des tokens de session et de vérification d'email, avec une
+     migration qui hache les tokens existants (personne n'est déconnecté).
+   - Login en temps constant : comparer avec un faux hash quand l'utilisateur n'existe pas, pour que le temps de réponse
+     ne révèle pas si l'email est inscrit.
+2. **Erreurs côté web** :
+   - Stocker un code dans l'état des pages (`{ status: 'error'; code: ErrorCode }`), plus un message.
+   - Ajouter `constants/errors.ts` : `ErrorCode` (codes de l'API tirés des types générés, plus `NETWORK_ERROR` et
+     `ROUTE_NOT_FOUND`) et `ERROR_MESSAGES`, pour afficher des messages lisibles au lieu du code brut.
+   - Remplacer `RouteNotFound` par `ErrorPage` avec `ROUTE_NOT_FOUND`.
+   - Nettoyer la saisie avant l'envoi : email en minuscules, espaces retirés.
+3. **Renommages, sans changement de comportement** :
+   - Web : suffixer les pages de `Page` (`LoginPage`…), et déplacer `useAuth` dans `contexts/AuthContext.ts`.
+   - API : séparer les use cases en `commands/` et `queries/` (`LoginCommand`, `GetUserTransactionsQuery`…), et
+     renommer les méthodes des mappers en `toDomain()` / `toInfrastructure()`.
+   - Codes, le sujet d'abord : `INVALID_EMAIL` → `EMAIL_INVALID`, `WEAK_PASSWORD` → `PASSWORD_TOO_WEAK`,
+     `WRONG_PASSWORD` → `PASSWORD_WRONG`, `ACTIVE_COOLDOWN` → `EMAIL_VERIFICATION_COOLDOWN_ACTIVE`, et le code public
+     `INVALID_CREDENTIALS` → `CREDENTIALS_INVALID` (change le contrat : régénérer la spec et les types, à faire aussi
+     dans Saffy).
+4. **Le reste** :
+   - Gérer le `415` dans le gestionnaire d'erreurs global (`UNSUPPORTED_MEDIA_TYPE`), aujourd'hui une 500.
+   - Prolonger la session au plus une fois par jour (`EXTENSION_INTERVAL`, comme dans Saffy), au lieu d'une écriture en
+     base à chaque requête authentifiée.
+   - Intégrer à leur page les composants utilisés une seule fois (`TransactionListSection`, `TransactionsOverview`, les
+     deux modales), à juger au cas par cas : les modales forment des blocs bien délimités.
 
 ## API
 
-- **Prolonger la session au plus une fois par jour** (`EXTENSION_INTERVAL`, comme dans Saffy), au lieu d'une écriture en
-  base à chaque requête authentifiée.
 - **Reader CQRS pour l'authentification**, si besoin d'optimiser : charger la session et son user en une seule requête,
   au lieu de deux lectures dans `AuthenticateUseCase`.
 - **Séparer `Transaction` en deux entités** (revenu et dépense) grâce au polymorphisme.
@@ -16,11 +45,6 @@ de référence pour les conventions. Une entrée terminée est retirée dans le 
   par période marchent toujours), avec une migration. Alternatives : un value object (classe) si la date porte un jour
   de vraies règles, ou `Temporal.PlainDate` quand Temporal sera disponible partout. À faire avec la séparation de
   `Transaction`.
-
-## Web
-
-- **Messages d'erreur lisibles** : traduire les codes d'erreur en messages (comme `constants/errors.ts` dans Saffy) au
-  lieu d'afficher le code brut.
 
 ## Infra
 

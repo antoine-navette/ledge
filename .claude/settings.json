@@ -1,0 +1,15 @@
+{
+  "enabledPlugins": {
+    "api-conventions@antoine-navette": true,
+    "web-conventions@antoine-navette": true,
+    "docker-conventions@antoine-navette": true
+  },
+  "extraKnownMarketplaces": {
+    "antoine-navette": {
+      "source": {
+        "source": "github",
+        "repo": "antoine-navette/claude-plugins"
+      }
+    }
+  }
+}
