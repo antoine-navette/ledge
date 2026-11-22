@@ -14,10 +14,8 @@ Dans cet ordre, une étape par branche ou par commit :
    - Login en temps constant : comparer avec un faux hash quand l'utilisateur n'existe pas, pour que le temps de réponse
      ne révèle pas si l'email est inscrit.
 2. **Erreurs côté web** :
-   - Stocker un code dans l'état des pages (`{ status: 'error'; code: ErrorCode }`), plus un message.
-   - Ajouter `constants/errors.ts` : `ErrorCode` (codes de l'API tirés des types générés, plus `NETWORK_ERROR` et
-     `ROUTE_NOT_FOUND`) et `ERROR_MESSAGES`, pour afficher des messages lisibles au lieu du code brut.
-   - Remplacer `RouteNotFoundPage` par `ErrorPage` avec `ROUTE_NOT_FOUND`.
+   - Stocker un code dans l'état des pages (`{ status: 'error'; code: ErrorCode }`), plus un message, et l'afficher avec
+     `ERROR_MESSAGES[code]` au lieu du code brut.
    - Nettoyer la saisie avant l'envoi : email en minuscules, espaces retirés.
 3. **Renommages, sans changement de comportement** :
    - API : séparer les use cases en `commands/` et `queries/` (`LoginCommand`, `GetUserTransactionsQuery`…), et

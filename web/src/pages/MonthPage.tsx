@@ -5,6 +5,7 @@ import TransactionsOverview from '../components/TransactionsOverview.tsx';
 import DateNavigator from '../components/DateNavigator';
 import { getUserTransactions } from '../services/transaction.ts';
 import type { Transaction } from '../entities/Transaction';
+import ErrorPage from './ErrorPage.tsx';
 
 const MonthPage = () => {
     const navigate = useNavigate();
@@ -71,11 +72,16 @@ const MonthPage = () => {
         });
     };
 
-    if (!Number.isInteger(year) || year < 1970 || year > currentYear) {
+    // Not a date at all: this page doesn't exist. A real date out of range is a plausible navigation instead
+    if (!/^\d{4}$/.test(params.year ?? '') || !/^\d{1,2}$/.test(params.month ?? '') || month < 1 || month > 12) {
+        return <ErrorPage code="ROUTE_NOT_FOUND" />;
+    }
+
+    if (year < 1970 || year > currentYear) {
         return <Navigate to="/" replace />;
     }
 
-    if (!Number.isInteger(month) || month < 1 || month > 12 || (year === currentYear && month > currentMonth)) {
+    if (year === currentYear && month > currentMonth) {
         return <Navigate to={`/${year}`} replace />;
     }
 

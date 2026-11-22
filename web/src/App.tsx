@@ -5,7 +5,7 @@ import LoginPage from './pages/LoginPage.tsx';
 import RegisterPage from './pages/RegisterPage.tsx';
 import ProfilePage from './pages/ProfilePage.tsx';
 import VerifyEmailPage from './pages/VerifyEmailPage.tsx';
-import RouteNotFoundPage from './pages/RouteNotFoundPage.tsx';
+import ErrorPage from './pages/ErrorPage.tsx';
 import { useEffect } from 'react';
 import RequireAuth from './guards/RequireAuth.tsx';
 import RequireGuest from './guards/RequireGuest.tsx';
@@ -33,7 +33,7 @@ function App() {
                 </Route>
 
                 <Route path="/verify-email/:token" element={<VerifyEmailPage />} />
-                <Route path="*" element={<RouteNotFoundPage />} />
+                <Route path="*" element={<ErrorPage code="ROUTE_NOT_FOUND" />} />
             </Routes>
         </div>
     );

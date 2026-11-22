@@ -1,6 +1,7 @@
 import { Link, Navigate, useNavigate, useParams } from 'react-router-dom';
 import Navbar from '../components/Navbar';
 import DateNavigator from '../components/DateNavigator';
+import ErrorPage from './ErrorPage.tsx';
 
 const HomePage = () => {
     const navigate = useNavigate();
@@ -11,7 +12,12 @@ const HomePage = () => {
     const currentYear = new Date().getFullYear();
     const currentMonth = new Date().getMonth() + 1;
 
-    if (!Number.isInteger(year) || year < 1970 || year > new Date().getFullYear()) {
+    // Not a year at all: this page doesn't exist. A real year out of range is a plausible navigation instead
+    if (!/^\d{4}$/.test(params.year ?? '')) {
+        return <ErrorPage code="ROUTE_NOT_FOUND" />;
+    }
+
+    if (year < 1970 || year > currentYear) {
         return <Navigate to="/" replace />;
     }
 
