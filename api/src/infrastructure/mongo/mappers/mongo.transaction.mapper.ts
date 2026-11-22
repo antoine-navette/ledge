@@ -4,7 +4,7 @@ import type { MongoTransactionDocument } from '../documents/mongo.transaction.do
 import { ObjectId } from 'mongodb';
 
 export const MongoTransactionMapper = {
-    toDocument: (transaction: Transaction): MongoTransactionDocument => ({
+    toInfrastructure: (transaction: Transaction): MongoTransactionDocument => ({
         _id: new ObjectId(transaction.id),
         userId: new ObjectId(transaction.userId),
         name: transaction.name,
@@ -16,7 +16,7 @@ export const MongoTransactionMapper = {
         updatedAt: transaction.updatedAt,
     }),
 
-    toEntity: (document: MongoTransactionDocument): Transaction =>
+    toDomain: (document: MongoTransactionDocument): Transaction =>
         Transaction.reconstitute(
             document._id.toString() as TransactionId,
             document.userId.toString() as UserId,

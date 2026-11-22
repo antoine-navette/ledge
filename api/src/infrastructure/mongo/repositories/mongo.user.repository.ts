@@ -8,7 +8,7 @@ export class MongoUserRepository implements UserRepository {
     constructor(private userCollection: Collection<MongoUserDocument>) {}
 
     create = async (user: User) => {
-        const document = MongoUserMapper.toDocument(user);
+        const document = MongoUserMapper.toInfrastructure(user);
 
         try {
             await this.userCollection.insertOne(document);
@@ -27,13 +27,13 @@ export class MongoUserRepository implements UserRepository {
 
         const document = await this.userCollection.findOne({ _id: new ObjectId(id) });
 
-        return document ? MongoUserMapper.toEntity(document) : null;
+        return document ? MongoUserMapper.toDomain(document) : null;
     };
 
     findByEmail = async (email: User['email']): Promise<User | null> => {
         const document = await this.userCollection.findOne({ email });
 
-        return document ? MongoUserMapper.toEntity(document) : null;
+        return document ? MongoUserMapper.toDomain(document) : null;
     };
 
     findByEmailVerificationToken = async (
@@ -41,11 +41,11 @@ export class MongoUserRepository implements UserRepository {
     ): Promise<User | null> => {
         const document = await this.userCollection.findOne({ 'emailVerification.token': token });
 
-        return document ? MongoUserMapper.toEntity(document) : null;
+        return document ? MongoUserMapper.toDomain(document) : null;
     };
 
     save = async (user: User): Promise<void> => {
-        const { _id, ...rest } = MongoUserMapper.toDocument(user);
+        const { _id, ...rest } = MongoUserMapper.toInfrastructure(user);
 
         await this.userCollection.updateOne({ _id }, { $set: rest });
     };

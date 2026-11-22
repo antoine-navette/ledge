@@ -14,8 +14,7 @@ Dans cet ordre, une étape par branche ou par commit :
    - Login en temps constant : comparer avec un faux hash quand l'utilisateur n'existe pas, pour que le temps de réponse
      ne révèle pas si l'email est inscrit.
 2. **Renommages, sans changement de comportement** :
-   - API : séparer les use cases en `commands/` et `queries/` (`LoginCommand`, `GetUserTransactionsQuery`…), et
-     renommer les méthodes des mappers en `toDomain()` / `toInfrastructure()`.
+   - API : séparer les use cases en `commands/` et `queries/` (`LoginCommand`, `GetUserTransactionsQuery`…).
 3. **Le reste** :
    - Prolonger la session au plus une fois par jour (`EXTENSION_INTERVAL`, comme dans Saffy), au lieu d'une écriture en
      base à chaque requête authentifiée.

@@ -11,7 +11,7 @@ export class MongoTransactionRepository implements TransactionRepository {
     constructor(private transactionCollection: Collection<MongoTransactionDocument>) {}
 
     create = async (transaction: Transaction): Promise<void> => {
-        const document = MongoTransactionMapper.toDocument(transaction);
+        const document = MongoTransactionMapper.toInfrastructure(transaction);
 
         await this.transactionCollection.insertOne(document);
     };
@@ -47,7 +47,7 @@ export class MongoTransactionRepository implements TransactionRepository {
             })
             .toArray();
 
-        return documents.map((document) => MongoTransactionMapper.toEntity(document));
+        return documents.map((document) => MongoTransactionMapper.toDomain(document));
     };
 
     findById = async (id: Transaction['id']): Promise<Transaction | null> => {
@@ -55,17 +55,17 @@ export class MongoTransactionRepository implements TransactionRepository {
 
         const document = await this.transactionCollection.findOne({ _id: new ObjectId(id) });
 
-        return document ? MongoTransactionMapper.toEntity(document) : null;
+        return document ? MongoTransactionMapper.toDomain(document) : null;
     };
 
     save = async (transaction: Transaction): Promise<void> => {
-        const { _id, ...rest } = MongoTransactionMapper.toDocument(transaction);
+        const { _id, ...rest } = MongoTransactionMapper.toInfrastructure(transaction);
 
         await this.transactionCollection.updateOne({ _id }, { $set: rest });
     };
 
     delete = async (transaction: Transaction): Promise<void> => {
-        const { _id } = MongoTransactionMapper.toDocument(transaction);
+        const { _id } = MongoTransactionMapper.toInfrastructure(transaction);
 
         await this.transactionCollection.deleteOne({ _id });
     };

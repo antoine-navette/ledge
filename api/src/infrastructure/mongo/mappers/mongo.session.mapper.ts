@@ -4,7 +4,7 @@ import { Session, type SessionId } from '../../../domain/entities/session.js';
 import type { MongoSessionDocument } from '../documents/mongo.session.document.js';
 
 export const MongoSessionMapper = {
-    toDocument: (session: Session): MongoSessionDocument => ({
+    toInfrastructure: (session: Session): MongoSessionDocument => ({
         _id: new ObjectId(session.id),
         userId: new ObjectId(session.userId),
         token: session.token,
@@ -13,7 +13,7 @@ export const MongoSessionMapper = {
         updatedAt: session.updatedAt,
     }),
 
-    toEntity: (document: MongoSessionDocument): Session =>
+    toDomain: (document: MongoSessionDocument): Session =>
         Session.reconstitute(
             document._id.toString() as SessionId,
             document.userId.toString() as UserId,
