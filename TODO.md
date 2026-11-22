@@ -13,12 +13,10 @@ Dans cet ordre, une étape par branche ou par commit :
      migration qui hache les tokens existants (personne n'est déconnecté).
    - Login en temps constant : comparer avec un faux hash quand l'utilisateur n'existe pas, pour que le temps de réponse
      ne révèle pas si l'email est inscrit.
-2. **Erreurs côté web** :
-   - Nettoyer la saisie avant l'envoi : email en minuscules, espaces retirés.
-3. **Renommages, sans changement de comportement** :
+2. **Renommages, sans changement de comportement** :
    - API : séparer les use cases en `commands/` et `queries/` (`LoginCommand`, `GetUserTransactionsQuery`…), et
      renommer les méthodes des mappers en `toDomain()` / `toInfrastructure()`.
-4. **Le reste** :
+3. **Le reste** :
    - Prolonger la session au plus une fois par jour (`EXTENSION_INTERVAL`, comme dans Saffy), au lieu d'une écriture en
      base à chaque requête authentifiée.
    - Intégrer à leur page les composants utilisés une seule fois (`TransactionListSection`, `TransactionsOverview`, les
@@ -28,6 +26,9 @@ Dans cet ordre, une étape par branche ou par commit :
 
 - **Reader CQRS pour l'authentification**, si besoin d'optimiser : charger la session et son user en une seule requête,
   au lieu de deux lectures dans `AuthenticateUseCase`.
+- **Mots de passe au-delà de 72 octets** : `bcrypt` n'en prend en compte que les 72 premiers et ignore le reste en
+  silence. Soit refuser au-delà (avec un code, un message et la même règle dans le front), soit passer à argon2 comme
+  dans Saffy, avec une transition pour les mots de passe existants.
 - **Séparer `Transaction` en deux entités** (revenu et dépense) grâce au polymorphisme.
 - **Type dédié pour `Transaction.date`**, un jour calendaire sans heure ni fuseau, au lieu d'une `Date` à minuit UTC.
   Piste privilégiée : une chaîne brandée `CalendarDate` (`"YYYY-MM-DD"`) avec un module de fonctions, comme les IDs

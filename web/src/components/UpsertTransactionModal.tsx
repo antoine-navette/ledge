@@ -41,9 +41,12 @@ const UpsertTransactionModal = ({ onClose, transaction, type, year, month, onUps
 
         // The date input gives a calendar day ("2026-11-11"), parsed as midnight UTC like transaction dates
         const date = new Date(form.date);
+        // The API refuses surrounding spaces, which mobile keyboards often add after the last word
+        const name = form.name.trim();
+        const value = Number(form.value);
         const [upserted, code] = transaction
-            ? await updateTransaction(transaction.id, form.name, Number(form.value), type, form.category, date)
-            : await createTransaction(form.name, Number(form.value), type, form.category, date);
+            ? await updateTransaction(transaction.id, name, value, type, form.category, date)
+            : await createTransaction(name, value, type, form.category, date);
         if (code) {
             setState({ status: 'error', code });
             return;
@@ -71,6 +74,8 @@ const UpsertTransactionModal = ({ onClose, transaction, type, year, month, onUps
                         onChange={(e) => setForm((prev) => ({ ...prev, name: e.target.value }))}
                         className="w-full border rounded px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 transition-colors border-gray-300"
                         required
+                        // At least one visible character, so a name made of spaces only is refused before sending
+                        pattern=".*\S.*"
                         maxLength={99}
                     />
                 </div>

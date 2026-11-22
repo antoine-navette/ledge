@@ -118,7 +118,9 @@ export class User {
     };
 
     private static validateEmail = (email: string) => {
-        if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
+        // Strict on purpose: the email must already be lowercase (and the regex rejects any whitespace), so what is stored
+        // is exactly what clients send, at registration as well as at login
+        if (email !== email.toLowerCase() || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
             return 'EMAIL_INVALID' as const;
         }
 

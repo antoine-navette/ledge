@@ -18,7 +18,7 @@ const LoginPage = () => {
 
         setState({ status: 'loading' });
 
-        const [user, code] = await login(form.email, form.password);
+        const [user, code] = await login(form.email.trim(), form.password);
         if (code) {
             setState({ status: 'error', code });
             return;
@@ -44,7 +44,7 @@ const LoginPage = () => {
                             type="email"
                             id="email"
                             value={form.email}
-                            onChange={(e) => setForm((prev) => ({ ...prev, email: e.target.value }))}
+                            onChange={(e) => setForm((prev) => ({ ...prev, email: e.target.value.toLowerCase() }))}
                             className="block w-full px-3 py-2 border rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 transition-colors border-gray-300"
                             required
                         />
