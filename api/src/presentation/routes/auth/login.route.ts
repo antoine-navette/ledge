@@ -3,9 +3,10 @@ import type { FastifyZodOpenApiSchema, FastifyZodOpenApiTypeProvider } from 'fas
 import z from 'zod';
 import type { LoginUseCase } from '../../../application/auth/login.use-case.js';
 import { userSchema } from '../../schemas/user.schema.js';
-import { invalidCredentialsSchema } from '../../schemas/invalid-credentials.schema.js';
+import { credentialsInvalidSchema } from '../../schemas/credentials-invalid.schema.js';
 import { badRequestSchema } from '../../schemas/bad-request.schema.js';
 import { payloadTooLargeSchema } from '../../schemas/payload-too-large.schema.js';
+import { unsupportedMediaTypeSchema } from '../../schemas/unsupported-media-type.schema.js';
 import { tooManyRequestsSchema } from '../../schemas/too-many-requests.schema.js';
 import { internalServerErrorSchema } from '../../schemas/internal-server-error.schema.js';
 import { UserPresenter } from '../../presenters/user.presenter.js';
@@ -27,8 +28,9 @@ export const loginRoute: FastifyPluginAsync<Options> = async (app, { loginUseCas
             response: {
                 200: userSchema,
                 400: badRequestSchema,
-                401: invalidCredentialsSchema,
+                401: credentialsInvalidSchema,
                 413: payloadTooLargeSchema,
+                415: unsupportedMediaTypeSchema,
                 429: tooManyRequestsSchema,
                 500: internalServerErrorSchema,
             },
@@ -38,9 +40,9 @@ export const loginRoute: FastifyPluginAsync<Options> = async (app, { loginUseCas
 
             const [session, code] = await loginUseCase.execute(email, password);
             if (code) {
-                if (code === 'USER_NOT_FOUND' || code === 'WRONG_PASSWORD') {
+                if (code === 'USER_NOT_FOUND' || code === 'PASSWORD_WRONG') {
                     request.log.warn({ code }, 'Unauthorized');
-                    return reply.status(401).send({ code: 'INVALID_CREDENTIALS' });
+                    return reply.status(401).send({ code: 'CREDENTIALS_INVALID' });
                 }
                 return code satisfies never;
             }

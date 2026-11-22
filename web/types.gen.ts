@@ -66,6 +66,15 @@ export interface paths {
                     };
                 };
                 /** @description Default Response */
+                415: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["UnsupportedMediaType"];
+                    };
+                };
+                /** @description Default Response */
                 422: {
                     headers: {
                         [name: string]: unknown;
@@ -149,7 +158,7 @@ export interface paths {
                         [name: string]: unknown;
                     };
                     content: {
-                        "application/json": components["schemas"]["InvalidCredentials"];
+                        "application/json": components["schemas"]["CredentialsInvalid"];
                     };
                 };
                 /** @description Default Response */
@@ -159,6 +168,15 @@ export interface paths {
                     };
                     content: {
                         "application/json": components["schemas"]["PayloadTooLarge"];
+                    };
+                };
+                /** @description Default Response */
+                415: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["UnsupportedMediaType"];
                     };
                 };
                 /** @description Default Response */
@@ -237,6 +255,15 @@ export interface paths {
                     };
                     content: {
                         "application/json": components["schemas"]["PayloadTooLarge"];
+                    };
+                };
+                /** @description Default Response */
+                415: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["UnsupportedMediaType"];
                     };
                 };
                 /** @description Default Response */
@@ -376,7 +403,7 @@ export interface paths {
                         [name: string]: unknown;
                     };
                     content: {
-                        "application/json": components["schemas"]["ActiveCooldown"] | components["schemas"]["EmailAlreadyVerified"];
+                        "application/json": components["schemas"]["EmailVerificationCooldownActive"] | components["schemas"]["EmailAlreadyVerified"];
                     };
                 };
                 /** @description Default Response */
@@ -386,6 +413,15 @@ export interface paths {
                     };
                     content: {
                         "application/json": components["schemas"]["PayloadTooLarge"];
+                    };
+                };
+                /** @description Default Response */
+                415: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["UnsupportedMediaType"];
                     };
                 };
                 /** @description Default Response */
@@ -465,7 +501,7 @@ export interface paths {
                         [name: string]: unknown;
                     };
                     content: {
-                        "application/json": components["schemas"]["TokenExpired"];
+                        "application/json": components["schemas"]["EmailVerificationExpired"];
                     };
                 };
                 /** @description Default Response */
@@ -475,6 +511,15 @@ export interface paths {
                     };
                     content: {
                         "application/json": components["schemas"]["PayloadTooLarge"];
+                    };
+                };
+                /** @description Default Response */
+                415: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["UnsupportedMediaType"];
                     };
                 };
                 /** @description Default Response */
@@ -625,6 +670,15 @@ export interface paths {
                     };
                     content: {
                         "application/json": components["schemas"]["PayloadTooLarge"];
+                    };
+                };
+                /** @description Default Response */
+                415: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["UnsupportedMediaType"];
                     };
                 };
                 /** @description Default Response */
@@ -823,6 +877,15 @@ export interface paths {
                     };
                 };
                 /** @description Default Response */
+                415: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["UnsupportedMediaType"];
+                    };
+                };
+                /** @description Default Response */
                 422: {
                     headers: {
                         [name: string]: unknown;
@@ -916,6 +979,15 @@ export interface paths {
                     };
                 };
                 /** @description Default Response */
+                415: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["UnsupportedMediaType"];
+                    };
+                };
+                /** @description Default Response */
                 429: {
                     headers: {
                         [name: string]: unknown;
@@ -965,6 +1037,10 @@ export interface components {
             /** @constant */
             code: "PAYLOAD_TOO_LARGE";
         };
+        UnsupportedMediaType: {
+            /** @constant */
+            code: "UNSUPPORTED_MEDIA_TYPE";
+        };
         UnprocessableContent: {
             /** @constant */
             code: "UNPROCESSABLE_CONTENT";
@@ -977,17 +1053,17 @@ export interface components {
             /** @constant */
             code: "INTERNAL_SERVER_ERROR";
         };
-        InvalidCredentials: {
+        CredentialsInvalid: {
             /** @constant */
-            code: "INVALID_CREDENTIALS";
+            code: "CREDENTIALS_INVALID";
         };
         Unauthorized: {
             /** @constant */
             code: "UNAUTHORIZED";
         };
-        ActiveCooldown: {
+        EmailVerificationCooldownActive: {
             /** @constant */
-            code: "ACTIVE_COOLDOWN";
+            code: "EMAIL_VERIFICATION_COOLDOWN_ACTIVE";
         };
         EmailAlreadyVerified: {
             /** @constant */
@@ -997,9 +1073,9 @@ export interface components {
             /** @constant */
             code: "EMAIL_VERIFICATION_NOT_FOUND";
         };
-        TokenExpired: {
+        EmailVerificationExpired: {
             /** @constant */
-            code: "TOKEN_EXPIRED";
+            code: "EMAIL_VERIFICATION_EXPIRED";
         };
         Transaction: {
             id: string;

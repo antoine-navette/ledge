@@ -21,7 +21,7 @@ export class LoginUseCase {
         if (!user) return [null, 'USER_NOT_FOUND'] as const;
 
         const isPasswordCorrect = await this.passwordHasher.compare(password, user.passwordHash);
-        if (!isPasswordCorrect) return [null, 'WRONG_PASSWORD'] as const;
+        if (!isPasswordCorrect) return [null, 'PASSWORD_WRONG'] as const;
 
         const session = Session.create(
             this.idGenerator.generate() as SessionId,

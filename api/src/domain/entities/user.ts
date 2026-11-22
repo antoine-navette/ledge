@@ -80,7 +80,7 @@ export class User {
             this.emailVerification &&
             now.getTime() - this.emailVerification.createdAt.getTime() < EmailVerification.COOLDOWN_DURATION
         ) {
-            return [null, 'ACTIVE_COOLDOWN'] as const;
+            return [null, 'EMAIL_VERIFICATION_COOLDOWN_ACTIVE'] as const;
         }
 
         return [
@@ -112,14 +112,14 @@ export class User {
             throw new Error('User.verifyEmail called without a pending email verification');
         }
 
-        if (this.emailVerification.expiresAt < now) return [null, 'TOKEN_EXPIRED'] as const;
+        if (this.emailVerification.expiresAt < now) return [null, 'EMAIL_VERIFICATION_EXPIRED'] as const;
 
         return [new User(this.id, this.email, this.passwordHash, true, null, this.createdAt, now), null] as const;
     };
 
     private static validateEmail = (email: string) => {
         if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
-            return 'INVALID_EMAIL' as const;
+            return 'EMAIL_INVALID' as const;
         }
 
         return null;
@@ -133,7 +133,7 @@ export class User {
             !/\d/.test(password) ||
             !/[!@#$%^&*(),.?":{}|<>]/.test(password)
         ) {
-            return 'WEAK_PASSWORD' as const;
+            return 'PASSWORD_TOO_WEAK' as const;
         }
 
         return null;

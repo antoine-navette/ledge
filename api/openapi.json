@@ -77,6 +77,19 @@
                 ],
                 "additionalProperties": false
             },
+            "UnsupportedMediaType": {
+                "type": "object",
+                "properties": {
+                    "code": {
+                        "type": "string",
+                        "const": "UNSUPPORTED_MEDIA_TYPE"
+                    }
+                },
+                "required": [
+                    "code"
+                ],
+                "additionalProperties": false
+            },
             "UnprocessableContent": {
                 "type": "object",
                 "properties": {
@@ -116,12 +129,12 @@
                 ],
                 "additionalProperties": false
             },
-            "InvalidCredentials": {
+            "CredentialsInvalid": {
                 "type": "object",
                 "properties": {
                     "code": {
                         "type": "string",
-                        "const": "INVALID_CREDENTIALS"
+                        "const": "CREDENTIALS_INVALID"
                     }
                 },
                 "required": [
@@ -142,12 +155,12 @@
                 ],
                 "additionalProperties": false
             },
-            "ActiveCooldown": {
+            "EmailVerificationCooldownActive": {
                 "type": "object",
                 "properties": {
                     "code": {
                         "type": "string",
-                        "const": "ACTIVE_COOLDOWN"
+                        "const": "EMAIL_VERIFICATION_COOLDOWN_ACTIVE"
                     }
                 },
                 "required": [
@@ -181,12 +194,12 @@
                 ],
                 "additionalProperties": false
             },
-            "TokenExpired": {
+            "EmailVerificationExpired": {
                 "type": "object",
                 "properties": {
                     "code": {
                         "type": "string",
-                        "const": "TOKEN_EXPIRED"
+                        "const": "EMAIL_VERIFICATION_EXPIRED"
                     }
                 },
                 "required": [
@@ -357,6 +370,16 @@
                             }
                         }
                     },
+                    "415": {
+                        "description": "Default Response",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/UnsupportedMediaType"
+                                }
+                            }
+                        }
+                    },
                     "422": {
                         "description": "Default Response",
                         "content": {
@@ -443,7 +466,7 @@
                         "content": {
                             "application/json": {
                                 "schema": {
-                                    "$ref": "#/components/schemas/InvalidCredentials"
+                                    "$ref": "#/components/schemas/CredentialsInvalid"
                                 }
                             }
                         }
@@ -454,6 +477,16 @@
                             "application/json": {
                                 "schema": {
                                     "$ref": "#/components/schemas/PayloadTooLarge"
+                                }
+                            }
+                        }
+                    },
+                    "415": {
+                        "description": "Default Response",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/UnsupportedMediaType"
                                 }
                             }
                         }
@@ -516,6 +549,16 @@
                             "application/json": {
                                 "schema": {
                                     "$ref": "#/components/schemas/PayloadTooLarge"
+                                }
+                            }
+                        }
+                    },
+                    "415": {
+                        "description": "Default Response",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/UnsupportedMediaType"
                                 }
                             }
                         }
@@ -628,7 +671,7 @@
                                 "schema": {
                                     "anyOf": [
                                         {
-                                            "$ref": "#/components/schemas/ActiveCooldown"
+                                            "$ref": "#/components/schemas/EmailVerificationCooldownActive"
                                         },
                                         {
                                             "$ref": "#/components/schemas/EmailAlreadyVerified"
@@ -644,6 +687,16 @@
                             "application/json": {
                                 "schema": {
                                     "$ref": "#/components/schemas/PayloadTooLarge"
+                                }
+                            }
+                        }
+                    },
+                    "415": {
+                        "description": "Default Response",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/UnsupportedMediaType"
                                 }
                             }
                         }
@@ -715,7 +768,7 @@
                         "content": {
                             "application/json": {
                                 "schema": {
-                                    "$ref": "#/components/schemas/TokenExpired"
+                                    "$ref": "#/components/schemas/EmailVerificationExpired"
                                 }
                             }
                         }
@@ -726,6 +779,16 @@
                             "application/json": {
                                 "schema": {
                                     "$ref": "#/components/schemas/PayloadTooLarge"
+                                }
+                            }
+                        }
+                    },
+                    "415": {
+                        "description": "Default Response",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/UnsupportedMediaType"
                                 }
                             }
                         }
@@ -847,6 +910,16 @@
                             "application/json": {
                                 "schema": {
                                     "$ref": "#/components/schemas/PayloadTooLarge"
+                                }
+                            }
+                        }
+                    },
+                    "415": {
+                        "description": "Default Response",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/UnsupportedMediaType"
                                 }
                             }
                         }
@@ -1179,6 +1252,16 @@
                             }
                         }
                     },
+                    "415": {
+                        "description": "Default Response",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/UnsupportedMediaType"
+                                }
+                            }
+                        }
+                    },
                     "422": {
                         "description": "Default Response",
                         "content": {
@@ -1275,6 +1358,16 @@
                             "application/json": {
                                 "schema": {
                                     "$ref": "#/components/schemas/PayloadTooLarge"
+                                }
+                            }
+                        }
+                    },
+                    "415": {
+                        "description": "Default Response",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/UnsupportedMediaType"
                                 }
                             }
                         }

@@ -31,7 +31,7 @@ http.use({
         }
 
         // Read from a clone, since openapi-fetch reads the body afterwards. The code is checked rather than the status:
-        // a 401 on login means wrong credentials (INVALID_CREDENTIALS), not a lost session
+        // a 401 on login means wrong credentials (CREDENTIALS_INVALID), not a lost session
         if (response.status === 401) {
             const body: unknown = await response.clone().json();
             if (typeof body === 'object' && body !== null && 'code' in body && body.code === 'UNAUTHORIZED') {

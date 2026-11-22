@@ -17,17 +17,12 @@ Dans cet ordre, une étape par branche ou par commit :
    - Stocker un code dans l'état des pages (`{ status: 'error'; code: ErrorCode }`), plus un message.
    - Ajouter `constants/errors.ts` : `ErrorCode` (codes de l'API tirés des types générés, plus `NETWORK_ERROR` et
      `ROUTE_NOT_FOUND`) et `ERROR_MESSAGES`, pour afficher des messages lisibles au lieu du code brut.
-   - Remplacer `RouteNotFound` par `ErrorPage` avec `ROUTE_NOT_FOUND`.
+   - Remplacer `RouteNotFoundPage` par `ErrorPage` avec `ROUTE_NOT_FOUND`.
    - Nettoyer la saisie avant l'envoi : email en minuscules, espaces retirés.
 3. **Renommages, sans changement de comportement** :
    - API : séparer les use cases en `commands/` et `queries/` (`LoginCommand`, `GetUserTransactionsQuery`…), et
      renommer les méthodes des mappers en `toDomain()` / `toInfrastructure()`.
-   - Codes, le sujet d'abord : `INVALID_EMAIL` → `EMAIL_INVALID`, `WEAK_PASSWORD` → `PASSWORD_TOO_WEAK`,
-     `WRONG_PASSWORD` → `PASSWORD_WRONG`, `ACTIVE_COOLDOWN` → `EMAIL_VERIFICATION_COOLDOWN_ACTIVE`, et le code public
-     `INVALID_CREDENTIALS` → `CREDENTIALS_INVALID` (change le contrat : régénérer la spec et les types, à faire aussi
-     dans Saffy).
 4. **Le reste** :
-   - Gérer le `415` dans le gestionnaire d'erreurs global (`UNSUPPORTED_MEDIA_TYPE`), aujourd'hui une 500.
    - Prolonger la session au plus une fois par jour (`EXTENSION_INTERVAL`, comme dans Saffy), au lieu d'une écriture en
      base à chaque requête authentifiée.
    - Intégrer à leur page les composants utilisés une seule fois (`TransactionListSection`, `TransactionsOverview`, les

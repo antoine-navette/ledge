@@ -6,6 +6,7 @@ import { userSchema } from '../../schemas/user.schema.js';
 import { emailAlreadyInUseSchema } from '../../schemas/email-already-in-use.schema.js';
 import { badRequestSchema } from '../../schemas/bad-request.schema.js';
 import { payloadTooLargeSchema } from '../../schemas/payload-too-large.schema.js';
+import { unsupportedMediaTypeSchema } from '../../schemas/unsupported-media-type.schema.js';
 import { tooManyRequestsSchema } from '../../schemas/too-many-requests.schema.js';
 import { internalServerErrorSchema } from '../../schemas/internal-server-error.schema.js';
 import { unprocessableContentSchema } from '../../schemas/unprocessable-content.schema.js';
@@ -30,6 +31,7 @@ export const registerRoute: FastifyPluginAsync<Options> = async (app, { register
                 400: badRequestSchema,
                 409: emailAlreadyInUseSchema,
                 413: payloadTooLargeSchema,
+                415: unsupportedMediaTypeSchema,
                 422: unprocessableContentSchema,
                 429: tooManyRequestsSchema,
                 500: internalServerErrorSchema,
@@ -44,7 +46,7 @@ export const registerRoute: FastifyPluginAsync<Options> = async (app, { register
                     request.log.warn({ code }, 'Conflict');
                     return reply.status(409).send({ code: 'EMAIL_ALREADY_IN_USE' });
                 }
-                if (code === 'INVALID_EMAIL' || code === 'WEAK_PASSWORD') {
+                if (code === 'EMAIL_INVALID' || code === 'PASSWORD_TOO_WEAK') {
                     request.log.warn({ code }, 'Unprocessable content');
                     return reply.status(422).send({ code: 'UNPROCESSABLE_CONTENT' });
                 }
