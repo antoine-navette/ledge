@@ -6,6 +6,7 @@ import DateNavigator from '../components/DateNavigator';
 import { getUserTransactions } from '../services/transaction.ts';
 import type { Transaction } from '../entities/Transaction';
 import ErrorPage from './ErrorPage.tsx';
+import { ERROR_MESSAGES, type ErrorCode } from '../constants/errors.ts';
 
 const MonthPage = () => {
     const navigate = useNavigate();
@@ -20,7 +21,7 @@ const MonthPage = () => {
     const [state, setState] = useState<
         | { status: 'loading' }
         | { status: 'success'; transactions: Transaction[] }
-        | { status: 'error'; message: string }
+        | { status: 'error'; code: ErrorCode }
     >({ status: 'loading' });
 
     useEffect(() => {
@@ -37,7 +38,7 @@ const MonthPage = () => {
             const [transactions, code] = await getUserTransactions(from, to);
             if (ignore) return;
             if (code) {
-                setState({ status: 'error', message: code });
+                setState({ status: 'error', code });
                 return;
             }
 
@@ -114,7 +115,7 @@ const MonthPage = () => {
 
                 {state.status === 'loading' && <p className="text-gray-500 select-none">Loading...</p>}
 
-                {state.status === 'error' && <p className="text-red-600 select-none">{state.message}</p>}
+                {state.status === 'error' && <p className="text-red-600 select-none">{ERROR_MESSAGES[state.code]}</p>}
 
                 {state.status === 'success' && (
                     <TransactionsOverview

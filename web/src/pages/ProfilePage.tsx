@@ -2,10 +2,11 @@ import { useState } from 'react';
 import { requestEmailVerification } from '../services/email-verification.ts';
 import Navbar from '../components/Navbar.tsx';
 import { useAuth } from '../contexts/AuthContext.ts';
+import { ERROR_MESSAGES, type ErrorCode } from '../constants/errors.ts';
 
 const ProfilePage = () => {
     const [state, setState] = useState<
-        { status: 'idle' } | { status: 'loading' } | { status: 'success' } | { status: 'error'; message: string }
+        { status: 'idle' } | { status: 'loading' } | { status: 'success' } | { status: 'error'; code: ErrorCode }
     >({ status: 'idle' });
 
     const auth = useAuth();
@@ -17,7 +18,7 @@ const ProfilePage = () => {
 
         const code = await requestEmailVerification();
         if (code) {
-            setState({ status: 'error', message: code });
+            setState({ status: 'error', code });
             return;
         }
 
@@ -44,7 +45,9 @@ const ProfilePage = () => {
                             <div className="mt-4 text-green-600">Email sent successfully!</div>
                         )}
 
-                        {state.status === 'error' && <div className={'mt-4 text-red-600'}>{state.message}</div>}
+                        {state.status === 'error' && (
+                            <div className={'mt-4 text-red-600'}>{ERROR_MESSAGES[state.code]}</div>
+                        )}
                     </>
                 )}
             </div>

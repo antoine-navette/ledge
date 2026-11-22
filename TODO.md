@@ -14,8 +14,6 @@ Dans cet ordre, une étape par branche ou par commit :
    - Login en temps constant : comparer avec un faux hash quand l'utilisateur n'existe pas, pour que le temps de réponse
      ne révèle pas si l'email est inscrit.
 2. **Erreurs côté web** :
-   - Stocker un code dans l'état des pages (`{ status: 'error'; code: ErrorCode }`), plus un message, et l'afficher avec
-     `ERROR_MESSAGES[code]` au lieu du code brut.
    - Nettoyer la saisie avant l'envoi : email en minuscules, espaces retirés.
 3. **Renommages, sans changement de comportement** :
    - API : séparer les use cases en `commands/` et `queries/` (`LoginCommand`, `GetUserTransactionsQuery`…), et

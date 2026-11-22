@@ -2,6 +2,7 @@ import { useState, FormEvent } from 'react';
 import { createTransaction, updateTransaction } from '../services/transaction.ts';
 import type { Transaction } from '../entities/Transaction';
 import Modal from './Modal.tsx';
+import { ERROR_MESSAGES, type ErrorCode } from '../constants/errors.ts';
 
 interface Props {
     onClose: () => void;
@@ -14,7 +15,7 @@ interface Props {
 
 const UpsertTransactionModal = ({ onClose, transaction, type, year, month, onUpsert }: Props) => {
     const [state, setState] = useState<
-        { status: 'idle' } | { status: 'loading' } | { status: 'error'; message: string }
+        { status: 'idle' } | { status: 'loading' } | { status: 'error'; code: ErrorCode }
     >({ status: 'idle' });
 
     // TODO: clean
@@ -44,7 +45,7 @@ const UpsertTransactionModal = ({ onClose, transaction, type, year, month, onUps
             ? await updateTransaction(transaction.id, form.name, Number(form.value), type, form.category, date)
             : await createTransaction(form.name, Number(form.value), type, form.category, date);
         if (code) {
-            setState({ status: 'error', message: code });
+            setState({ status: 'error', code });
             return;
         }
 
@@ -169,7 +170,7 @@ const UpsertTransactionModal = ({ onClose, transaction, type, year, month, onUps
 
                 {state.status === 'error' && (
                     <div className="p-3 rounded bg-red-50 text-red-600 text-sm text-center border border-red-100">
-                        {state.message}
+                        {ERROR_MESSAGES[state.code]}
                     </div>
                 )}
 

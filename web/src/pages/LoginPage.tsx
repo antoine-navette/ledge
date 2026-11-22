@@ -2,12 +2,13 @@ import { FormEvent, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { login } from '../services/auth.ts';
 import { useAuth } from '../contexts/AuthContext.ts';
+import { ERROR_MESSAGES, type ErrorCode } from '../constants/errors.ts';
 
 const LoginPage = () => {
     const auth = useAuth();
 
     const [state, setState] = useState<
-        { status: 'idle' } | { status: 'loading' } | { status: 'error'; message: string }
+        { status: 'idle' } | { status: 'loading' } | { status: 'error'; code: ErrorCode }
     >({ status: 'idle' });
 
     const [form, setForm] = useState({ email: '', password: '' });
@@ -19,7 +20,7 @@ const LoginPage = () => {
 
         const [user, code] = await login(form.email, form.password);
         if (code) {
-            setState({ status: 'error', message: code });
+            setState({ status: 'error', code });
             return;
         }
 
@@ -68,7 +69,7 @@ const LoginPage = () => {
 
                     {state.status === 'error' && (
                         <div className="p-3 rounded bg-red-50 text-red-600 text-sm text-center font-medium border border-red-100">
-                            {state.message}
+                            {ERROR_MESSAGES[state.code]}
                         </div>
                     )}
 
