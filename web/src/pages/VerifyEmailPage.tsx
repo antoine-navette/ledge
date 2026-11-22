@@ -2,7 +2,7 @@ import { useState } from 'react';
 import { verifyEmail } from '../services/email-verification.ts';
 import { useParams } from 'react-router-dom';
 
-export default function VerifyEmail() {
+export default function VerifyEmailPage() {
     const [state, setState] = useState<
         { status: 'idle' } | { status: 'loading' } | { status: 'success' } | { status: 'error'; message: string }
     >({ status: 'idle' });

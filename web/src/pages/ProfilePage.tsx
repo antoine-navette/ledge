@@ -1,9 +1,9 @@
 import { useState } from 'react';
 import { requestEmailVerification } from '../services/email-verification.ts';
 import Navbar from '../components/Navbar.tsx';
-import { useAuth } from '../hooks/useAuth.ts';
+import { useAuth } from '../contexts/AuthContext.ts';
 
-const Profile = () => {
+const ProfilePage = () => {
     const [state, setState] = useState<
         { status: 'idle' } | { status: 'loading' } | { status: 'success' } | { status: 'error'; message: string }
     >({ status: 'idle' });
@@ -52,4 +52,4 @@ const Profile = () => {
     );
 };
 
-export default Profile;
+export default ProfilePage;

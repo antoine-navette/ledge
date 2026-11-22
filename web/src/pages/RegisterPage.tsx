@@ -1,9 +1,9 @@
 import { FormEvent, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { register } from '../services/auth.ts';
-import { useAuth } from '../hooks/useAuth.ts';
+import { useAuth } from '../contexts/AuthContext.ts';
 
-const Register = () => {
+const RegisterPage = () => {
     const auth = useAuth();
 
     const [state, setState] = useState<
@@ -94,4 +94,4 @@ const Register = () => {
     );
 };
 
-export default Register;
+export default RegisterPage;

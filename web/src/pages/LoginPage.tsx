@@ -1,9 +1,9 @@
 import { FormEvent, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { login } from '../services/auth.ts';
-import { useAuth } from '../hooks/useAuth.ts';
+import { useAuth } from '../contexts/AuthContext.ts';
 
-const Login = () => {
+const LoginPage = () => {
     const auth = useAuth();
 
     const [state, setState] = useState<
@@ -93,4 +93,4 @@ const Login = () => {
     );
 };
 
-export default Login;
+export default LoginPage;

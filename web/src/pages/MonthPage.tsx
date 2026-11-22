@@ -6,7 +6,7 @@ import DateNavigator from '../components/DateNavigator';
 import { getUserTransactions } from '../services/transaction.ts';
 import type { Transaction } from '../entities/Transaction';
 
-const Month = () => {
+const MonthPage = () => {
     const navigate = useNavigate();
     const params = useParams();
 
@@ -124,4 +124,4 @@ const Month = () => {
     );
 };
 
-export default Month;
+export default MonthPage;

@@ -2,7 +2,7 @@ import { Link, Navigate, useNavigate, useParams } from 'react-router-dom';
 import Navbar from '../components/Navbar';
 import DateNavigator from '../components/DateNavigator';
 
-const Home = () => {
+const HomePage = () => {
     const navigate = useNavigate();
     const params = useParams();
 
@@ -71,4 +71,4 @@ const Home = () => {
     );
 };
 
-export default Home;
+export default HomePage;

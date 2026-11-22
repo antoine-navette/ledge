@@ -20,7 +20,6 @@ Dans cet ordre, une étape par branche ou par commit :
    - Remplacer `RouteNotFound` par `ErrorPage` avec `ROUTE_NOT_FOUND`.
    - Nettoyer la saisie avant l'envoi : email en minuscules, espaces retirés.
 3. **Renommages, sans changement de comportement** :
-   - Web : suffixer les pages de `Page` (`LoginPage`…), et déplacer `useAuth` dans `contexts/AuthContext.ts`.
    - API : séparer les use cases en `commands/` et `queries/` (`LoginCommand`, `GetUserTransactionsQuery`…), et
      renommer les méthodes des mappers en `toDomain()` / `toInfrastructure()`.
    - Codes, le sujet d'abord : `INVALID_EMAIL` → `EMAIL_INVALID`, `WEAK_PASSWORD` → `PASSWORD_TOO_WEAK`,

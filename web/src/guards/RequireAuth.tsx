@@ -1,4 +1,4 @@
-import { useAuth } from '../hooks/useAuth.ts';
+import { useAuth } from '../contexts/AuthContext.ts';
 import { Navigate, Outlet } from 'react-router-dom';
 
 const RequireAuth = () => {
