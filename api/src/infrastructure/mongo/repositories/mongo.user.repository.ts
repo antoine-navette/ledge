@@ -36,10 +36,10 @@ export class MongoUserRepository implements UserRepository {
         return document ? MongoUserMapper.toDomain(document) : null;
     };
 
-    findByEmailVerificationToken = async (
-        token: NonNullable<User['emailVerification']>['token'],
+    findByEmailVerificationTokenHash = async (
+        tokenHash: NonNullable<User['emailVerification']>['tokenHash'],
     ): Promise<User | null> => {
-        const document = await this.userCollection.findOne({ 'emailVerification.token': token });
+        const document = await this.userCollection.findOne({ 'emailVerification.tokenHash': tokenHash });
 
         return document ? MongoUserMapper.toDomain(document) : null;
     };

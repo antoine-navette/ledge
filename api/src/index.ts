@@ -9,6 +9,7 @@ import { MongoSessionRepository } from './infrastructure/mongo/repositories/mong
 import { NodemailerEmailSender } from './infrastructure/adapters/nodemailer.email-sender.js';
 import { MongoIdGenerator } from './infrastructure/adapters/mongo.id-generator.js';
 import { CryptoTokenGenerator } from './infrastructure/adapters/crypto.token-generator.js';
+import { CryptoTokenHasher } from './infrastructure/adapters/crypto.token-hasher.js';
 import { BcryptPasswordHasher } from './infrastructure/adapters/bcrypt.password-hasher.js';
 import { AuthenticateUseCase } from './application/auth/authenticate.use-case.js';
 import { LogoutUseCase } from './application/auth/logout.use-case.js';
@@ -47,9 +48,10 @@ try {
     const emailSender = new NodemailerEmailSender(smtp.transporter);
     const idGenerator = new MongoIdGenerator();
     const tokenGenerator = new CryptoTokenGenerator();
+    const tokenHasher = new CryptoTokenHasher();
     const passwordHasher = new BcryptPasswordHasher();
 
-    const authenticateUseCase = new AuthenticateUseCase(sessionRepository, userRepository);
+    const authenticateUseCase = new AuthenticateUseCase(sessionRepository, userRepository, tokenHasher);
     const logoutUseCase = new LogoutUseCase(sessionRepository);
     const loginUseCase = new LoginUseCase(
         userRepository,
@@ -57,6 +59,7 @@ try {
         passwordHasher,
         idGenerator,
         tokenGenerator,
+        tokenHasher,
     );
     const registerUseCase = new RegisterUseCase(
         userRepository,
@@ -64,15 +67,17 @@ try {
         passwordHasher,
         idGenerator,
         tokenGenerator,
+        tokenHasher,
     );
     const requestEmailVerificationUseCase = new RequestEmailVerificationUseCase(
         userRepository,
         emailSender,
         tokenGenerator,
+        tokenHasher,
         env.emailFrom,
         env.webUrl,
     );
-    const verifyEmailUseCase = new VerifyEmailUseCase(userRepository);
+    const verifyEmailUseCase = new VerifyEmailUseCase(userRepository, tokenHasher);
     const createTransactionUseCase = new CreateTransactionUseCase(transactionRepository, idGenerator);
     const getUserTransactionsUseCase = new GetUserTransactionsUseCase(transactionRepository);
     const getTransactionUseCase = new GetTransactionUseCase(transactionRepository);

@@ -8,12 +8,9 @@ entrée terminée est retirée dans le commit qui la termine.
 
 Dans cet ordre, une étape par branche ou par commit :
 
-1. **Sécurité** :
-   - Ne stocker que le hash (SHA-256, port `TokenHasher`) des tokens de session et de vérification d'email, avec une
-     migration qui hache les tokens existants (personne n'est déconnecté).
-2. **Renommages, sans changement de comportement** :
+1. **Renommages, sans changement de comportement** :
    - API : séparer les use cases en `commands/` et `queries/` (`LoginCommand`, `GetUserTransactionsQuery`…).
-3. **Le reste** :
+2. **Le reste** :
    - Prolonger la session au plus une fois par jour (`EXTENSION_INTERVAL`, comme dans Saffy), au lieu d'une écriture en
      base à chaque requête authentifiée.
    - Intégrer à leur page les composants utilisés une seule fois (`TransactionListSection`, `TransactionsOverview`, les

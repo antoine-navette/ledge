@@ -13,8 +13,8 @@ export class MongoSessionRepository implements SessionRepository {
         await this.sessionCollection.insertOne(document);
     };
 
-    findByToken = async (token: Session['token']): Promise<Session | null> => {
-        const document = await this.sessionCollection.findOne({ token });
+    findByTokenHash = async (tokenHash: Session['tokenHash']): Promise<Session | null> => {
+        const document = await this.sessionCollection.findOne({ tokenHash });
 
         return document ? MongoSessionMapper.toDomain(document) : null;
     };

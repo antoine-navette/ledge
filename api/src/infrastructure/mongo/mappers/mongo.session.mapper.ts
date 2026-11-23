@@ -7,7 +7,7 @@ export const MongoSessionMapper = {
     toInfrastructure: (session: Session): MongoSessionDocument => ({
         _id: new ObjectId(session.id),
         userId: new ObjectId(session.userId),
-        token: session.token,
+        tokenHash: session.tokenHash,
         expiresAt: session.expiresAt,
         createdAt: session.createdAt,
         updatedAt: session.updatedAt,
@@ -17,7 +17,7 @@ export const MongoSessionMapper = {
         Session.reconstitute(
             document._id.toString() as SessionId,
             document.userId.toString() as UserId,
-            document.token,
+            document.tokenHash,
             document.expiresAt,
             document.createdAt,
             document.updatedAt,

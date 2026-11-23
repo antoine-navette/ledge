@@ -10,7 +10,7 @@ export const MongoUserMapper = {
         isEmailVerified: user.isEmailVerified,
         emailVerification: user.emailVerification
             ? {
-                  token: user.emailVerification.token,
+                  tokenHash: user.emailVerification.tokenHash,
                   expiresAt: user.emailVerification.expiresAt,
                   createdAt: user.emailVerification.createdAt,
               }
@@ -27,7 +27,7 @@ export const MongoUserMapper = {
             document.isEmailVerified,
             document.emailVerification
                 ? User.reconstituteEmailVerification(
-                      document.emailVerification.token,
+                      document.emailVerification.tokenHash,
                       document.emailVerification.expiresAt,
                       document.emailVerification.createdAt,
                   )

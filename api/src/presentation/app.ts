@@ -49,7 +49,7 @@ declare module 'fastify' {
     }
 
     interface FastifyReply {
-        setSessionCookie(session: Session): void;
+        setSessionCookie(session: Session & { token: string }): void;
         clearSessionCookie(): void;
     }
 }
@@ -107,7 +107,7 @@ export const createApp = (
     app.register(fastifyCookie);
 
     // Session cookie
-    app.decorateReply('setSessionCookie', function (session: Session) {
+    app.decorateReply('setSessionCookie', function (session: Session & { token: string }) {
         this.setCookie(SESSION_COOKIE_NAME, session.token, {
             path: '/',
             httpOnly: true,

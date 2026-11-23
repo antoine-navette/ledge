@@ -3,6 +3,7 @@ import type { SessionRepository } from '../../domain/repositories/session.reposi
 import type { PasswordHasher } from '../../domain/ports/password-hasher.js';
 import type { IdGenerator } from '../../domain/ports/id-generator.js';
 import type { TokenGenerator } from '../../domain/ports/token-generator.js';
+import type { TokenHasher } from '../../domain/ports/token-hasher.js';
 import { Session, type SessionId } from '../../domain/entities/session.js';
 
 export class LoginUseCase {
@@ -12,6 +13,7 @@ export class LoginUseCase {
         private passwordHasher: PasswordHasher,
         private idGenerator: IdGenerator,
         private tokenGenerator: TokenGenerator,
+        private tokenHasher: TokenHasher,
     ) {}
 
     execute = async (email: string, password: string) => {
@@ -23,14 +25,10 @@ export class LoginUseCase {
         if (!user) return [null, 'USER_NOT_FOUND'] as const;
         if (!isPasswordCorrect) return [null, 'PASSWORD_WRONG'] as const;
 
-        const session = Session.create(
-            this.idGenerator.generate() as SessionId,
-            user.id,
-            this.tokenGenerator.generate(Session.TOKEN_LENGTH),
-            now,
-        );
+        const token = this.tokenGenerator.generate(Session.TOKEN_LENGTH);
+        const session = Session.create(this.idGenerator.generate() as SessionId, user.id, token, this.tokenHasher, now);
         await this.sessionRepository.create(session);
 
-        return [Object.assign(session, { user }), null] as const;
+        return [Object.assign(session, { token, user }), null] as const;
     };
 }

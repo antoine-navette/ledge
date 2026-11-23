@@ -6,7 +6,7 @@ export type MongoUserDocument = {
     passwordHash: string;
     isEmailVerified: boolean;
     emailVerification: {
-        token: string;
+        tokenHash: string;
         expiresAt: Date;
         createdAt: Date;
     } | null;

@@ -2,12 +2,14 @@ import { User } from '../../domain/entities/user.js';
 import type { EmailSender } from '../../domain/ports/email-sender.js';
 import type { UserRepository } from '../../domain/repositories/user.repository.js';
 import type { TokenGenerator } from '../../domain/ports/token-generator.js';
+import type { TokenHasher } from '../../domain/ports/token-hasher.js';
 
 export class RequestEmailVerificationUseCase {
     constructor(
         private userRepository: UserRepository,
         private emailSender: EmailSender,
         private tokenGenerator: TokenGenerator,
+        private tokenHasher: TokenHasher,
         private emailFrom: string,
         private webUrl: string,
     ) {}
@@ -18,7 +20,7 @@ export class RequestEmailVerificationUseCase {
 
         const token = this.tokenGenerator.generate(User.EMAIL_VERIFICATION_TOKEN_LENGTH);
 
-        const [updated, code] = user.requestEmailVerification(token, now);
+        const [updated, code] = user.requestEmailVerification(token, this.tokenHasher, now);
         if (code) return [null, code] as const;
 
         await this.userRepository.save(updated);
