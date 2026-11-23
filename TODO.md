@@ -11,8 +11,6 @@ Dans cet ordre, une étape par branche ou par commit :
 1. **Sécurité** :
    - Ne stocker que le hash (SHA-256, port `TokenHasher`) des tokens de session et de vérification d'email, avec une
      migration qui hache les tokens existants (personne n'est déconnecté).
-   - Login en temps constant : comparer avec un faux hash quand l'utilisateur n'existe pas, pour que le temps de réponse
-     ne révèle pas si l'email est inscrit.
 2. **Renommages, sans changement de comportement** :
    - API : séparer les use cases en `commands/` et `queries/` (`LoginCommand`, `GetUserTransactionsQuery`…).
 3. **Le reste** :

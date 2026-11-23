@@ -37,5 +37,10 @@ describe('BcryptPasswordHasher', () => {
             const result = await passwordHasher.compare('wrong-password', hash);
             expect(result).toBe(false);
         });
+
+        it('should return false when there is no hash to compare with', async () => {
+            const result = await passwordHasher.compare('password123', null);
+            expect(result).toBe(false);
+        });
     });
 });

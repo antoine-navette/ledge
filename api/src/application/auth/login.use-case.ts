@@ -18,9 +18,9 @@ export class LoginUseCase {
         const now = new Date();
 
         const user = await this.userRepository.findByEmail(email);
+        // Compared even without a user, so that the response time doesn't reveal whether the email is registered
+        const isPasswordCorrect = await this.passwordHasher.compare(password, user?.passwordHash ?? null);
         if (!user) return [null, 'USER_NOT_FOUND'] as const;
-
-        const isPasswordCorrect = await this.passwordHasher.compare(password, user.passwordHash);
         if (!isPasswordCorrect) return [null, 'PASSWORD_WRONG'] as const;
 
         const session = Session.create(
