@@ -25,9 +25,6 @@ Dans cet ordre, une étape par branche ou par commit :
 
 - **Reader CQRS pour l'authentification**, si besoin d'optimiser : charger la session et son user en une seule requête,
   au lieu de deux lectures dans `AuthenticateUseCase`.
-- **Mots de passe au-delà de 72 octets** : `bcrypt` n'en prend en compte que les 72 premiers et ignore le reste en
-  silence. Soit refuser au-delà (avec un code, un message et la même règle dans le front), soit passer à argon2 comme
-  dans Saffy, avec une transition pour les mots de passe existants.
 - **Séparer `Transaction` en deux entités** (revenu et dépense) grâce au polymorphisme.
 - **Type dédié pour `Transaction.date`**, un jour calendaire sans heure ni fuseau, au lieu d'une `Date` à minuit UTC.
   Piste privilégiée : une chaîne brandée `CalendarDate` (`"YYYY-MM-DD"`) avec un module de fonctions, comme les IDs
@@ -64,3 +61,13 @@ Dans cet ordre, une étape par branche ou par commit :
 ## Documentation
 
 - **Écrire une vraie doc**, à l'occasion (voir `docs/` dans Saffy).
+
+## Limites connues
+
+De simples détails, notés pour ne pas les redécouvrir, sans action prévue.
+
+- **`bcrypt` ignore tout ce qui dépasse 72 octets d'un mot de passe.** La troncature a lieu à la création du hash comme
+  à la comparaison, donc la connexion fonctionne normalement : seuls les octets au-delà ne comptent pas. 72 octets, c'est
+  72 caractères ASCII (moins avec des accents ou des emojis), largement assez pour un mot de passe sûr. Le vrai danger
+  de cette troncature, concaténer quelque chose avant le mot de passe pour le hacher, ne nous concerne pas : seul le mot
+  de passe est haché. À revoir si on passe un jour à argon2, comme Saffy, qui n'a pas cette limite.
