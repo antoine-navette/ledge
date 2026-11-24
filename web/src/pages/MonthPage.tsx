@@ -1,7 +1,6 @@
 import { useEffect, useState } from 'react';
 import { Navigate, useNavigate, useParams } from 'react-router-dom';
 import { Pencil, Trash2 } from 'lucide-react';
-import Navbar from '../components/Navbar';
 import DateNavigator from '../components/DateNavigator';
 import UpsertTransactionModal from '../modals/UpsertTransactionModal.tsx';
 import DeleteTransactionModal from '../modals/DeleteTransactionModal.tsx';
@@ -114,201 +113,194 @@ const MonthPage = () => {
     const total = totalIncomes - totalExpenses;
 
     return (
-        <>
-            <Navbar />
+        <div className="flex flex-col flex-1 items-center p-4">
+            <h1 className="text-3xl font-bold mb-6 text-gray-800 select-none">Ledge</h1>
 
-            <div className="flex flex-col flex-1 items-center p-4">
-                <h1 className="text-3xl font-bold mb-6 text-gray-800 select-none">Ledge</h1>
+            <DateNavigator
+                label={`${String(month).padStart(2, '0')}/${year}`}
+                onPrev={goToPreviousMonth}
+                onToday={() => navigate(`/${currentYear}/${String(currentMonth).padStart(2, '0')}`)}
+                onNext={goToNextMonth}
+                isPrevDisabled={year === 1970 && month === 1}
+                isTodayDisabled={year === currentYear && month === currentMonth}
+                isNextDisabled={year === currentYear && month === currentMonth}
+            />
 
-                <DateNavigator
-                    label={`${String(month).padStart(2, '0')}/${year}`}
-                    onPrev={goToPreviousMonth}
-                    onToday={() => navigate(`/${currentYear}/${String(currentMonth).padStart(2, '0')}`)}
-                    onNext={goToNextMonth}
-                    isPrevDisabled={year === 1970 && month === 1}
-                    isTodayDisabled={year === currentYear && month === currentMonth}
-                    isNextDisabled={year === currentYear && month === currentMonth}
-                />
+            {state.status === 'loading' && <p className="text-gray-500 select-none">Loading...</p>}
 
-                {state.status === 'loading' && <p className="text-gray-500 select-none">Loading...</p>}
+            {state.status === 'error' && <p className="text-red-600 select-none">{ERROR_MESSAGES[state.code]}</p>}
 
-                {state.status === 'error' && <p className="text-red-600 select-none">{ERROR_MESSAGES[state.code]}</p>}
+            {state.status === 'success' && (
+                <>
+                    <div className="w-full max-w-5xl bg-white shadow-md rounded-lg p-4 mb-6 text-center">
+                        <h3 className="text-xl font-semibold text-gray-800 select-none">Total balance</h3>
+                        <p
+                            className={`text-2xl font-bold select-none ${total > 0 ? 'text-green-900' : total < 0 ? 'text-red-900' : 'text-black'}`}
+                        >
+                            {total.toFixed(2)} €
+                        </p>
+                    </div>
 
-                {state.status === 'success' && (
-                    <>
-                        <div className="w-full max-w-5xl bg-white shadow-md rounded-lg p-4 mb-6 text-center">
-                            <h3 className="text-xl font-semibold text-gray-800 select-none">Total balance</h3>
-                            <p
-                                className={`text-2xl font-bold select-none ${total > 0 ? 'text-green-900' : total < 0 ? 'text-red-900' : 'text-black'}`}
-                            >
-                                {total.toFixed(2)} €
-                            </p>
-                        </div>
-
-                        <div className="grid grid-cols-1 md:grid-cols-2 gap-6 w-full max-w-5xl">
-                            {(
-                                [
-                                    {
-                                        type: 'income',
-                                        transactions: incomes,
-                                        total: totalIncomes,
-                                        // Full class names, so that Tailwind finds them in the code
-                                        styles: {
-                                            title: 'Incomes',
-                                            background: 'bg-green-50',
-                                            heading: 'text-green-700',
-                                            total: 'text-green-800',
-                                            value: 'text-green-700',
-                                            button: 'bg-green-600 hover:bg-green-700',
-                                            sign: '+',
-                                        },
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-6 w-full max-w-5xl">
+                        {(
+                            [
+                                {
+                                    type: 'income',
+                                    transactions: incomes,
+                                    total: totalIncomes,
+                                    // Full class names, so that Tailwind finds them in the code
+                                    styles: {
+                                        title: 'Incomes',
+                                        background: 'bg-green-50',
+                                        heading: 'text-green-700',
+                                        total: 'text-green-800',
+                                        value: 'text-green-700',
+                                        button: 'bg-green-600 hover:bg-green-700',
+                                        sign: '+',
                                     },
-                                    {
-                                        type: 'expense',
-                                        transactions: expenses,
-                                        total: totalExpenses,
-                                        styles: {
-                                            title: 'Expenses',
-                                            background: 'bg-red-50',
-                                            heading: 'text-red-700',
-                                            total: 'text-red-800',
-                                            value: 'text-red-700',
-                                            button: 'bg-red-600 hover:bg-red-700',
-                                            sign: '-',
-                                        },
+                                },
+                                {
+                                    type: 'expense',
+                                    transactions: expenses,
+                                    total: totalExpenses,
+                                    styles: {
+                                        title: 'Expenses',
+                                        background: 'bg-red-50',
+                                        heading: 'text-red-700',
+                                        total: 'text-red-800',
+                                        value: 'text-red-700',
+                                        button: 'bg-red-600 hover:bg-red-700',
+                                        sign: '-',
                                     },
-                                ] as const
-                            ).map((section) => {
-                                const { styles } = section;
+                                },
+                            ] as const
+                        ).map((section) => {
+                            const { styles } = section;
 
-                                return (
-                                    <div key={section.type} className="flex flex-col gap-3">
-                                        <button
-                                            onClick={() =>
-                                                setModal({ status: 'upsert', type: section.type, transaction: null })
-                                            }
-                                            className={`${styles.button} text-white rounded-md px-4 py-3 text-sm shadow cursor-pointer transition select-none font-semibold flex items-center justify-center gap-2 capitalize`}
-                                        >
-                                            + {section.type}
-                                        </button>
+                            return (
+                                <div key={section.type} className="flex flex-col gap-3">
+                                    <button
+                                        onClick={() =>
+                                            setModal({ status: 'upsert', type: section.type, transaction: null })
+                                        }
+                                        className={`${styles.button} text-white rounded-md px-4 py-3 text-sm shadow cursor-pointer transition select-none font-semibold flex items-center justify-center gap-2 capitalize`}
+                                    >
+                                        + {section.type}
+                                    </button>
 
-                                        <div
-                                            className={`${styles.background} rounded-lg p-4 shadow-md flex flex-col transition-all`}
-                                        >
-                                            <div className="flex justify-between items-end mb-4 border-b pb-2 border-black/5">
-                                                <h3 className={`text-lg font-bold ${styles.heading} select-none`}>
-                                                    {styles.title}
-                                                </h3>
-                                                <p className={`font-semibold ${styles.total} select-none`}>
-                                                    {section.total.toFixed(2)} €
-                                                </p>
-                                            </div>
+                                    <div
+                                        className={`${styles.background} rounded-lg p-4 shadow-md flex flex-col transition-all`}
+                                    >
+                                        <div className="flex justify-between items-end mb-4 border-b pb-2 border-black/5">
+                                            <h3 className={`text-lg font-bold ${styles.heading} select-none`}>
+                                                {styles.title}
+                                            </h3>
+                                            <p className={`font-semibold ${styles.total} select-none`}>
+                                                {section.total.toFixed(2)} €
+                                            </p>
+                                        </div>
 
-                                            <div className="flex flex-col gap-2">
-                                                {section.transactions.length > 0 ? (
-                                                    section.transactions.map((transaction) => (
-                                                        <div
-                                                            key={transaction.id}
-                                                            className="bg-white p-3 rounded-md shadow-sm border border-gray-100 hover:shadow-md transition"
-                                                        >
-                                                            <div className="flex justify-between items-start">
-                                                                <div>
-                                                                    <h4 className="text-gray-800 font-medium select-none">
-                                                                        {transaction.name}
-                                                                    </h4>
+                                        <div className="flex flex-col gap-2">
+                                            {section.transactions.length > 0 ? (
+                                                section.transactions.map((transaction) => (
+                                                    <div
+                                                        key={transaction.id}
+                                                        className="bg-white p-3 rounded-md shadow-sm border border-gray-100 hover:shadow-md transition"
+                                                    >
+                                                        <div className="flex justify-between items-start">
+                                                            <div>
+                                                                <h4 className="text-gray-800 font-medium select-none">
+                                                                    {transaction.name}
+                                                                </h4>
 
-                                                                    <p className="text-gray-400 text-xs mt-0.5 select-none">
-                                                                        {transaction.date.toLocaleDateString('en-UK', {
-                                                                            timeZone: 'UTC',
-                                                                        })}
-                                                                    </p>
-                                                                </div>
-
-                                                                <div className="flex flex-col items-end">
-                                                                    <p
-                                                                        className={`font-bold ${styles.value} select-none`}
-                                                                    >
-                                                                        {styles.sign} {transaction.value} €
-                                                                    </p>
-
-                                                                    {transaction.type === 'expense' &&
-                                                                        transaction.category && (
-                                                                            <span
-                                                                                className={`text-xs px-2 py-0.5 rounded-full mt-1 capitalize select-none font-medium ${
-                                                                                    transaction.category === 'need'
-                                                                                        ? 'bg-blue-100 text-blue-700'
-                                                                                        : transaction.category ===
-                                                                                            'want'
-                                                                                          ? 'bg-red-100 text-red-700'
-                                                                                          : 'bg-green-100 text-green-700'
-                                                                                }`}
-                                                                            >
-                                                                                {transaction.category}
-                                                                            </span>
-                                                                        )}
-                                                                </div>
+                                                                <p className="text-gray-400 text-xs mt-0.5 select-none">
+                                                                    {transaction.date.toLocaleDateString('en-UK', {
+                                                                        timeZone: 'UTC',
+                                                                    })}
+                                                                </p>
                                                             </div>
 
-                                                            <div className="flex justify-end gap-3 mt-3 pt-2 border-t border-gray-50">
-                                                                <button
-                                                                    onClick={() =>
-                                                                        setModal({
-                                                                            status: 'upsert',
-                                                                            type: transaction.type,
-                                                                            transaction,
-                                                                        })
-                                                                    }
-                                                                    className="text-gray-400 hover:text-blue-600 transition cursor-pointer p-1"
-                                                                    aria-label="Edit"
-                                                                >
-                                                                    <Pencil size={16} />
-                                                                </button>
-                                                                <button
-                                                                    onClick={() =>
-                                                                        setModal({ status: 'delete', transaction })
-                                                                    }
-                                                                    className="text-gray-400 hover:text-red-600 transition cursor-pointer p-1"
-                                                                    aria-label="Delete"
-                                                                >
-                                                                    <Trash2 size={16} />
-                                                                </button>
+                                                            <div className="flex flex-col items-end">
+                                                                <p className={`font-bold ${styles.value} select-none`}>
+                                                                    {styles.sign} {transaction.value} €
+                                                                </p>
+
+                                                                {transaction.type === 'expense' &&
+                                                                    transaction.category && (
+                                                                        <span
+                                                                            className={`text-xs px-2 py-0.5 rounded-full mt-1 capitalize select-none font-medium ${
+                                                                                transaction.category === 'need'
+                                                                                    ? 'bg-blue-100 text-blue-700'
+                                                                                    : transaction.category === 'want'
+                                                                                      ? 'bg-red-100 text-red-700'
+                                                                                      : 'bg-green-100 text-green-700'
+                                                                            }`}
+                                                                        >
+                                                                            {transaction.category}
+                                                                        </span>
+                                                                    )}
                                                             </div>
                                                         </div>
-                                                    ))
-                                                ) : (
-                                                    <p className="text-gray-400 text-sm text-center italic py-4 select-none">
-                                                        No {section.type} for this month.
-                                                    </p>
-                                                )}
-                                            </div>
+
+                                                        <div className="flex justify-end gap-3 mt-3 pt-2 border-t border-gray-50">
+                                                            <button
+                                                                onClick={() =>
+                                                                    setModal({
+                                                                        status: 'upsert',
+                                                                        type: transaction.type,
+                                                                        transaction,
+                                                                    })
+                                                                }
+                                                                className="text-gray-400 hover:text-blue-600 transition cursor-pointer p-1"
+                                                                aria-label="Edit"
+                                                            >
+                                                                <Pencil size={16} />
+                                                            </button>
+                                                            <button
+                                                                onClick={() =>
+                                                                    setModal({ status: 'delete', transaction })
+                                                                }
+                                                                className="text-gray-400 hover:text-red-600 transition cursor-pointer p-1"
+                                                                aria-label="Delete"
+                                                            >
+                                                                <Trash2 size={16} />
+                                                            </button>
+                                                        </div>
+                                                    </div>
+                                                ))
+                                            ) : (
+                                                <p className="text-gray-400 text-sm text-center italic py-4 select-none">
+                                                    No {section.type} for this month.
+                                                </p>
+                                            )}
                                         </div>
                                     </div>
-                                );
-                            })}
-                        </div>
+                                </div>
+                            );
+                        })}
+                    </div>
 
-                        {modal.status === 'upsert' && (
-                            <UpsertTransactionModal
-                                onClose={() => setModal({ status: 'closed' })}
-                                transaction={modal.transaction}
-                                type={modal.type}
-                                year={year}
-                                month={month}
-                                onUpsert={handleUpsert}
-                            />
-                        )}
+                    {modal.status === 'upsert' && (
+                        <UpsertTransactionModal
+                            onClose={() => setModal({ status: 'closed' })}
+                            transaction={modal.transaction}
+                            type={modal.type}
+                            year={year}
+                            month={month}
+                            onUpsert={handleUpsert}
+                        />
+                    )}
 
-                        {modal.status === 'delete' && (
-                            <DeleteTransactionModal
-                                onClose={() => setModal({ status: 'closed' })}
-                                transaction={modal.transaction}
-                                onDelete={handleDelete}
-                            />
-                        )}
-                    </>
-                )}
-            </div>
-        </>
+                    {modal.status === 'delete' && (
+                        <DeleteTransactionModal
+                            onClose={() => setModal({ status: 'closed' })}
+                            transaction={modal.transaction}
+                            onDelete={handleDelete}
+                        />
+                    )}
+                </>
+            )}
+        </div>
     );
 };
 

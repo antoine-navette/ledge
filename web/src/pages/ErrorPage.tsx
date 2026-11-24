@@ -32,7 +32,7 @@ const ErrorPage = ({ code, hideBack = false }: Props) => {
     };
 
     return (
-        <div className="flex flex-col flex-1 items-center justify-center min-h-screen p-4 gap-4">
+        <div className="flex flex-col flex-1 items-center justify-center p-4 gap-4">
             <h1 className="text-2xl font-bold text-gray-800">{ERROR_TITLES[code] ?? 'Something went wrong'}</h1>
             <p className="text-gray-600">{ERROR_MESSAGES[code]}</p>
 
