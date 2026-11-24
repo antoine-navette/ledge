@@ -10,7 +10,7 @@ const ProfilePage = () => {
     >({ status: 'idle' });
 
     const auth = useAuth();
-    // Always nested in RequireAuth
+    // Always nested in AuthGuard
     if (!auth.user) return;
 
     const handleClick = async () => {

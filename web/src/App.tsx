@@ -7,8 +7,8 @@ import ProfilePage from './pages/ProfilePage.tsx';
 import VerifyEmailPage from './pages/VerifyEmailPage.tsx';
 import ErrorPage from './pages/ErrorPage.tsx';
 import { useEffect } from 'react';
-import RequireAuth from './guards/RequireAuth.tsx';
-import RequireGuest from './guards/RequireGuest.tsx';
+import AuthGuard from './guards/AuthGuard.tsx';
+import GuestGuard from './guards/GuestGuard.tsx';
 
 function App() {
     const { pathname } = useLocation();
@@ -20,12 +20,12 @@ function App() {
     return (
         <div className="min-h-screen bg-gray-100">
             <Routes>
-                <Route element={<RequireGuest />}>
+                <Route element={<GuestGuard />}>
                     <Route path="/register" element={<RegisterPage />} />
                     <Route path="/login" element={<LoginPage />} />
                 </Route>
 
-                <Route element={<RequireAuth />}>
+                <Route element={<AuthGuard />}>
                     <Route path="/" element={<Navigate to={`/${new Date().getFullYear()}`} replace />} />
                     <Route path="/:year" element={<HomePage />} />
                     <Route path="/:year/:month" element={<MonthPage />} />

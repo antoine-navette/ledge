@@ -13,7 +13,7 @@ const Navbar = () => {
 
         await logout(); // We don't really care if an error occurred
 
-        auth.setUser(null); // RequireAuth will redirect us to login
+        auth.setUser(null); // AuthGuard will redirect us to login
     };
 
     return (

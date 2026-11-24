@@ -24,7 +24,7 @@ const LoginPage = () => {
             return;
         }
 
-        auth.setUser(user); // RequireGuest will redirect us to home
+        auth.setUser(user); // GuestGuard will redirect us to home
     };
 
     return (
