@@ -13,8 +13,8 @@ Dans cet ordre, une étape par branche ou par commit :
 2. **Le reste** :
    - Prolonger la session au plus une fois par jour (`EXTENSION_INTERVAL`, comme dans Saffy), au lieu d'une écriture en
      base à chaque requête authentifiée.
-   - Intégrer à leur page les composants utilisés une seule fois (`TransactionListSection`, `TransactionsOverview`, les
-     deux modales), à juger au cas par cas : les modales forment des blocs bien délimités.
+   - Décider si les deux modales de transaction restent des composants ou rejoignent `MonthPage`, comme
+     `TransactionsOverview` et `TransactionListSection`.
 
 ## API
 
@@ -27,6 +27,12 @@ Dans cet ordre, une étape par branche ou par commit :
   par période marchent toujours), avec une migration. Alternatives : un value object (classe) si la date porte un jour
   de vraies règles, ou `Temporal.PlainDate` quand Temporal sera disponible partout. À faire avec la séparation de
   `Transaction`.
+
+## Web
+
+- **Indenter le front à 2 espaces** au lieu de 4 : la norme de l'écosystème React et la valeur par défaut de Prettier, et
+  le JSX s'imbrique vite. Un réglage dans la config Prettier du web, puis un `prettier --write`, dans un commit à part
+  qui ne contient que ça.
 
 ## Infra
 
