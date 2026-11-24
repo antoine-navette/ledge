@@ -13,8 +13,6 @@ Dans cet ordre, une étape par branche ou par commit :
 2. **Le reste** :
    - Prolonger la session au plus une fois par jour (`EXTENSION_INTERVAL`, comme dans Saffy), au lieu d'une écriture en
      base à chaque requête authentifiée.
-   - Décider si les deux modales de transaction restent des composants ou rejoignent `MonthPage`, comme
-     `TransactionsOverview` et `TransactionListSection`.
 
 ## API
 
@@ -30,6 +28,8 @@ Dans cet ordre, une étape par branche ou par commit :
 
 ## Web
 
+- **Un layout pour les pages connectées** (dans `layouts/`) : afficher la `Navbar` puis un `<Outlet />`, au lieu que
+  chaque page l'affiche elle-même.
 - **Indenter le front à 2 espaces** au lieu de 4 : la norme de l'écosystème React et la valeur par défaut de Prettier, et
   le JSX s'imbrique vite. Un réglage dans la config Prettier du web, puis un `prettier --write`, dans un commit à part
   qui ne contient que ça.

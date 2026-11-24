@@ -1,7 +1,7 @@
 import { useState, FormEvent } from 'react';
 import { createTransaction, updateTransaction } from '../services/transaction.ts';
 import type { Transaction } from '../entities/Transaction';
-import Modal from './Modal.tsx';
+import Modal from '../components/Modal.tsx';
 import { ERROR_MESSAGES, type ErrorCode } from '../constants/errors.ts';
 
 interface Props {
