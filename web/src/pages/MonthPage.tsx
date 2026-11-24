@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react';
 import { Navigate, useNavigate, useParams } from 'react-router-dom';
 import Navbar from '../components/Navbar';
-import TransactionsOverview from '../components/TransactionsOverview.tsx';
+import TransactionListSection from '../components/TransactionListSection.tsx';
 import DateNavigator from '../components/DateNavigator';
 import { getUserTransactions } from '../services/transaction.ts';
 import type { Transaction } from '../entities/Transaction';
@@ -96,6 +96,14 @@ const MonthPage = () => {
         else navigate(`/${year}/${String(month + 1).padStart(2, '0')}`);
     };
 
+    // Empty until the month is loaded: only shown on success anyway
+    const transactions = state.status === 'success' ? state.transactions : [];
+    const incomes = transactions.filter((t) => t.type === 'income').sort((a, b) => b.value - a.value);
+    const expenses = transactions.filter((t) => t.type === 'expense').sort((a, b) => b.value - a.value);
+    const totalIncomes = incomes.reduce((acc, t) => acc + t.value, 0);
+    const totalExpenses = expenses.reduce((acc, t) => acc + t.value, 0);
+    const total = totalIncomes - totalExpenses;
+
     return (
         <>
             <Navbar />
@@ -118,13 +126,37 @@ const MonthPage = () => {
                 {state.status === 'error' && <p className="text-red-600 select-none">{ERROR_MESSAGES[state.code]}</p>}
 
                 {state.status === 'success' && (
-                    <TransactionsOverview
-                        transactions={state.transactions}
-                        year={year}
-                        month={month}
-                        onUpsert={handleUpsert}
-                        onDelete={handleDelete}
-                    />
+                    <>
+                        <div className="w-full max-w-5xl bg-white shadow-md rounded-lg p-4 mb-6 text-center">
+                            <h3 className="text-xl font-semibold text-gray-800 select-none">Total balance</h3>
+                            <p
+                                className={`text-2xl font-bold select-none ${total > 0 ? 'text-green-900' : total < 0 ? 'text-red-900' : 'text-black'}`}
+                            >
+                                {total.toFixed(2)} €
+                            </p>
+                        </div>
+
+                        <div className="grid grid-cols-1 md:grid-cols-2 gap-6 w-full max-w-5xl">
+                            <TransactionListSection
+                                transactions={incomes}
+                                total={totalIncomes}
+                                year={year}
+                                month={month}
+                                type="income"
+                                onUpsert={handleUpsert}
+                                onDelete={handleDelete}
+                            />
+                            <TransactionListSection
+                                transactions={expenses}
+                                total={totalExpenses}
+                                year={year}
+                                month={month}
+                                type="expense"
+                                onUpsert={handleUpsert}
+                                onDelete={handleDelete}
+                            />
+                        </div>
+                    </>
                 )}
             </div>
         </>
