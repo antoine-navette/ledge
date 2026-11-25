@@ -41,7 +41,7 @@ const ErrorPage = ({ code, hideBack = false }: Props) => {
                     <button
                         type="button"
                         onClick={handleBack}
-                        className="px-4 py-2 border border-gray-300 text-gray-700 rounded hover:bg-gray-100 transition cursor-pointer"
+                        className="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700 transition cursor-pointer"
                     >
                         Back
                     </button>
