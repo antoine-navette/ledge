@@ -108,15 +108,22 @@ const UpsertTransactionModal = ({ onClose, transaction, type, year, month, onUps
                     </label>
                     <input
                         id="value"
-                        type="number"
+                        // A text input, since a number input lets letters through and can't limit the decimals as
+                        // they are typed. Mobile keyboards still show digits
+                        type="text"
                         inputMode="decimal"
-                        step="0.01"
-                        min="0.01"
-                        max="999999999.99"
                         value={form.value}
-                        onChange={(e) => setForm((prev) => ({ ...prev, value: e.target.value }))}
+                        onChange={(e) => {
+                            const value = e.target.value;
+                            // Digits only, with a dot and at most 2 decimals. 9 digits before it keep the value within
+                            // the API's maximum (999999999.99). Any other keystroke is ignored
+                            if (!/^\d{0,9}(\.\d{0,2})?$/.test(value)) return;
+                            setForm((prev) => ({ ...prev, value }));
+                        }}
                         className="w-full border rounded px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 transition-colors border-gray-300"
                         required
+                        // At least one non-zero digit, so that 0 is refused before sending (the minimum is 0.01)
+                        pattern=".*[1-9].*"
                     />
                 </div>
 
