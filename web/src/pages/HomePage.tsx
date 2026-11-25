@@ -21,7 +21,7 @@ const HomePage = () => {
     }
 
     return (
-        <div className="flex flex-col flex-1 items-center justify-center p-4">
+        <div className="flex flex-col flex-1 items-center p-4">
             <h1 className="text-3xl font-bold mb-6 text-gray-800 select-none">Ledge</h1>
 
             <DateNavigator

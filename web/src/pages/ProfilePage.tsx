@@ -25,7 +25,7 @@ const ProfilePage = () => {
     };
 
     return (
-        <div className="flex flex-col flex-1 items-center justify-center p-4">
+        <div className="flex flex-col flex-1 items-center p-4">
             <h1 className="text-4xl font-bold mb-4">Profile page</h1>
             <p className="text-lg mb-6">This is the profile page.</p>
             {!auth.user.isEmailVerified && (
