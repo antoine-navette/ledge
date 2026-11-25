@@ -48,6 +48,19 @@ Dans cet ordre, une étape par branche ou par commit :
   le JSX s'imbrique vite. Un réglage dans la config Prettier du web, puis un `prettier --write`, dans un commit à part
   qui ne contient que ça.
 
+- **Langue, format régional et devise**, réglables dans le profil et stockés sur l'utilisateur (pour suivre d'un
+  appareil à l'autre et servir aux emails), avec `navigator.language` par défaut à l'inscription :
+  - **Langue** (EN/FR) : traduit tous les textes, avec une table typée par langue comme `ERROR_MESSAGES` (un texte
+    manquant fait échouer le build), et les emails côté API. `react-i18next` seulement si les pluriels ou les langues
+    se multiplient.
+  - **Format régional** (`fr-FR`, `en-GB`…) : séparateur décimal, position du symbole, format des dates, tout passe par
+    `Intl.NumberFormat` et `Intl.DateTimeFormat` plutôt que par des réglages séparés. Lié à la langue au départ. Le
+    champ du montant accepte alors la virgule en plus du point (ignoré aujourd'hui).
+  - **Devise** : une donnée et non de l'affichage, changer de devise ne convertit rien. Le nombre de décimales en
+    dépend (le yen n'en a aucune), donc la règle des 2 décimales et le minimum de 0,01 aussi : l'occasion de stocker les
+    montants en centimes entiers.
+  - À faire après `CalendarDate` et la séparation de `Transaction`, qui touchent les mêmes endroits.
+
 ## Infra
 
 - **Relancer `npm audit fix`** (sans `--force`) sur l'API et le web quand les correctifs des outils de dev seront
