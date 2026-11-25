@@ -99,3 +99,7 @@ De simples détails, notés pour ne pas les redécouvrir, sans action prévue.
   72 caractères ASCII (moins avec des accents ou des emojis), largement assez pour un mot de passe sûr. Le vrai danger
   de cette troncature, concaténer quelque chose avant le mot de passe pour le hacher, ne nous concerne pas : seul le mot
   de passe est haché. À revoir si on passe un jour à argon2, comme Saffy, qui n'a pas cette limite.
+- **La staging envoie ses emails depuis le même domaine que la prod.** Une erreur en staging (des envois en boucle, des
+  adresses de test qui rebondissent) entame la réputation du domaine de la prod. Pour les séparer, ajouter
+  `staging.ledge.ovh` comme domaine dans Resend, avec ses propres enregistrements DNS, puis passer `EMAIL_FROM` à
+  `no-reply@staging.ledge.ovh` dans le `.env` de la staging. Aucun changement de code.
