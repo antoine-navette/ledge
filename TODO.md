@@ -4,22 +4,6 @@ Ce qu'il reste à faire sur le projet, par catégorie. Les conventions sont cell
 `web-conventions` et `docker-conventions` (`antoine-navette/claude-plugins`, déclarés dans `.claude/settings.json`). Une
 entrée terminée est retirée dans le commit qui la termine.
 
-## Avant de merger `refactor/conventions`
-
-Tester dans l'app, en local puis en staging (« Run workflow » sur la branche) :
-
-- **Connexion et inscription** : un email tapé avec des majuscules passe en minuscules, une erreur affiche un message
-  lisible (« Wrong email or password. ») et non un code. Après le déploiement, la session existante est perdue une fois :
-  se reconnecter.
-- **Vérification d'email** : en demander une depuis le profil, puis ouvrir le lien reçu.
-- **Transactions** : en ajouter une depuis le téléphone avec une espace après le nom, en modifier une, en supprimer une.
-  Ouvrir « Modifier » sur deux transactions à la suite : le formulaire doit reprendre les valeurs de la seconde.
-- **Navigation** : la barre de navigation apparaît une seule fois sur `/2026`, un mois et `/profile`. `/abc` affiche la
-  404 sous la barre si on est connecté, et renvoie vers la connexion sinon. `/2026/13` affiche aussi la 404. « Back »
-  revient à la page précédente, ou sur `/` depuis un nouvel onglet.
-- **Erreur au démarrage** : couper l'API et recharger : la page d'erreur occupe tout l'écran, avec « Retry » et sans
-  « Back ».
-
 ## Alignement sur les conventions
 
 Dans cet ordre, une étape par branche ou par commit :
