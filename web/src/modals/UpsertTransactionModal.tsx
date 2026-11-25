@@ -1,7 +1,8 @@
 import { useState, FormEvent } from 'react';
 import { createTransaction, updateTransaction } from '../services/transaction.ts';
 import type { Transaction } from '../entities/Transaction';
-import Modal from './Modal.tsx';
+import Modal from '../components/Modal.tsx';
+import { ERROR_MESSAGES, type ErrorCode } from '../constants/errors.ts';
 
 interface Props {
     onClose: () => void;
@@ -14,7 +15,7 @@ interface Props {
 
 const UpsertTransactionModal = ({ onClose, transaction, type, year, month, onUpsert }: Props) => {
     const [state, setState] = useState<
-        { status: 'idle' } | { status: 'loading' } | { status: 'error'; message: string }
+        { status: 'idle' } | { status: 'loading' } | { status: 'error'; code: ErrorCode }
     >({ status: 'idle' });
 
     // TODO: clean
@@ -40,11 +41,14 @@ const UpsertTransactionModal = ({ onClose, transaction, type, year, month, onUps
 
         // The date input gives a calendar day ("2026-11-11"), parsed as midnight UTC like transaction dates
         const date = new Date(form.date);
+        // The API refuses surrounding spaces, which mobile keyboards often add after the last word
+        const name = form.name.trim();
+        const value = Number(form.value);
         const [upserted, code] = transaction
-            ? await updateTransaction(transaction.id, form.name, Number(form.value), type, form.category, date)
-            : await createTransaction(form.name, Number(form.value), type, form.category, date);
+            ? await updateTransaction(transaction.id, name, value, type, form.category, date)
+            : await createTransaction(name, value, type, form.category, date);
         if (code) {
-            setState({ status: 'error', message: code });
+            setState({ status: 'error', code });
             return;
         }
 
@@ -70,6 +74,8 @@ const UpsertTransactionModal = ({ onClose, transaction, type, year, month, onUps
                         onChange={(e) => setForm((prev) => ({ ...prev, name: e.target.value }))}
                         className="w-full border rounded px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 transition-colors border-gray-300"
                         required
+                        // At least one visible character, so a name made of spaces only is refused before sending
+                        pattern=".*\S.*"
                         maxLength={99}
                     />
                 </div>
@@ -102,15 +108,22 @@ const UpsertTransactionModal = ({ onClose, transaction, type, year, month, onUps
                     </label>
                     <input
                         id="value"
-                        type="number"
+                        // A text input, since a number input lets letters through and can't limit the decimals as
+                        // they are typed. Mobile keyboards still show digits
+                        type="text"
                         inputMode="decimal"
-                        step="0.01"
-                        min="0.01"
-                        max="999999999.99"
                         value={form.value}
-                        onChange={(e) => setForm((prev) => ({ ...prev, value: e.target.value }))}
+                        onChange={(e) => {
+                            const value = e.target.value;
+                            // Digits only, with a dot and at most 2 decimals. 9 digits before it keep the value within
+                            // the API's maximum (999999999.99). Any other keystroke is ignored
+                            if (!/^\d{0,9}(\.\d{0,2})?$/.test(value)) return;
+                            setForm((prev) => ({ ...prev, value }));
+                        }}
                         className="w-full border rounded px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 transition-colors border-gray-300"
                         required
+                        // At least one non-zero digit, so that 0 is refused before sending (the minimum is 0.01)
+                        pattern=".*[1-9].*"
                     />
                 </div>
 
@@ -169,7 +182,7 @@ const UpsertTransactionModal = ({ onClose, transaction, type, year, month, onUps
 
                 {state.status === 'error' && (
                     <div className="p-3 rounded bg-red-50 text-red-600 text-sm text-center border border-red-100">
-                        {state.message}
+                        {ERROR_MESSAGES[state.code]}
                     </div>
                 )}
 

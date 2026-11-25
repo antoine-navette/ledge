@@ -1,13 +1,14 @@
 import { FormEvent, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { login } from '../services/auth.ts';
-import { useAuth } from '../hooks/useAuth.ts';
+import { useAuth } from '../contexts/AuthContext.ts';
+import { ERROR_MESSAGES, type ErrorCode } from '../constants/errors.ts';
 
-const Login = () => {
+const LoginPage = () => {
     const auth = useAuth();
 
     const [state, setState] = useState<
-        { status: 'idle' } | { status: 'loading' } | { status: 'error'; message: string }
+        { status: 'idle' } | { status: 'loading' } | { status: 'error'; code: ErrorCode }
     >({ status: 'idle' });
 
     const [form, setForm] = useState({ email: '', password: '' });
@@ -17,13 +18,13 @@ const Login = () => {
 
         setState({ status: 'loading' });
 
-        const [user, code] = await login(form.email, form.password);
+        const [user, code] = await login(form.email.trim(), form.password);
         if (code) {
-            setState({ status: 'error', message: code });
+            setState({ status: 'error', code });
             return;
         }
 
-        auth.setUser(user); // RequireGuest will redirect us to home
+        auth.setUser(user); // GuestGuard will redirect us to home
     };
 
     return (
@@ -43,7 +44,7 @@ const Login = () => {
                             type="email"
                             id="email"
                             value={form.email}
-                            onChange={(e) => setForm((prev) => ({ ...prev, email: e.target.value }))}
+                            onChange={(e) => setForm((prev) => ({ ...prev, email: e.target.value.toLowerCase() }))}
                             className="block w-full px-3 py-2 border rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 transition-colors border-gray-300"
                             required
                         />
@@ -68,7 +69,7 @@ const Login = () => {
 
                     {state.status === 'error' && (
                         <div className="p-3 rounded bg-red-50 text-red-600 text-sm text-center font-medium border border-red-100">
-                            {state.message}
+                            {ERROR_MESSAGES[state.code]}
                         </div>
                     )}
 
@@ -93,4 +94,4 @@ const Login = () => {
     );
 };
 
-export default Login;
+export default LoginPage;

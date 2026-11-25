@@ -1,10 +1,11 @@
 import { useState } from 'react';
 import { verifyEmail } from '../services/email-verification.ts';
 import { useParams } from 'react-router-dom';
+import { ERROR_MESSAGES, type ErrorCode } from '../constants/errors.ts';
 
-export default function VerifyEmail() {
+export default function VerifyEmailPage() {
     const [state, setState] = useState<
-        { status: 'idle' } | { status: 'loading' } | { status: 'success' } | { status: 'error'; message: string }
+        { status: 'idle' } | { status: 'loading' } | { status: 'success' } | { status: 'error'; code: ErrorCode }
     >({ status: 'idle' });
 
     const { token } = useParams();
@@ -15,7 +16,7 @@ export default function VerifyEmail() {
 
         const code = await verifyEmail(token);
         if (code) {
-            setState({ status: 'error', message: code });
+            setState({ status: 'error', code });
             return;
         }
 
@@ -38,7 +39,7 @@ export default function VerifyEmail() {
                         </button>
                         {state.status === 'error' && (
                             <div className="text-red-600">
-                                <p>{state.message}</p>
+                                <p>{ERROR_MESSAGES[state.code]}</p>
                             </div>
                         )}
                     </>

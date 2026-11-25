@@ -1,7 +1,8 @@
 import { useState } from 'react';
 import { deleteTransaction } from '../services/transaction.ts';
 import type { Transaction } from '../entities/Transaction';
-import Modal from './Modal.tsx';
+import Modal from '../components/Modal.tsx';
+import { ERROR_MESSAGES, type ErrorCode } from '../constants/errors.ts';
 
 interface Props {
     onClose: () => void;
@@ -11,7 +12,7 @@ interface Props {
 
 const DeleteTransactionModal = ({ onClose, transaction, onDelete }: Props) => {
     const [state, setState] = useState<
-        { status: 'idle' } | { status: 'loading' } | { status: 'error'; message: string }
+        { status: 'idle' } | { status: 'loading' } | { status: 'error'; code: ErrorCode }
     >({ status: 'idle' });
 
     const handleDelete = async () => {
@@ -19,7 +20,7 @@ const DeleteTransactionModal = ({ onClose, transaction, onDelete }: Props) => {
 
         const code = await deleteTransaction(transaction.id);
         if (code) {
-            setState({ status: 'error', message: code });
+            setState({ status: 'error', code });
             return;
         }
 
@@ -36,7 +37,9 @@ const DeleteTransactionModal = ({ onClose, transaction, onDelete }: Props) => {
             </p>
 
             {state.status === 'error' && (
-                <p className="text-sm text-red-500 mb-4 bg-red-50 p-2 rounded text-center">{state.message}</p>
+                <p className="text-sm text-red-500 mb-4 bg-red-50 p-2 rounded text-center">
+                    {ERROR_MESSAGES[state.code]}
+                </p>
             )}
 
             <div className="flex justify-end gap-3">

@@ -11,6 +11,7 @@ import { unauthorizedSchema } from '../../schemas/unauthorized.schema.js';
 import { forbiddenSchema } from '../../schemas/forbidden.schema.js';
 import { transactionNotFoundSchema } from '../../schemas/transaction-not-found.schema.js';
 import { payloadTooLargeSchema } from '../../schemas/payload-too-large.schema.js';
+import { unsupportedMediaTypeSchema } from '../../schemas/unsupported-media-type.schema.js';
 import { tooManyRequestsSchema } from '../../schemas/too-many-requests.schema.js';
 import { internalServerErrorSchema } from '../../schemas/internal-server-error.schema.js';
 import { TransactionPresenter } from '../../presenters/transaction.presenter.js';
@@ -52,6 +53,7 @@ export const updateTransactionRoute: FastifyPluginAsync<Options> = async (
                 403: forbiddenSchema,
                 404: transactionNotFoundSchema,
                 413: payloadTooLargeSchema,
+                415: unsupportedMediaTypeSchema,
                 422: unprocessableContentSchema,
                 429: tooManyRequestsSchema,
                 500: internalServerErrorSchema,

@@ -8,25 +8,25 @@ export class MongoSessionRepository implements SessionRepository {
     constructor(private sessionCollection: Collection<MongoSessionDocument>) {}
 
     create = async (session: Session): Promise<void> => {
-        const document = MongoSessionMapper.toDocument(session);
+        const document = MongoSessionMapper.toInfrastructure(session);
 
         await this.sessionCollection.insertOne(document);
     };
 
-    findByToken = async (token: Session['token']): Promise<Session | null> => {
-        const document = await this.sessionCollection.findOne({ token });
+    findByTokenHash = async (tokenHash: Session['tokenHash']): Promise<Session | null> => {
+        const document = await this.sessionCollection.findOne({ tokenHash });
 
-        return document ? MongoSessionMapper.toEntity(document) : null;
+        return document ? MongoSessionMapper.toDomain(document) : null;
     };
 
     save = async (session: Session): Promise<void> => {
-        const { _id, ...rest } = MongoSessionMapper.toDocument(session);
+        const { _id, ...rest } = MongoSessionMapper.toInfrastructure(session);
 
         await this.sessionCollection.updateOne({ _id }, { $set: rest });
     };
 
     delete = async (session: Session): Promise<void> => {
-        const { _id } = MongoSessionMapper.toDocument(session);
+        const { _id } = MongoSessionMapper.toInfrastructure(session);
 
         await this.sessionCollection.deleteOne({ _id });
     };

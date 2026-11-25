@@ -1,4 +1,5 @@
 import type { PasswordHasher } from '../ports/password-hasher.js';
+import type { TokenHasher } from '../ports/token-hasher.js';
 
 // Not exported: an email verification only exists through its User, which is the only one able to create or rebuild it
 class EmailVerification {
@@ -10,12 +11,13 @@ class EmailVerification {
     private static readonly DURATION = 60 * 60 * 1000;
 
     private constructor(
-        public readonly token: string,
+        // Only the token's hash is stored, like a session's: the token itself only exists in the email's link
+        public readonly tokenHash: string,
         public readonly expiresAt: Date,
         public readonly createdAt: Date,
     ) {}
 
-    static create = (token: string, now: Date) => {
+    static create = (token: string, tokenHasher: TokenHasher, now: Date) => {
         // Same reasoning as Session.create(): token length is a security property, not an
         // incidental format detail — a wrong length means the caller's TokenGenerator wiring
         // is broken, a programmer error, not a legitimate outcome to report as a 4xx.
@@ -25,11 +27,15 @@ class EmailVerification {
             );
         }
 
-        return new EmailVerification(token, new Date(now.getTime() + EmailVerification.DURATION), now);
+        return new EmailVerification(
+            tokenHasher.hash(token),
+            new Date(now.getTime() + EmailVerification.DURATION),
+            now,
+        );
     };
 
-    static reconstitute = (token: string, expiresAt: Date, createdAt: Date) => {
-        return new EmailVerification(token, expiresAt, createdAt);
+    static reconstitute = (tokenHash: string, expiresAt: Date, createdAt: Date) => {
+        return new EmailVerification(tokenHash, expiresAt, createdAt);
     };
 }
 
@@ -73,14 +79,14 @@ export class User {
         return [new User(id, email, passwordHash, false, null, now, now), null] as const;
     };
 
-    requestEmailVerification = (token: string, now: Date) => {
+    requestEmailVerification = (token: string, tokenHasher: TokenHasher, now: Date) => {
         if (this.isEmailVerified) return [null, 'EMAIL_ALREADY_VERIFIED'] as const;
 
         if (
             this.emailVerification &&
             now.getTime() - this.emailVerification.createdAt.getTime() < EmailVerification.COOLDOWN_DURATION
         ) {
-            return [null, 'ACTIVE_COOLDOWN'] as const;
+            return [null, 'EMAIL_VERIFICATION_COOLDOWN_ACTIVE'] as const;
         }
 
         return [
@@ -89,7 +95,7 @@ export class User {
                 this.email,
                 this.passwordHash,
                 this.isEmailVerified,
-                EmailVerification.create(token, now),
+                EmailVerification.create(token, tokenHasher, now),
                 this.createdAt,
                 now,
             ),
@@ -97,29 +103,29 @@ export class User {
         ] as const;
     };
 
-    // No token argument here, on purpose: whether the caller actually supplied the right
-    // token is entirely decided by which repository lookup found this User in the first
-    // place (by token, never by id, for this flow) — an entity-level re-check couldn't add
-    // real protection anyway, since any caller holding a User can already read the correct
-    // value straight off emailVerification.token and hand it right back. That property has
-    // to be guarded by the use case's choice of query, not by this method — covered by tests.
+    // No token argument here, on purpose: whether the caller supplied the right token is
+    // entirely decided by which repository lookup found this User in the first place (by the
+    // token's hash, never by id, for this flow). That property has to be guarded by the use
+    // case's choice of query, not by this method.
     verifyEmail = (now: Date) => {
         // Should never happen: the use case only ever gets here via a repository lookup by
-        // token, which can't succeed without emailVerification being set. If it's null
+        // the token's hash, which can't succeed without emailVerification being set. If it's null
         // anyway, that's a programmer error, not a legitimate outcome to report as a 4xx —
         // let it throw and surface as a 500, like any other unexpected exception.
         if (!this.emailVerification) {
             throw new Error('User.verifyEmail called without a pending email verification');
         }
 
-        if (this.emailVerification.expiresAt < now) return [null, 'TOKEN_EXPIRED'] as const;
+        if (this.emailVerification.expiresAt < now) return [null, 'EMAIL_VERIFICATION_EXPIRED'] as const;
 
         return [new User(this.id, this.email, this.passwordHash, true, null, this.createdAt, now), null] as const;
     };
 
     private static validateEmail = (email: string) => {
-        if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
-            return 'INVALID_EMAIL' as const;
+        // Strict on purpose: the email must already be lowercase (and the regex rejects any whitespace), so what is stored
+        // is exactly what clients send, at registration as well as at login
+        if (email !== email.toLowerCase() || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
+            return 'EMAIL_INVALID' as const;
         }
 
         return null;
@@ -133,7 +139,7 @@ export class User {
             !/\d/.test(password) ||
             !/[!@#$%^&*(),.?":{}|<>]/.test(password)
         ) {
-            return 'WEAK_PASSWORD' as const;
+            return 'PASSWORD_TOO_WEAK' as const;
         }
 
         return null;

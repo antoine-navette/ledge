@@ -39,6 +39,7 @@ import { deleteTransactionRoute } from './routes/transaction/delete-transaction.
 import type { RouteNotFoundSchema } from './schemas/route-not-found.schema.js';
 import type { BadRequestSchema } from './schemas/bad-request.schema.js';
 import type { PayloadTooLargeSchema } from './schemas/payload-too-large.schema.js';
+import type { UnsupportedMediaTypeSchema } from './schemas/unsupported-media-type.schema.js';
 import type { TooManyRequestsSchema } from './schemas/too-many-requests.schema.js';
 import type { InternalServerErrorSchema } from './schemas/internal-server-error.schema.js';
 
@@ -48,7 +49,7 @@ declare module 'fastify' {
     }
 
     interface FastifyReply {
-        setSessionCookie(session: Session): void;
+        setSessionCookie(session: Session & { token: string }): void;
         clearSessionCookie(): void;
     }
 }
@@ -106,7 +107,7 @@ export const createApp = (
     app.register(fastifyCookie);
 
     // Session cookie
-    app.decorateReply('setSessionCookie', function (session: Session) {
+    app.decorateReply('setSessionCookie', function (session: Session & { token: string }) {
         this.setCookie(SESSION_COOKIE_NAME, session.token, {
             path: '/',
             httpOnly: true,
@@ -171,6 +172,15 @@ export const createApp = (
         if (err instanceof Error && 'statusCode' in err && err.statusCode === 413) {
             request.log.warn({ err }, 'Payload too large');
             return reply.status(413).send({ code: 'PAYLOAD_TOO_LARGE' } satisfies PayloadTooLargeSchema);
+        }
+
+        // Body with a Content-Type that has no registered parser (only application/json and text/plain by default,
+        // e.g. multipart/form-data or application/x-www-form-urlencoded), a malformed Content-Type, or a body sent
+        // without any Content-Type — only possible on bodywith routes (POST/PUT/PATCH/DELETE/OPTIONS), like the 413.
+        // Note that text/plain is parsed as a string and then fails the zod validation with a 400 instead.
+        if (err instanceof Error && 'statusCode' in err && err.statusCode === 415) {
+            request.log.warn({ err }, 'Unsupported media type');
+            return reply.status(415).send({ code: 'UNSUPPORTED_MEDIA_TYPE' } satisfies UnsupportedMediaTypeSchema);
         }
 
         if (err instanceof Error && 'statusCode' in err && err.statusCode === 429) {

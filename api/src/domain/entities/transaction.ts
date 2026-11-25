@@ -60,14 +60,16 @@ export class Transaction {
         date: Date,
         now: Date,
     ) => {
-        if (name.length < 1 || name.length > 99) {
+        // Strict on purpose: the name must already be trimmed, it is stored exactly as sent
+        if (name !== name.trim() || name.length < 1 || name.length > 99) {
             return 'TRANSACTION_NAME_INVALID' as const;
         }
 
         // We cannot check Number.isInteger(value * 100)
         // It doesn't work with some values (ex.: 542.42) due to binary conversions
         const decimals = value.toString().split('.')[1];
-        if (value < 0.01 || value > 999999999.99 || (decimals && decimals.length > 2)) {
+        // Number.isFinite first: NaN fails every comparison below, so it would otherwise pass
+        if (!Number.isFinite(value) || value < 0.01 || value > 999999999.99 || (decimals && decimals.length > 2)) {
             return 'TRANSACTION_VALUE_INVALID' as const;
         }
 

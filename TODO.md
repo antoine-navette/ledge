@@ -1,12 +1,21 @@
 # TODO
 
-Ce qu'il reste à faire sur le projet, par catégorie. Saffy (`../saffy`), qui utilise quasiment les mêmes technos, sert
-de référence pour les conventions. Une entrée terminée est retirée dans le commit qui la termine.
+Ce qu'il reste à faire sur le projet, par catégorie. Les conventions sont celles des plugins `api-conventions`,
+`web-conventions` et `docker-conventions` (`antoine-navette/claude-plugins`, déclarés dans `.claude/settings.json`). Une
+entrée terminée est retirée dans le commit qui la termine.
+
+## Alignement sur les conventions
+
+Dans cet ordre, une étape par branche ou par commit :
+
+1. **Renommages, sans changement de comportement** :
+   - API : séparer les use cases en `commands/` et `queries/` (`LoginCommand`, `GetUserTransactionsQuery`…).
+2. **Le reste** :
+   - Prolonger la session au plus une fois par jour (`EXTENSION_INTERVAL`, comme dans Saffy), au lieu d'une écriture en
+     base à chaque requête authentifiée.
 
 ## API
 
-- **Prolonger la session au plus une fois par jour** (`EXTENSION_INTERVAL`, comme dans Saffy), au lieu d'une écriture en
-  base à chaque requête authentifiée.
 - **Reader CQRS pour l'authentification**, si besoin d'optimiser : charger la session et son user en une seule requête,
   au lieu de deux lectures dans `AuthenticateUseCase`.
 - **Séparer `Transaction` en deux entités** (revenu et dépense) grâce au polymorphisme.
@@ -19,8 +28,22 @@ de référence pour les conventions. Une entrée terminée est retirée dans le 
 
 ## Web
 
-- **Messages d'erreur lisibles** : traduire les codes d'erreur en messages (comme `constants/errors.ts` dans Saffy) au
-  lieu d'afficher le code brut.
+- **Indenter le front à 2 espaces** au lieu de 4 : la norme de l'écosystème React et la valeur par défaut de Prettier, et
+  le JSX s'imbrique vite. Un réglage dans la config Prettier du web, puis un `prettier --write`, dans un commit à part
+  qui ne contient que ça.
+
+- **Langue, format régional et devise**, réglables dans le profil et stockés sur l'utilisateur (pour suivre d'un
+  appareil à l'autre et servir aux emails), avec `navigator.language` par défaut à l'inscription :
+  - **Langue** (EN/FR) : traduit tous les textes, avec une table typée par langue comme `ERROR_MESSAGES` (un texte
+    manquant fait échouer le build), et les emails côté API. `react-i18next` seulement si les pluriels ou les langues
+    se multiplient.
+  - **Format régional** (`fr-FR`, `en-GB`…) : séparateur décimal, position du symbole, format des dates, tout passe par
+    `Intl.NumberFormat` et `Intl.DateTimeFormat` plutôt que par des réglages séparés. Lié à la langue au départ. Le
+    champ du montant accepte alors la virgule en plus du point (ignoré aujourd'hui).
+  - **Devise** : une donnée et non de l'affichage, changer de devise ne convertit rien. Le nombre de décimales en
+    dépend (le yen n'en a aucune), donc la règle des 2 décimales et le minimum de 0,01 aussi : l'occasion de stocker les
+    montants en centimes entiers.
+  - À faire après `CalendarDate` et la séparation de `Transaction`, qui touchent les mêmes endroits.
 
 ## Infra
 
@@ -50,3 +73,17 @@ de référence pour les conventions. Une entrée terminée est retirée dans le 
 ## Documentation
 
 - **Écrire une vraie doc**, à l'occasion (voir `docs/` dans Saffy).
+
+## Limites connues
+
+De simples détails, notés pour ne pas les redécouvrir, sans action prévue.
+
+- **`bcrypt` ignore tout ce qui dépasse 72 octets d'un mot de passe.** La troncature a lieu à la création du hash comme
+  à la comparaison, donc la connexion fonctionne normalement : seuls les octets au-delà ne comptent pas. 72 octets, c'est
+  72 caractères ASCII (moins avec des accents ou des emojis), largement assez pour un mot de passe sûr. Le vrai danger
+  de cette troncature, concaténer quelque chose avant le mot de passe pour le hacher, ne nous concerne pas : seul le mot
+  de passe est haché. À revoir si on passe un jour à argon2, comme Saffy, qui n'a pas cette limite.
+- **La staging envoie ses emails depuis le même domaine que la prod.** Une erreur en staging (des envois en boucle, des
+  adresses de test qui rebondissent) entame la réputation du domaine de la prod. Pour les séparer, ajouter
+  `staging.ledge.ovh` comme domaine dans Resend, avec ses propres enregistrements DNS, puis passer `EMAIL_FROM` à
+  `no-reply@staging.ledge.ovh` dans le `.env` de la staging. Aucun changement de code.

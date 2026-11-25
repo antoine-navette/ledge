@@ -3,9 +3,10 @@ import type { FastifyZodOpenApiSchema, FastifyZodOpenApiTypeProvider } from 'fas
 import z from 'zod';
 import type { VerifyEmailUseCase } from '../../../application/email-verification/verify-email.use-case.js';
 import { emailVerificationNotFoundSchema } from '../../schemas/email-verification-not-found.schema.js';
-import { tokenExpiredSchema } from '../../schemas/token-expired.schema.js';
+import { emailVerificationExpiredSchema } from '../../schemas/email-verification-expired.schema.js';
 import { badRequestSchema } from '../../schemas/bad-request.schema.js';
 import { payloadTooLargeSchema } from '../../schemas/payload-too-large.schema.js';
+import { unsupportedMediaTypeSchema } from '../../schemas/unsupported-media-type.schema.js';
 import { tooManyRequestsSchema } from '../../schemas/too-many-requests.schema.js';
 import { internalServerErrorSchema } from '../../schemas/internal-server-error.schema.js';
 
@@ -26,8 +27,9 @@ export const verifyEmailRoute: FastifyPluginAsync<Options> = async (app, { verif
                 204: {},
                 400: badRequestSchema,
                 404: emailVerificationNotFoundSchema,
-                410: tokenExpiredSchema,
+                410: emailVerificationExpiredSchema,
                 413: payloadTooLargeSchema,
+                415: unsupportedMediaTypeSchema,
                 429: tooManyRequestsSchema,
                 500: internalServerErrorSchema,
             },
@@ -39,9 +41,9 @@ export const verifyEmailRoute: FastifyPluginAsync<Options> = async (app, { verif
                     request.log.warn({ code }, 'Not found');
                     return reply.status(404).send({ code: 'EMAIL_VERIFICATION_NOT_FOUND' });
                 }
-                if (code === 'TOKEN_EXPIRED') {
+                if (code === 'EMAIL_VERIFICATION_EXPIRED') {
                     request.log.warn({ code }, 'Gone');
-                    return reply.status(410).send({ code: 'TOKEN_EXPIRED' });
+                    return reply.status(410).send({ code: 'EMAIL_VERIFICATION_EXPIRED' });
                 }
                 return code satisfies never;
             }

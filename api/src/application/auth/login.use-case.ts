@@ -3,6 +3,7 @@ import type { SessionRepository } from '../../domain/repositories/session.reposi
 import type { PasswordHasher } from '../../domain/ports/password-hasher.js';
 import type { IdGenerator } from '../../domain/ports/id-generator.js';
 import type { TokenGenerator } from '../../domain/ports/token-generator.js';
+import type { TokenHasher } from '../../domain/ports/token-hasher.js';
 import { Session, type SessionId } from '../../domain/entities/session.js';
 
 export class LoginUseCase {
@@ -12,25 +13,22 @@ export class LoginUseCase {
         private passwordHasher: PasswordHasher,
         private idGenerator: IdGenerator,
         private tokenGenerator: TokenGenerator,
+        private tokenHasher: TokenHasher,
     ) {}
 
     execute = async (email: string, password: string) => {
         const now = new Date();
 
         const user = await this.userRepository.findByEmail(email);
+        // Compared even without a user, so that the response time doesn't reveal whether the email is registered
+        const isPasswordCorrect = await this.passwordHasher.compare(password, user?.passwordHash ?? null);
         if (!user) return [null, 'USER_NOT_FOUND'] as const;
+        if (!isPasswordCorrect) return [null, 'PASSWORD_WRONG'] as const;
 
-        const isPasswordCorrect = await this.passwordHasher.compare(password, user.passwordHash);
-        if (!isPasswordCorrect) return [null, 'WRONG_PASSWORD'] as const;
-
-        const session = Session.create(
-            this.idGenerator.generate() as SessionId,
-            user.id,
-            this.tokenGenerator.generate(Session.TOKEN_LENGTH),
-            now,
-        );
+        const token = this.tokenGenerator.generate(Session.TOKEN_LENGTH);
+        const session = Session.create(this.idGenerator.generate() as SessionId, user.id, token, this.tokenHasher, now);
         await this.sessionRepository.create(session);
 
-        return [Object.assign(session, { user }), null] as const;
+        return [Object.assign(session, { token, user }), null] as const;
     };
 }

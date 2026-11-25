@@ -8,9 +8,13 @@ import { BrowserRouter } from 'react-router-dom';
 createRoot(document.getElementById('root')!).render(
     <StrictMode>
         <BrowserRouter>
-            <AuthProvider>
-                <App />
-            </AuthProvider>
+            {/* The frame of the whole app, so that everything rendered, even before App (the session loading or
+            failing), fills the screen */}
+            <div className="flex flex-col min-h-screen bg-gray-100">
+                <AuthProvider>
+                    <App />
+                </AuthProvider>
+            </div>
         </BrowserRouter>
     </StrictMode>,
 );

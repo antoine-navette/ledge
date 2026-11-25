@@ -3,14 +3,14 @@ import type { MongoUserDocument } from '../documents/mongo.user.document.js';
 import { ObjectId } from 'mongodb';
 
 export const MongoUserMapper = {
-    toDocument: (user: User): MongoUserDocument => ({
+    toInfrastructure: (user: User): MongoUserDocument => ({
         _id: new ObjectId(user.id),
         email: user.email,
         passwordHash: user.passwordHash,
         isEmailVerified: user.isEmailVerified,
         emailVerification: user.emailVerification
             ? {
-                  token: user.emailVerification.token,
+                  tokenHash: user.emailVerification.tokenHash,
                   expiresAt: user.emailVerification.expiresAt,
                   createdAt: user.emailVerification.createdAt,
               }
@@ -19,7 +19,7 @@ export const MongoUserMapper = {
         updatedAt: user.updatedAt,
     }),
 
-    toEntity: (document: MongoUserDocument): User =>
+    toDomain: (document: MongoUserDocument): User =>
         User.reconstitute(
             document._id.toString() as UserId,
             document.email,
@@ -27,7 +27,7 @@ export const MongoUserMapper = {
             document.isEmailVerified,
             document.emailVerification
                 ? User.reconstituteEmailVerification(
-                      document.emailVerification.token,
+                      document.emailVerification.tokenHash,
                       document.emailVerification.expiresAt,
                       document.emailVerification.createdAt,
                   )

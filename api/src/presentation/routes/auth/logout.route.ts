@@ -6,6 +6,7 @@ import { isAuthenticated } from '../../middlewares/is-authenticated.middleware.j
 import { unauthorizedSchema } from '../../schemas/unauthorized.schema.js';
 import { badRequestSchema } from '../../schemas/bad-request.schema.js';
 import { payloadTooLargeSchema } from '../../schemas/payload-too-large.schema.js';
+import { unsupportedMediaTypeSchema } from '../../schemas/unsupported-media-type.schema.js';
 import { tooManyRequestsSchema } from '../../schemas/too-many-requests.schema.js';
 import { internalServerErrorSchema } from '../../schemas/internal-server-error.schema.js';
 
@@ -25,6 +26,7 @@ export const logoutRoute: FastifyPluginAsync<Options> = async (app, { authentica
                 400: badRequestSchema,
                 401: unauthorizedSchema,
                 413: payloadTooLargeSchema,
+                415: unsupportedMediaTypeSchema,
                 429: tooManyRequestsSchema,
                 500: internalServerErrorSchema,
             },

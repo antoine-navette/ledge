@@ -5,10 +5,11 @@ import type { RequestEmailVerificationUseCase } from '../../../application/email
 import type { AuthenticateUseCase } from '../../../application/auth/authenticate.use-case.js';
 import { isAuthenticated } from '../../middlewares/is-authenticated.middleware.js';
 import { unauthorizedSchema } from '../../schemas/unauthorized.schema.js';
-import { activeCooldownSchema } from '../../schemas/active-cooldown.schema.js';
+import { emailVerificationCooldownActiveSchema } from '../../schemas/email-verification-cooldown-active.schema.js';
 import { emailAlreadyVerifiedSchema } from '../../schemas/email-already-verified.schema.js';
 import { badRequestSchema } from '../../schemas/bad-request.schema.js';
 import { payloadTooLargeSchema } from '../../schemas/payload-too-large.schema.js';
+import { unsupportedMediaTypeSchema } from '../../schemas/unsupported-media-type.schema.js';
 import { tooManyRequestsSchema } from '../../schemas/too-many-requests.schema.js';
 import { internalServerErrorSchema } from '../../schemas/internal-server-error.schema.js';
 
@@ -30,8 +31,9 @@ export const requestEmailVerificationRoute: FastifyPluginAsync<Options> = async 
                 204: {},
                 400: badRequestSchema,
                 401: unauthorizedSchema,
-                409: z.union([activeCooldownSchema, emailAlreadyVerifiedSchema]),
+                409: z.union([emailVerificationCooldownActiveSchema, emailAlreadyVerifiedSchema]),
                 413: payloadTooLargeSchema,
+                415: unsupportedMediaTypeSchema,
                 429: tooManyRequestsSchema,
                 500: internalServerErrorSchema,
             },
@@ -40,9 +42,9 @@ export const requestEmailVerificationRoute: FastifyPluginAsync<Options> = async 
         handler: async (request, reply) => {
             const [, code] = await requestEmailVerificationUseCase.execute(request.session.user);
             if (code) {
-                if (code === 'ACTIVE_COOLDOWN') {
+                if (code === 'EMAIL_VERIFICATION_COOLDOWN_ACTIVE') {
                     request.log.warn({ code }, 'Conflict');
-                    return reply.status(409).send({ code: 'ACTIVE_COOLDOWN' });
+                    return reply.status(409).send({ code: 'EMAIL_VERIFICATION_COOLDOWN_ACTIVE' });
                 }
                 if (code === 'EMAIL_ALREADY_VERIFIED') {
                     request.log.warn({ code }, 'Conflict');

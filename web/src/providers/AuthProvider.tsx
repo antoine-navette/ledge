@@ -40,7 +40,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     }
 
     if (state.status === 'error') {
-        return <ErrorPage code={state.code} />;
+        return <ErrorPage code={state.code} hideBack />;
     }
 
     return <AuthContext.Provider value={{ user: state.user, setUser }}>{children}</AuthContext.Provider>;
