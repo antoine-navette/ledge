@@ -14,24 +14,51 @@ Dans cet ordre, une étape par branche ou par commit :
    - Prolonger la session au plus une fois par jour (`EXTENSION_INTERVAL`, comme dans Saffy), au lieu d'une écriture en
      base à chaque requête authentifiée.
 
+## Fonctionnalités
+
+- **Revoir l'authentification**, dans une même branche :
+  - **Inscription par lien envoyé par email** : on saisit son email, le lien mène au choix du mot de passe, et le compte
+    est créé avec un email forcément vérifié. Le formulaire répond toujours « vérifie ta boîte mail » (si le compte
+    existe, l'email le dit à son propriétaire) : il ne révèle plus quels emails sont utilisés, et `EmailVerification`
+    disparaît. À trancher : garder le mot de passe pour la connexion, ou se connecter par lien à chaque fois et le
+    supprimer (les deux points suivants disparaissent alors).
+  - **Modifier son mot de passe** depuis le profil, et **mot de passe oublié** par lien envoyé par email.
+  - **Modifier son email**, confirmé par un lien envoyé à la nouvelle adresse.
+  - **2FA** (TOTP, avec une application d'authentification).
+- **Une page de graphiques** : la répartition des dépenses par catégorie sur un mois ou une année, l'évolution des
+  dépenses mois après mois, le moment du mois où l'on dépense le plus…
+
 ## API
 
 - **Reader CQRS pour l'authentification**, si besoin d'optimiser : charger la session et son user en une seule requête,
   au lieu de deux lectures dans `AuthenticateUseCase`.
-- **Séparer `Transaction` en deux entités** (revenu et dépense) grâce au polymorphisme.
-- **Type dédié pour `Transaction.date`**, un jour calendaire sans heure ni fuseau, au lieu d'une `Date` à minuit UTC.
-  Piste privilégiée : une chaîne brandée `CalendarDate` (`"YYYY-MM-DD"`) avec un module de fonctions, comme les IDs
-  brandés, côté API et front. Stockée telle quelle en base (l'ordre alphabétique est chronologique, donc les requêtes
-  par période marchent toujours), avec une migration. Alternatives : un value object (classe) si la date porte un jour
-  de vraies règles, ou `Temporal.PlainDate` quand Temporal sera disponible partout. À faire avec la séparation de
-  `Transaction`.
+- **Type dédié pour `Transaction.date`**, un jour calendaire sans heure ni fuseau, au lieu d'une `Date` à minuit UTC
+  (branche `refactor/calendar-date`) :
+  - Un value object `CalendarDate` (`{ year, month, day }` en nombres), dont `create()` refuse une date qui n'existe pas
+    (30 février, mois 13). Stocké en sous-document, avec un index sur `date.year` et `date.month`, et une migration qui
+    découpe les dates existantes. Un objet `{ year, month, day }` dans le JSON, et un type `Readonly` côté front.
+  - `GET /transactions?year=&month=` au lieu de `from` et `to`, les deux obligatoires : seule la page d'un mois charge
+    des transactions. Les rendre facultatifs plus tard (les graphiques par année) ne cassera rien, l'inverse si. Pas de
+    limite par défaut, qui tronquerait les résultats sans le dire. Plusieurs valeurs se feraient avec un `$in` ; une
+    période à cheval sur deux mois demanderait un `$or` sur les trois champs, écrit dans le repository.
+  - Le modal ne demande plus que le jour, puisque la page fixe déjà l'année et le mois : le `TODO: clean` disparaît.
+  - Écartés : une chaîne `"YYYY-MM-DD"` (les périodes sont simples, mais regrouper par mois ou par année l'est moins),
+    et `Temporal.PlainDate`, que ni Mongo ni JSON ne connaissent, donc qui ne règle pas le stockage.
+- **Une transaction datée du jour est refusée chaque nuit entre minuit et 1 h (2 h en été), heure de Paris.** L'API
+  refuse les dates futures en comparant la date choisie, à minuit UTC, avec l'heure UTC du serveur. Le 1er décembre à
+  0 h 30 à Paris, il est encore le 30 novembre 23 h 30 en UTC : le front propose bien le 1er (il raisonne en heure
+  locale), mais l'API le juge dans le futur. Deux corrections possibles :
+  - **La simple, privilégiée** : tolérer jusqu'au lendemain de la date UTC du serveur, puisque le fuseau le plus en
+    avance est UTC+14. Une date future passerait au pire un jour trop tôt, sans conséquence pour un suivi de dépenses.
+  - **La juste** : connaître le fuseau de l'utilisateur, stocké avec la langue et le format régional (voir Web), et
+    calculer « aujourd'hui » dans ce fuseau. Plus exacte, mais dépend de ces réglages.
+- **Séparer `Transaction` en deux entités** (revenu et dépense) grâce au polymorphisme, dans une branche à part.
 
 ## Web
 
 - **Indenter le front à 2 espaces** au lieu de 4 : la norme de l'écosystème React et la valeur par défaut de Prettier, et
   le JSX s'imbrique vite. Un réglage dans la config Prettier du web, puis un `prettier --write`, dans un commit à part
   qui ne contient que ça.
-
 - **Langue, format régional et devise**, réglables dans le profil et stockés sur l'utilisateur (pour suivre d'un
   appareil à l'autre et servir aux emails), avec `navigator.language` par défaut à l'inscription :
   - **Langue** (EN/FR) : traduit tous les textes, avec une table typée par langue comme `ERROR_MESSAGES` (un texte
