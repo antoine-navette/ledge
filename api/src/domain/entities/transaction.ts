@@ -1,4 +1,5 @@
 import type { UserId } from './user.js';
+import { CalendarDate } from '../value-objects/calendar-date.js';
 
 export type TransactionId = string & { readonly __brand: 'TransactionId' };
 
@@ -14,7 +15,7 @@ export class Transaction {
         public readonly value: number,
         public readonly type: 'income' | 'expense',
         public readonly category: 'need' | 'want' | 'investment' | null,
-        public readonly date: Date,
+        public readonly date: CalendarDate,
         public readonly createdAt: Date,
         public readonly updatedAt: Date,
     ) {}
@@ -26,7 +27,7 @@ export class Transaction {
         value: number,
         type: 'income' | 'expense',
         category: 'need' | 'want' | 'investment' | null,
-        date: Date,
+        date: CalendarDate,
         now: Date,
     ) => {
         const code = Transaction.validate(name, value, type, category, date, now);
@@ -40,7 +41,7 @@ export class Transaction {
         value: number,
         type: 'income' | 'expense',
         category: 'need' | 'want' | 'investment' | null,
-        date: Date,
+        date: CalendarDate,
         now: Date,
     ) => {
         const code = Transaction.validate(name, value, type, category, date, now);
@@ -57,7 +58,7 @@ export class Transaction {
         value: number,
         type: 'income' | 'expense',
         category: 'need' | 'want' | 'investment' | null,
-        date: Date,
+        date: CalendarDate,
         now: Date,
     ) => {
         // Strict on purpose: the name must already be trimmed, it is stored exactly as sent
@@ -78,20 +79,11 @@ export class Transaction {
             return 'TRANSACTION_CATEGORY_INVALID' as const;
         }
 
-        // date must be a valid, UTC-midnight day between the epoch and today. The format
-        // and midnight checks below are deliberately duplicated with the routes' Zod
-        // schema (z.iso.date()) rather than trusted away: this entity must stay safe for
-        // any caller that doesn't go through Zod first (e.g. tests calling create()/
-        // update() directly). Number.isNaN must stay first and short-circuit the rest —
-        // date.toISOString() throws on an Invalid Date, and NaN comparisons always
-        // evaluate to false, so removing it wouldn't just be "redundant": it would either
-        // crash this call or let an Invalid Date silently pass the range check below.
-        if (
-            Number.isNaN(date.getTime()) ||
-            !date.toISOString().endsWith('T00:00:00.000Z') ||
-            date.getTime() < 0 ||
-            date.getTime() > now.getTime()
-        ) {
+        // From 1970 to today, where today is taken as tomorrow in UTC: the user may already be on the next day (up to
+        // UTC+14), so today in UTC would refuse a transaction made just after midnight in France. A future date may then
+        // pass one day early, which is harmless
+        const tomorrow = CalendarDate.fromUtc(new Date(now.getTime() + 24 * 60 * 60 * 1000));
+        if (date.year < 1970 || date.isAfter(tomorrow)) {
             return 'TRANSACTION_DATE_INVALID' as const;
         }
 
@@ -105,7 +97,7 @@ export class Transaction {
         value: number,
         type: 'income' | 'expense',
         category: 'need' | 'want' | 'investment' | null,
-        date: Date,
+        date: CalendarDate,
         createdAt: Date,
         updatedAt: Date,
     ) => {

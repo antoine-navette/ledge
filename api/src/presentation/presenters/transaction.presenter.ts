@@ -9,8 +9,7 @@ export const TransactionPresenter = {
         value: transaction.value,
         type: transaction.type,
         category: transaction.category,
-        // A calendar day: the API takes and returns it without the time
-        date: transaction.date.toISOString().slice(0, 10),
+        date: { year: transaction.date.year, month: transaction.date.month, day: transaction.date.day },
         createdAt: transaction.createdAt.toISOString(),
         updatedAt: transaction.updatedAt.toISOString(),
     }),

@@ -14,24 +14,31 @@ Dans cet ordre, une étape par branche ou par commit :
    - Prolonger la session au plus une fois par jour (`EXTENSION_INTERVAL`, comme dans Saffy), au lieu d'une écriture en
      base à chaque requête authentifiée.
 
+## Fonctionnalités
+
+- **Revoir l'authentification**, dans une même branche :
+  - **Inscription par lien envoyé par email** : on saisit son email, le lien mène au choix du mot de passe, et le compte
+    est créé avec un email forcément vérifié. Le formulaire répond toujours « vérifie ta boîte mail » (si le compte
+    existe, l'email le dit à son propriétaire) : il ne révèle plus quels emails sont utilisés, et `EmailVerification`
+    disparaît. À trancher : garder le mot de passe pour la connexion, ou se connecter par lien à chaque fois et le
+    supprimer (les deux points suivants disparaissent alors).
+  - **Modifier son mot de passe** depuis le profil, et **mot de passe oublié** par lien envoyé par email.
+  - **Modifier son email**, confirmé par un lien envoyé à la nouvelle adresse.
+  - **2FA** (TOTP, avec une application d'authentification).
+- **Une page de graphiques** : la répartition des dépenses par catégorie sur un mois ou une année, l'évolution des
+  dépenses mois après mois, le moment du mois où l'on dépense le plus…
+
 ## API
 
 - **Reader CQRS pour l'authentification**, si besoin d'optimiser : charger la session et son user en une seule requête,
   au lieu de deux lectures dans `AuthenticateUseCase`.
-- **Séparer `Transaction` en deux entités** (revenu et dépense) grâce au polymorphisme.
-- **Type dédié pour `Transaction.date`**, un jour calendaire sans heure ni fuseau, au lieu d'une `Date` à minuit UTC.
-  Piste privilégiée : une chaîne brandée `CalendarDate` (`"YYYY-MM-DD"`) avec un module de fonctions, comme les IDs
-  brandés, côté API et front. Stockée telle quelle en base (l'ordre alphabétique est chronologique, donc les requêtes
-  par période marchent toujours), avec une migration. Alternatives : un value object (classe) si la date porte un jour
-  de vraies règles, ou `Temporal.PlainDate` quand Temporal sera disponible partout. À faire avec la séparation de
-  `Transaction`.
+- **Séparer `Transaction` en deux entités** (revenu et dépense) grâce au polymorphisme, dans une branche à part.
 
 ## Web
 
 - **Indenter le front à 2 espaces** au lieu de 4 : la norme de l'écosystème React et la valeur par défaut de Prettier, et
   le JSX s'imbrique vite. Un réglage dans la config Prettier du web, puis un `prettier --write`, dans un commit à part
   qui ne contient que ça.
-
 - **Langue, format régional et devise**, réglables dans le profil et stockés sur l'utilisateur (pour suivre d'un
   appareil à l'autre et servir aux emails), avec `navigator.language` par défaut à l'inscription :
   - **Langue** (EN/FR) : traduit tous les textes, avec une table typée par langue comme `ERROR_MESSAGES` (un texte

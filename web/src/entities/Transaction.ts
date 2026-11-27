@@ -1,3 +1,5 @@
+import type { CalendarDate } from './CalendarDate.ts';
+
 export type Transaction = Readonly<{
     id: string;
     userId: string;
@@ -5,8 +7,7 @@ export type Transaction = Readonly<{
     value: number;
     type: 'income' | 'expense';
     category: 'need' | 'want' | 'investment' | null;
-    // A calendar day, at midnight UTC like in the API: read it with timeZone: 'UTC' or toISOString()
-    date: Date;
+    date: CalendarDate;
     createdAt: Date;
     updatedAt: Date;
 }>;

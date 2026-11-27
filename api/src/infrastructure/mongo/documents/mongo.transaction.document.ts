@@ -1,4 +1,5 @@
 import type { ObjectId } from 'mongodb';
+import type { MongoCalendarDateDocument } from './mongo.calendar-date.document.js';
 
 export type MongoTransactionDocument = {
     _id: ObjectId;
@@ -7,7 +8,7 @@ export type MongoTransactionDocument = {
     value: number;
     type: 'income' | 'expense';
     category: 'need' | 'want' | 'investment' | null;
-    date: Date;
+    date: MongoCalendarDateDocument;
     createdAt: Date;
     updatedAt: Date;
 };

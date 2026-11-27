@@ -6,6 +6,7 @@ import type { AuthenticateUseCase } from '../../../application/auth/authenticate
 import type { TransactionId } from '../../../domain/entities/transaction.js';
 import { isAuthenticated } from '../../middlewares/is-authenticated.middleware.js';
 import { transactionSchema } from '../../schemas/transaction.schema.js';
+import { calendarDateSchema } from '../../schemas/calendar-date.schema.js';
 import { badRequestSchema } from '../../schemas/bad-request.schema.js';
 import { unauthorizedSchema } from '../../schemas/unauthorized.schema.js';
 import { forbiddenSchema } from '../../schemas/forbidden.schema.js';
@@ -39,12 +40,7 @@ export const updateTransactionRoute: FastifyPluginAsync<Options> = async (
                 value: z.number(),
                 type: z.enum(['income', 'expense']),
                 category: z.enum(['need', 'want', 'investment']).nullable(),
-                // Deliberately duplicates part of what Transaction.update() re-validates:
-                // this only rejects a string that isn't shaped like a date at all (400,
-                // a format/type problem), while the entity still fully re-checks format,
-                // midnight and range regardless (422 for a well-formed but business-invalid
-                // date) — it has to stay safe for any caller, not just this route.
-                date: z.iso.date().transform((value) => new Date(value)),
+                date: calendarDateSchema,
             }),
             response: {
                 200: transactionSchema,
@@ -85,7 +81,8 @@ export const updateTransactionRoute: FastifyPluginAsync<Options> = async (
                     code === 'TRANSACTION_NAME_INVALID' ||
                     code === 'TRANSACTION_VALUE_INVALID' ||
                     code === 'TRANSACTION_CATEGORY_INVALID' ||
-                    code === 'TRANSACTION_DATE_INVALID'
+                    code === 'TRANSACTION_DATE_INVALID' ||
+                    code === 'CALENDAR_DATE_INVALID'
                 ) {
                     request.log.warn({ code }, 'Unprocessable content');
                     return reply.status(422).send({ code: 'UNPROCESSABLE_CONTENT' });

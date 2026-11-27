@@ -557,9 +557,9 @@ export interface paths {
         };
         get: {
             parameters: {
-                query?: {
-                    from?: string;
-                    to?: string;
+                query: {
+                    year: number;
+                    month: number;
                 };
                 header?: never;
                 path?: never;
@@ -630,8 +630,7 @@ export interface paths {
                         /** @enum {string} */
                         type: "income" | "expense";
                         category: ("need" | "want" | "investment") | null;
-                        /** Format: date */
-                        date: string;
+                        date: components["schemas"]["CalendarDate"];
                     };
                 };
             };
@@ -816,8 +815,7 @@ export interface paths {
                         /** @enum {string} */
                         type: "income" | "expense";
                         category: ("need" | "want" | "investment") | null;
-                        /** Format: date */
-                        date: string;
+                        date: components["schemas"]["CalendarDate"];
                     };
                 };
             };
@@ -1016,6 +1014,11 @@ export interface paths {
 export type webhooks = Record<string, never>;
 export interface components {
     schemas: {
+        CalendarDate: {
+            year: number;
+            month: number;
+            day: number;
+        };
         User: {
             id: string;
             email: string;
@@ -1085,8 +1088,7 @@ export interface components {
             /** @enum {string} */
             type: "income" | "expense";
             category: ("need" | "want" | "investment") | null;
-            /** Format: date */
-            date: string;
+            date: components["schemas"]["CalendarDate"];
             /** Format: date-time */
             createdAt: string;
             /** Format: date-time */

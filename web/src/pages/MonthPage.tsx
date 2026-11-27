@@ -38,12 +38,7 @@ const MonthPage = () => {
         const fetchData = async () => {
             setState({ status: 'loading' });
 
-            // TODO: clean
-            // Calendar days at midnight UTC, like transaction dates: day 0 of the next month is the last of this one
-            const from = new Date(Date.UTC(year, month - 1, 1));
-            const to = new Date(Date.UTC(year, month, 0));
-
-            const [transactions, code] = await getUserTransactions(from, to);
+            const [transactions, code] = await getUserTransactions(year, month);
             if (ignore) return;
             if (code) {
                 setState({ status: 'error', code });
@@ -214,9 +209,15 @@ const MonthPage = () => {
                                                                 </h4>
 
                                                                 <p className="text-gray-400 text-xs mt-0.5 select-none">
-                                                                    {transaction.date.toLocaleDateString('en-UK', {
-                                                                        timeZone: 'UTC',
-                                                                    })}
+                                                                    {/* Built and read in UTC, so that no time zone
+                                                                    shifts the day */}
+                                                                    {new Date(
+                                                                        Date.UTC(
+                                                                            transaction.date.year,
+                                                                            transaction.date.month - 1,
+                                                                            transaction.date.day,
+                                                                        ),
+                                                                    ).toLocaleDateString('en-UK', { timeZone: 'UTC' })}
                                                                 </p>
                                                             </div>
 
