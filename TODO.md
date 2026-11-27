@@ -39,6 +39,11 @@ Dans cet ordre, une étape par branche ou par commit :
 - **Indenter le front à 2 espaces** au lieu de 4 : la norme de l'écosystème React et la valeur par défaut de Prettier, et
   le JSX s'imbrique vite. Un réglage dans la config Prettier du web, puis un `prettier --write`, dans un commit à part
   qui ne contient que ça.
+- **Surligner la transaction ajoutée ou modifiée** une seconde ou deux, avec un fond qui s'estompe : la liste est
+  triée par montant, donc une petite dépense ajoutée atterrit souvent hors de l'écran. Complète le toast, qui confirme
+  l'action sans montrer où est la transaction.
+- **Masquer les investissements** dans la page d'un mois, et plus tard dans les graphiques : ils alourdissent les
+  dépenses sans en être vraiment (de l'argent mis de côté, pas consommé).
 - **Langue, format régional et devise**, réglables dans le profil et stockés sur l'utilisateur (pour suivre d'un
   appareil à l'autre et servir aux emails), avec `navigator.language` par défaut à l'inscription :
   - **Langue** (EN/FR) : traduit tous les textes, avec une table typée par langue comme `ERROR_MESSAGES` (un texte
