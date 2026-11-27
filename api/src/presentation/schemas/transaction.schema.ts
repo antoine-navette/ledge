@@ -1,4 +1,5 @@
 import z from 'zod';
+import { calendarDateSchema } from './calendar-date.schema.js';
 
 export const transactionSchema = z
     .object({
@@ -8,7 +9,7 @@ export const transactionSchema = z
         value: z.number(),
         type: z.enum(['income', 'expense']),
         category: z.enum(['need', 'want', 'investment']).nullable(),
-        date: z.iso.date(),
+        date: calendarDateSchema,
         createdAt: z.iso.datetime(),
         updatedAt: z.iso.datetime(),
     })

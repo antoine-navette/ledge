@@ -25,17 +25,11 @@ export const getUserTransactionsRoute: FastifyPluginAsync<Options> = async (
         url: '/transactions',
         schema: {
             tags: ['Transaction'],
-            // Unlike the transaction date in create/update, nothing downstream re-validates
-            // from/to (they never reach the entity), so the strict format check stays here.
+            // Only the types: a filter matching nothing (month 13) just finds nothing. Coerced since a query string only
+            // holds text, which also lets loose forms through (" 2026", "02"): harmless, they read as the same number
             querystring: z.object({
-                from: z.iso
-                    .date()
-                    .transform((value) => new Date(value))
-                    .optional(),
-                to: z.iso
-                    .date()
-                    .transform((value) => new Date(value))
-                    .optional(),
+                year: z.coerce.number().int(),
+                month: z.coerce.number().int(),
             }),
             response: {
                 200: z.array(transactionSchema),
@@ -47,9 +41,9 @@ export const getUserTransactionsRoute: FastifyPluginAsync<Options> = async (
         } satisfies FastifyZodOpenApiSchema,
         preHandler: isAuthenticated(authenticateUseCase),
         handler: async (request, reply) => {
-            const { from, to } = request.query;
+            const { year, month } = request.query;
 
-            const transactions = await getUserTransactionsUseCase.execute(request.session.userId, from, to);
+            const transactions = await getUserTransactionsUseCase.execute(request.session.userId, year, month);
 
             return reply.status(200).send(transactions.map(TransactionPresenter.toSchema));
         },

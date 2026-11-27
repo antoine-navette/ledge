@@ -44,14 +44,6 @@ Dans cet ordre, une étape par branche ou par commit :
   - Le modal ne demande plus que le jour, puisque la page fixe déjà l'année et le mois : le `TODO: clean` disparaît.
   - Écartés : une chaîne `"YYYY-MM-DD"` (les périodes sont simples, mais regrouper par mois ou par année l'est moins),
     et `Temporal.PlainDate`, que ni Mongo ni JSON ne connaissent, donc qui ne règle pas le stockage.
-- **Une transaction datée du jour est refusée chaque nuit entre minuit et 1 h (2 h en été), heure de Paris.** L'API
-  refuse les dates futures en comparant la date choisie, à minuit UTC, avec l'heure UTC du serveur. Le 1er décembre à
-  0 h 30 à Paris, il est encore le 30 novembre 23 h 30 en UTC : le front propose bien le 1er (il raisonne en heure
-  locale), mais l'API le juge dans le futur. Deux corrections possibles :
-  - **La simple, privilégiée** : tolérer jusqu'au lendemain de la date UTC du serveur, puisque le fuseau le plus en
-    avance est UTC+14. Une date future passerait au pire un jour trop tôt, sans conséquence pour un suivi de dépenses.
-  - **La juste** : connaître le fuseau de l'utilisateur, stocké avec la langue et le format régional (voir Web), et
-    calculer « aujourd'hui » dans ce fuseau. Plus exacte, mais dépend de ces réglages.
 - **Séparer `Transaction` en deux entités** (revenu et dépense) grâce au polymorphisme, dans une branche à part.
 
 ## Web

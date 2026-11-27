@@ -2,6 +2,7 @@ import type { UserId } from '../../../domain/entities/user.js';
 import { Transaction, type TransactionId } from '../../../domain/entities/transaction.js';
 import type { MongoTransactionDocument } from '../documents/mongo.transaction.document.js';
 import { ObjectId } from 'mongodb';
+import { MongoCalendarDateMapper } from './mongo.calendar-date.mapper.js';
 
 export const MongoTransactionMapper = {
     toInfrastructure: (transaction: Transaction): MongoTransactionDocument => ({
@@ -11,7 +12,7 @@ export const MongoTransactionMapper = {
         value: transaction.value,
         type: transaction.type,
         category: transaction.category,
-        date: transaction.date,
+        date: MongoCalendarDateMapper.toInfrastructure(transaction.date),
         createdAt: transaction.createdAt,
         updatedAt: transaction.updatedAt,
     }),
@@ -24,7 +25,7 @@ export const MongoTransactionMapper = {
             document.value,
             document.type,
             document.category,
-            document.date,
+            MongoCalendarDateMapper.toDomain(document.date),
             document.createdAt,
             document.updatedAt,
         ),

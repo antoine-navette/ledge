@@ -1,8 +1,5 @@
 import { Collection, ObjectId } from 'mongodb';
-import type {
-    TransactionCriteria,
-    TransactionRepository,
-} from '../../../domain/repositories/transaction.repository.js';
+import type { TransactionRepository } from '../../../domain/repositories/transaction.repository.js';
 import type { Transaction } from '../../../domain/entities/transaction.js';
 import type { MongoTransactionDocument } from '../documents/mongo.transaction.document.js';
 import { MongoTransactionMapper } from '../mappers/mongo.transaction.mapper.js';
@@ -16,35 +13,15 @@ export class MongoTransactionRepository implements TransactionRepository {
         await this.transactionCollection.insertOne(document);
     };
 
-    find = async (criteria: TransactionCriteria): Promise<Transaction[]> => {
-        // A plain truthy check isn't enough here: "" is falsy but !== undefined, and would
-        // otherwise silently be treated as "no userId filter", matching every user's
-        // transactions instead of failing. Checking !== undefined first, then validating the
-        // format, is what lets an explicitly-provided but malformed id be rejected below.
-        if (criteria.userId !== undefined && !ObjectId.isValid(criteria.userId)) return [];
+    findByUserIdAndYearAndMonth = async (
+        userId: Transaction['userId'],
+        year: number,
+        month: number,
+    ): Promise<Transaction[]> => {
+        if (!ObjectId.isValid(userId)) return [];
 
         const documents = await this.transactionCollection
-            .find({
-                // Truthy check is safe here only because of the guard above: by this point
-                // criteria.userId can only be undefined or a valid ObjectId hex string, which
-                // is always truthy, so there's no falsy-but-defined value left to mishandle.
-                ...(criteria.userId ? { userId: new ObjectId(criteria.userId) } : {}),
-                // from/to are both inclusive: from is the first day, to is the last day.
-                // Comparing to with $lte (rather than $lt on the next day) only works
-                // because every stored date is exactly UTC midnight, guaranteed by
-                // Transaction's own create()/update() validation. If a document ever ends
-                // up with a non-midnight date, it wouldn't be caught here — but it means
-                // invalid data already got written, which is the actual bug to fix, not
-                // something this query should defend against.
-                ...(criteria.from || criteria.to
-                    ? {
-                          date: {
-                              ...(criteria.from ? { $gte: criteria.from } : {}),
-                              ...(criteria.to ? { $lte: criteria.to } : {}),
-                          },
-                      }
-                    : {}),
-            })
+            .find({ userId: new ObjectId(userId), 'date.year': year, 'date.month': month })
             .toArray();
 
         return documents.map((document) => MongoTransactionMapper.toDomain(document));
