@@ -32,18 +32,6 @@ Dans cet ordre, une étape par branche ou par commit :
 
 - **Reader CQRS pour l'authentification**, si besoin d'optimiser : charger la session et son user en une seule requête,
   au lieu de deux lectures dans `AuthenticateUseCase`.
-- **Type dédié pour `Transaction.date`**, un jour calendaire sans heure ni fuseau, au lieu d'une `Date` à minuit UTC
-  (branche `refactor/calendar-date`) :
-  - Un value object `CalendarDate` (`{ year, month, day }` en nombres), dont `create()` refuse une date qui n'existe pas
-    (30 février, mois 13). Stocké en sous-document, avec un index sur `date.year` et `date.month`, et une migration qui
-    découpe les dates existantes. Un objet `{ year, month, day }` dans le JSON, et un type `Readonly` côté front.
-  - `GET /transactions?year=&month=` au lieu de `from` et `to`, les deux obligatoires : seule la page d'un mois charge
-    des transactions. Les rendre facultatifs plus tard (les graphiques par année) ne cassera rien, l'inverse si. Pas de
-    limite par défaut, qui tronquerait les résultats sans le dire. Plusieurs valeurs se feraient avec un `$in` ; une
-    période à cheval sur deux mois demanderait un `$or` sur les trois champs, écrit dans le repository.
-  - Le modal ne demande plus que le jour, puisque la page fixe déjà l'année et le mois : le `TODO: clean` disparaît.
-  - Écartés : une chaîne `"YYYY-MM-DD"` (les périodes sont simples, mais regrouper par mois ou par année l'est moins),
-    et `Temporal.PlainDate`, que ni Mongo ni JSON ne connaissent, donc qui ne règle pas le stockage.
 - **Séparer `Transaction` en deux entités** (revenu et dépense) grâce au polymorphisme, dans une branche à part.
 
 ## Web

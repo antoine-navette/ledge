@@ -18,20 +18,18 @@ const UpsertTransactionModal = ({ onClose, transaction, type, year, month, onUps
         { status: 'idle' } | { status: 'loading' } | { status: 'error'; code: ErrorCode }
     >({ status: 'idle' });
 
-    // TODO: clean
-    const monthStr = String(month).padStart(2, '0');
-    const minDate = `${year}-${monthStr}-01`;
-    const lastDayOfMonth = new Date(year, month, 0).getDate();
-    const maxDateOfMonth = `${year}-${monthStr}-${String(lastDayOfMonth).padStart(2, '0')}`;
+    // The page sets the year and the month, so only the day is chosen: up to the last day of the month (day 0 of the
+    // next one), or today in the current month. Read in local time, which is the user's
     const now = new Date();
-    const today = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}-${String(now.getDate()).padStart(2, '0')}`;
-    const maxDate = today < maxDateOfMonth ? today : maxDateOfMonth;
+    const isCurrentMonth = year === now.getFullYear() && month === now.getMonth() + 1;
+    const lastDay = isCurrentMonth ? now.getDate() : new Date(year, month, 0).getDate();
+    const days = Array.from({ length: lastDay }, (_, index) => index + 1);
 
     const [form, setForm] = useState({
         name: transaction ? transaction.name : '',
         value: transaction ? String(transaction.value) : '',
         category: transaction ? transaction.category : null,
-        date: transaction ? transaction.date.toISOString().slice(0, 10) : '',
+        day: transaction ? String(transaction.date.day) : '',
     });
 
     const handleSubmit = async (e: FormEvent) => {
@@ -39,8 +37,7 @@ const UpsertTransactionModal = ({ onClose, transaction, type, year, month, onUps
 
         setState({ status: 'loading' });
 
-        // The date input gives a calendar day ("2026-11-11"), parsed as midnight UTC like transaction dates
-        const date = new Date(form.date);
+        const date = { year, month, day: Number(form.day) };
         // The API refuses surrounding spaces, which mobile keyboards often add after the last word
         const name = form.name.trim();
         const value = Number(form.value);
@@ -62,6 +59,31 @@ const UpsertTransactionModal = ({ onClose, transaction, type, year, month, onUps
                 <div>
                     <label
                         className="block text-sm font-medium mb-1 text-gray-700 cursor-pointer select-none"
+                        htmlFor="day"
+                    >
+                        Day
+                    </label>
+                    <select
+                        id="day"
+                        value={form.day}
+                        onChange={(e) => setForm((prev) => ({ ...prev, day: e.target.value }))}
+                        className="w-full border rounded px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 transition-colors border-gray-300"
+                        required
+                    >
+                        <option value="" disabled>
+                            Select a day
+                        </option>
+                        {days.map((day) => (
+                            <option key={day} value={day}>
+                                {day}
+                            </option>
+                        ))}
+                    </select>
+                </div>
+
+                <div>
+                    <label
+                        className="block text-sm font-medium mb-1 text-gray-700 cursor-pointer select-none"
                         htmlFor="name"
                     >
                         Name
@@ -77,25 +99,6 @@ const UpsertTransactionModal = ({ onClose, transaction, type, year, month, onUps
                         // At least one visible character, so a name made of spaces only is refused before sending
                         pattern=".*\S.*"
                         maxLength={99}
-                    />
-                </div>
-
-                <div>
-                    <label
-                        className="block text-sm font-medium mb-1 text-gray-700 cursor-pointer select-none"
-                        htmlFor="date"
-                    >
-                        Date
-                    </label>
-                    <input
-                        id="date"
-                        type="date"
-                        min={minDate}
-                        max={maxDate}
-                        value={form.date}
-                        onChange={(e) => setForm((prev) => ({ ...prev, date: e.target.value }))}
-                        className="w-full border rounded px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 transition-colors border-gray-300"
-                        required
                     />
                 </div>
 
