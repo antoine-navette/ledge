@@ -1,13 +1,18 @@
 import { useEffect, useState } from 'react';
 import { Navigate, useNavigate, useParams } from 'react-router-dom';
-import { Pencil, Trash2 } from 'lucide-react';
+import { CircleCheck, Pencil, Trash2, X } from 'lucide-react';
 import DateNavigator from '../components/DateNavigator';
 import UpsertTransactionModal from '../modals/UpsertTransactionModal.tsx';
 import DeleteTransactionModal from '../modals/DeleteTransactionModal.tsx';
 import { getUserTransactions } from '../services/transaction.ts';
 import type { Transaction } from '../entities/Transaction';
+import type { CalendarDate } from '../entities/CalendarDate.ts';
 import ErrorPage from './ErrorPage.tsx';
 import { ERROR_MESSAGES, type ErrorCode } from '../constants/errors.ts';
+
+// Built and read in UTC, so that no time zone shifts the day
+const formatDate = (date: CalendarDate) =>
+    new Date(Date.UTC(date.year, date.month - 1, date.day)).toLocaleDateString('en-UK', { timeZone: 'UTC' });
 
 const MonthPage = () => {
     const navigate = useNavigate();
@@ -31,6 +36,25 @@ const MonthPage = () => {
         | { status: 'upsert'; type: Transaction['type']; transaction: Transaction | null }
         | { status: 'delete'; transaction: Transaction }
     >({ status: 'closed' });
+
+    // Off on each load, so that the full month stays the default view. Kept from one month to the next, since the page
+    // stays mounted, to compare months without investments
+    const [hideInvestments, setHideInvestments] = useState(false);
+
+    // A short confirmation of the last action. A new one replaces it, rather than piling up
+    // The transaction is shown whole, enough to spot a typo in the value or the day
+    const [toast, setToast] = useState<{
+        id: number;
+        action: 'added' | 'updated' | 'deleted';
+        transaction: Transaction;
+    } | null>(null);
+
+    useEffect(() => {
+        if (!toast) return;
+
+        const timeout = setTimeout(() => setToast(null), 6000);
+        return () => clearTimeout(timeout);
+    }, [toast]);
 
     useEffect(() => {
         let ignore = false; // Permet d'ignorer les réponses des anciennes requêtes lorsque l'on change de page trop vite
@@ -56,6 +80,9 @@ const MonthPage = () => {
     }, [year, month]);
 
     const handleUpsert = (transaction: Transaction) => {
+        const isUpdate = state.status === 'success' && state.transactions.some((t) => t.id === transaction.id);
+        setToast({ id: Date.now(), action: isUpdate ? 'updated' : 'added', transaction });
+
         setState((prev) => {
             if (prev.status !== 'success') return prev;
 
@@ -69,6 +96,8 @@ const MonthPage = () => {
     };
 
     const handleDelete = (transaction: Transaction) => {
+        setToast({ id: Date.now(), action: 'deleted', transaction });
+
         setState((prev) => {
             if (prev.status !== 'success') return prev;
 
@@ -102,7 +131,9 @@ const MonthPage = () => {
     // Empty until the month is loaded: only shown on success anyway
     const transactions = state.status === 'success' ? state.transactions : [];
     const incomes = transactions.filter((t) => t.type === 'income').sort((a, b) => b.value - a.value);
-    const expenses = transactions.filter((t) => t.type === 'expense').sort((a, b) => b.value - a.value);
+    const expenses = transactions
+        .filter((t) => t.type === 'expense' && !(hideInvestments && t.category === 'investment'))
+        .sort((a, b) => b.value - a.value);
     const totalIncomes = incomes.reduce((acc, t) => acc + t.value, 0);
     const totalExpenses = expenses.reduce((acc, t) => acc + t.value, 0);
     const total = totalIncomes - totalExpenses;
@@ -195,6 +226,18 @@ const MonthPage = () => {
                                             </p>
                                         </div>
 
+                                        {section.type === 'expense' && (
+                                            <label className="flex items-center justify-end gap-2 mb-3 text-sm text-gray-600 cursor-pointer select-none">
+                                                Hide investments
+                                                <input
+                                                    type="checkbox"
+                                                    checked={hideInvestments}
+                                                    onChange={(e) => setHideInvestments(e.target.checked)}
+                                                    className="cursor-pointer"
+                                                />
+                                            </label>
+                                        )}
+
                                         <div className="flex flex-col gap-2">
                                             {section.transactions.length > 0 ? (
                                                 section.transactions.map((transaction) => (
@@ -209,15 +252,7 @@ const MonthPage = () => {
                                                                 </h4>
 
                                                                 <p className="text-gray-400 text-xs mt-0.5 select-none">
-                                                                    {/* Built and read in UTC, so that no time zone
-                                                                    shifts the day */}
-                                                                    {new Date(
-                                                                        Date.UTC(
-                                                                            transaction.date.year,
-                                                                            transaction.date.month - 1,
-                                                                            transaction.date.day,
-                                                                        ),
-                                                                    ).toLocaleDateString('en-UK', { timeZone: 'UTC' })}
+                                                                    {formatDate(transaction.date)}
                                                                 </p>
                                                             </div>
 
@@ -301,6 +336,44 @@ const MonthPage = () => {
                     )}
                 </>
             )}
+
+            {/* Always rendered, so that screen readers announce each new message without moving the focus */}
+            <div role="status" className="fixed bottom-4 inset-x-4 flex justify-center pointer-events-none">
+                {toast && (
+                    <div
+                        key={toast.id}
+                        className="flex items-start gap-3 bg-white border border-gray-200 rounded-lg shadow-lg px-4 py-3 text-sm select-none pointer-events-auto"
+                    >
+                        <CircleCheck size={18} className="text-green-600 shrink-0" />
+                        <div>
+                            <p className="text-gray-800">
+                                {toast.action === 'added'
+                                    ? 'Added'
+                                    : toast.action === 'updated'
+                                      ? 'Updated'
+                                      : 'Deleted'}{' '}
+                                <span className="font-medium">{toast.transaction.name}</span>
+                            </p>
+                            <p className="text-gray-500">
+                                <span
+                                    className={toast.transaction.type === 'income' ? 'text-green-700' : 'text-red-700'}
+                                >
+                                    {toast.transaction.type === 'income' ? '+' : '-'} {toast.transaction.value} €
+                                </span>{' '}
+                                on {formatDate(toast.transaction.date)}
+                            </p>
+                        </div>
+                        <button
+                            type="button"
+                            onClick={() => setToast(null)}
+                            className="text-gray-400 hover:text-gray-600 transition cursor-pointer shrink-0"
+                            aria-label="Dismiss"
+                        >
+                            <X size={16} />
+                        </button>
+                    </div>
+                )}
+            </div>
         </div>
     );
 };
