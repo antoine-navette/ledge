@@ -37,6 +37,10 @@ const MonthPage = () => {
         | { status: 'delete'; transaction: Transaction }
     >({ status: 'closed' });
 
+    // Off on each load, so that the full month stays the default view. Kept from one month to the next, since the page
+    // stays mounted, to compare months without investments
+    const [hideInvestments, setHideInvestments] = useState(false);
+
     // A short confirmation of the last action. A new one replaces it, rather than piling up
     // The transaction is shown whole, enough to spot a typo in the value or the day
     const [toast, setToast] = useState<{
@@ -127,7 +131,9 @@ const MonthPage = () => {
     // Empty until the month is loaded: only shown on success anyway
     const transactions = state.status === 'success' ? state.transactions : [];
     const incomes = transactions.filter((t) => t.type === 'income').sort((a, b) => b.value - a.value);
-    const expenses = transactions.filter((t) => t.type === 'expense').sort((a, b) => b.value - a.value);
+    const expenses = transactions
+        .filter((t) => t.type === 'expense' && !(hideInvestments && t.category === 'investment'))
+        .sort((a, b) => b.value - a.value);
     const totalIncomes = incomes.reduce((acc, t) => acc + t.value, 0);
     const totalExpenses = expenses.reduce((acc, t) => acc + t.value, 0);
     const total = totalIncomes - totalExpenses;
@@ -219,6 +225,18 @@ const MonthPage = () => {
                                                 {section.total.toFixed(2)} €
                                             </p>
                                         </div>
+
+                                        {section.type === 'expense' && (
+                                            <label className="flex items-center justify-end gap-2 mb-3 text-sm text-gray-600 cursor-pointer select-none">
+                                                Hide investments
+                                                <input
+                                                    type="checkbox"
+                                                    checked={hideInvestments}
+                                                    onChange={(e) => setHideInvestments(e.target.checked)}
+                                                    className="cursor-pointer"
+                                                />
+                                            </label>
+                                        )}
 
                                         <div className="flex flex-col gap-2">
                                             {section.transactions.length > 0 ? (
