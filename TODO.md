@@ -26,12 +26,17 @@ Dans cet ordre, une étape par branche ou par commit :
   - **Modifier son email**, confirmé par un lien envoyé à la nouvelle adresse.
   - **2FA** (TOTP, avec une application d'authentification).
 - **Une page de graphiques** : la répartition des dépenses par catégorie sur un mois ou une année, l'évolution des
-  dépenses mois après mois, le moment du mois où l'on dépense le plus…
+  dépenses mois après mois, le moment du mois où l'on dépense le plus… Avec la même case « Hide investments » que la
+  page d'un mois.
 
 ## API
 
 - **Reader CQRS pour l'authentification**, si besoin d'optimiser : charger la session et son user en une seule requête,
   au lieu de deux lectures dans `AuthenticateUseCase`.
+- **Un script de seed** pour remplir la base de développement en une commande (`npm run seed`, à côté des scripts de
+  migration) : un utilisateur de test et quelques mois de transactions variées (revenus, dépenses de chaque catégorie,
+  plusieurs « Courses » le même mois). Passe par les entités, donc les données respectent les règles, et refuse de
+  tourner hors développement. Avec une option pour vider ce qu'il a créé.
 - **Séparer `Transaction` en deux entités** (revenu et dépense) grâce au polymorphisme, dans une branche à part.
 
 ## Web
@@ -42,8 +47,6 @@ Dans cet ordre, une étape par branche ou par commit :
 - **Surligner la transaction ajoutée ou modifiée** une seconde ou deux, avec un fond qui s'estompe : la liste est
   triée par montant, donc une petite dépense ajoutée atterrit souvent hors de l'écran. Complète le toast, qui confirme
   l'action sans montrer où est la transaction.
-- **Masquer les investissements** dans la page d'un mois, et plus tard dans les graphiques : ils alourdissent les
-  dépenses sans en être vraiment (de l'argent mis de côté, pas consommé).
 - **Langue, format régional et devise**, réglables dans le profil et stockés sur l'utilisateur (pour suivre d'un
   appareil à l'autre et servir aux emails), avec `navigator.language` par défaut à l'inscription :
   - **Langue** (EN/FR) : traduit tous les textes, avec une table typée par langue comme `ERROR_MESSAGES` (un texte
