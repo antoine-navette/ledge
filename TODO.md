@@ -37,7 +37,6 @@ Dans cet ordre, une étape par branche ou par commit :
   migration) : un utilisateur de test et quelques mois de transactions variées (revenus, dépenses de chaque catégorie,
   plusieurs « Courses » le même mois). Passe par les entités, donc les données respectent les règles, et refuse de
   tourner hors développement. Avec une option pour vider ce qu'il a créé.
-- **Séparer `Transaction` en deux entités** (revenu et dépense) grâce au polymorphisme, dans une branche à part.
 
 ## Web
 
@@ -58,7 +57,6 @@ Dans cet ordre, une étape par branche ou par commit :
   - **Devise** : une donnée et non de l'affichage, changer de devise ne convertit rien. Le nombre de décimales en
     dépend (le yen n'en a aucune), donc la règle des 2 décimales et le minimum de 0,01 aussi : l'occasion de stocker les
     montants en centimes entiers.
-  - À faire après `CalendarDate` et la séparation de `Transaction`, qui touchent les mêmes endroits.
 
 ## Infra
 

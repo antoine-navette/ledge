@@ -33,7 +33,7 @@ const MonthPage = () => {
     // One modal at a time for the whole page. A new transaction needs its type, an existing one already has it
     const [modal, setModal] = useState<
         | { status: 'closed' }
-        | { status: 'upsert'; type: Transaction['type']; transaction: Transaction | null }
+        | { status: 'upsert'; type: Transaction['kind']['type']; transaction: Transaction | null }
         | { status: 'delete'; transaction: Transaction }
     >({ status: 'closed' });
 
@@ -130,9 +130,9 @@ const MonthPage = () => {
 
     // Empty until the month is loaded: only shown on success anyway
     const transactions = state.status === 'success' ? state.transactions : [];
-    const incomes = transactions.filter((t) => t.type === 'income').sort((a, b) => b.value - a.value);
+    const incomes = transactions.filter((t) => t.kind.type === 'income').sort((a, b) => b.value - a.value);
     const expenses = transactions
-        .filter((t) => t.type === 'expense' && !(hideInvestments && t.category === 'investment'))
+        .filter((t) => t.kind.type === 'expense' && !(hideInvestments && t.kind.category === 'investment'))
         .sort((a, b) => b.value - a.value);
     const totalIncomes = incomes.reduce((acc, t) => acc + t.value, 0);
     const totalExpenses = expenses.reduce((acc, t) => acc + t.value, 0);
@@ -261,18 +261,19 @@ const MonthPage = () => {
                                                                     {styles.sign} {transaction.value} €
                                                                 </p>
 
-                                                                {transaction.type === 'expense' &&
-                                                                    transaction.category && (
+                                                                {transaction.kind.type === 'expense' &&
+                                                                    transaction.kind.category && (
                                                                         <span
                                                                             className={`text-xs px-2 py-0.5 rounded-full mt-1 capitalize select-none font-medium ${
-                                                                                transaction.category === 'need'
+                                                                                transaction.kind.category === 'need'
                                                                                     ? 'bg-blue-100 text-blue-700'
-                                                                                    : transaction.category === 'want'
+                                                                                    : transaction.kind.category ===
+                                                                                        'want'
                                                                                       ? 'bg-red-100 text-red-700'
                                                                                       : 'bg-green-100 text-green-700'
                                                                             }`}
                                                                         >
-                                                                            {transaction.category}
+                                                                            {transaction.kind.category}
                                                                         </span>
                                                                     )}
                                                             </div>
@@ -283,7 +284,7 @@ const MonthPage = () => {
                                                                 onClick={() =>
                                                                     setModal({
                                                                         status: 'upsert',
-                                                                        type: transaction.type,
+                                                                        type: transaction.kind.type,
                                                                         transaction,
                                                                     })
                                                                 }
@@ -356,9 +357,11 @@ const MonthPage = () => {
                             </p>
                             <p className="text-gray-500">
                                 <span
-                                    className={toast.transaction.type === 'income' ? 'text-green-700' : 'text-red-700'}
+                                    className={
+                                        toast.transaction.kind.type === 'income' ? 'text-green-700' : 'text-red-700'
+                                    }
                                 >
-                                    {toast.transaction.type === 'income' ? '+' : '-'} {toast.transaction.value} €
+                                    {toast.transaction.kind.type === 'income' ? '+' : '-'} {toast.transaction.value} €
                                 </span>{' '}
                                 on {formatDate(toast.transaction.date)}
                             </p>

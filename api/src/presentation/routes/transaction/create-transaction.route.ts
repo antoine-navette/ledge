@@ -6,6 +6,7 @@ import type { AuthenticateUseCase } from '../../../application/auth/authenticate
 import { isAuthenticated } from '../../middlewares/is-authenticated.middleware.js';
 import { transactionSchema } from '../../schemas/transaction.schema.js';
 import { calendarDateSchema } from '../../schemas/calendar-date.schema.js';
+import { transactionKindSchema } from '../../schemas/transaction-kind.schema.js';
 import { badRequestSchema } from '../../schemas/bad-request.schema.js';
 import { unauthorizedSchema } from '../../schemas/unauthorized.schema.js';
 import { payloadTooLargeSchema } from '../../schemas/payload-too-large.schema.js';
@@ -32,8 +33,7 @@ export const createTransactionRoute: FastifyPluginAsync<Options> = async (
             body: z.object({
                 name: z.string(),
                 value: z.number(),
-                type: z.enum(['income', 'expense']),
-                category: z.enum(['need', 'want', 'investment']).nullable(),
+                kind: transactionKindSchema,
                 date: calendarDateSchema,
             }),
             response: {
@@ -49,21 +49,19 @@ export const createTransactionRoute: FastifyPluginAsync<Options> = async (
         } satisfies FastifyZodOpenApiSchema,
         preHandler: isAuthenticated(authenticateUseCase),
         handler: async (request, reply) => {
-            const { name, value, type, category, date } = request.body;
+            const { name, value, kind, date } = request.body;
 
             const [transaction, code] = await createTransactionUseCase.execute(
                 request.session.userId,
                 name,
                 value,
-                type,
-                category,
+                kind,
                 date,
             );
             if (code) {
                 if (
                     code === 'TRANSACTION_NAME_INVALID' ||
                     code === 'TRANSACTION_VALUE_INVALID' ||
-                    code === 'TRANSACTION_CATEGORY_INVALID' ||
                     code === 'TRANSACTION_DATE_INVALID' ||
                     code === 'CALENDAR_DATE_INVALID'
                 ) {

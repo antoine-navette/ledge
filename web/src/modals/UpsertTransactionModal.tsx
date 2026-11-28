@@ -7,7 +7,7 @@ import { ERROR_MESSAGES, type ErrorCode } from '../constants/errors.ts';
 interface Props {
     onClose: () => void;
     transaction: Transaction | null;
-    type: 'income' | 'expense';
+    type: Transaction['kind']['type'];
     year: number;
     month: number;
     onUpsert: (transaction: Transaction) => void;
@@ -28,7 +28,7 @@ const UpsertTransactionModal = ({ onClose, transaction, type, year, month, onUps
     const [form, setForm] = useState({
         name: transaction ? transaction.name : '',
         value: transaction ? String(transaction.value) : '',
-        category: transaction ? transaction.category : null,
+        category: transaction && transaction.kind.type === 'expense' ? transaction.kind.category : null,
         day: transaction ? String(transaction.date.day) : '',
     });
 
@@ -41,9 +41,10 @@ const UpsertTransactionModal = ({ onClose, transaction, type, year, month, onUps
         // The API refuses surrounding spaces, which mobile keyboards often add after the last word
         const name = form.name.trim();
         const value = Number(form.value);
+        const kind = type === 'income' ? { type } : { type, category: form.category };
         const [upserted, code] = transaction
-            ? await updateTransaction(transaction.id, name, value, type, form.category, date)
-            : await createTransaction(name, value, type, form.category, date);
+            ? await updateTransaction(transaction.id, name, value, kind, date)
+            : await createTransaction(name, value, kind, date);
         if (code) {
             setState({ status: 'error', code });
             return;

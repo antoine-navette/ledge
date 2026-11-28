@@ -627,9 +627,7 @@ export interface paths {
                     "application/json": {
                         name: string;
                         value: number;
-                        /** @enum {string} */
-                        type: "income" | "expense";
-                        category: ("need" | "want" | "investment") | null;
+                        kind: components["schemas"]["TransactionKind"];
                         date: components["schemas"]["CalendarDate"];
                     };
                 };
@@ -812,9 +810,7 @@ export interface paths {
                     "application/json": {
                         name: string;
                         value: number;
-                        /** @enum {string} */
-                        type: "income" | "expense";
-                        category: ("need" | "want" | "investment") | null;
+                        kind: components["schemas"]["TransactionKind"];
                         date: components["schemas"]["CalendarDate"];
                     };
                 };
@@ -1014,6 +1010,14 @@ export interface paths {
 export type webhooks = Record<string, never>;
 export interface components {
     schemas: {
+        TransactionKind: {
+            /** @constant */
+            type: "income";
+        } | {
+            /** @constant */
+            type: "expense";
+            category: ("need" | "want" | "investment") | null;
+        };
         CalendarDate: {
             year: number;
             month: number;
@@ -1085,9 +1089,7 @@ export interface components {
             userId: string;
             name: string;
             value: number;
-            /** @enum {string} */
-            type: "income" | "expense";
-            category: ("need" | "want" | "investment") | null;
+            kind: components["schemas"]["TransactionKindOutput"];
             date: components["schemas"]["CalendarDateOutput"];
             /** Format: date-time */
             createdAt: string;
@@ -1101,6 +1103,14 @@ export interface components {
         TransactionNotFound: {
             /** @constant */
             code: "TRANSACTION_NOT_FOUND";
+        };
+        TransactionKindOutput: {
+            /** @constant */
+            type: "income";
+        } | {
+            /** @constant */
+            type: "expense";
+            category: ("need" | "want" | "investment") | null;
         };
         CalendarDateOutput: {
             year: number;

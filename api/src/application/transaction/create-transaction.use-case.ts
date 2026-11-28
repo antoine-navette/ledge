@@ -14,8 +14,7 @@ export class CreateTransactionUseCase {
         userId: UserId,
         name: string,
         value: number,
-        type: 'income' | 'expense',
-        category: 'need' | 'want' | 'investment' | null,
+        kind: Transaction['kind'],
         date: { year: number; month: number; day: number },
     ) => {
         const now = new Date();
@@ -28,8 +27,7 @@ export class CreateTransactionUseCase {
             userId,
             name,
             value,
-            type,
-            category,
+            kind,
             calendarDate,
             now,
         );
