@@ -3,7 +3,7 @@ import type { FastifyZodOpenApiSchema, FastifyZodOpenApiTypeProvider } from 'fas
 import z from 'zod';
 import type { UpdateTransactionUseCase } from '../../../application/transaction/update-transaction.use-case.js';
 import type { AuthenticateUseCase } from '../../../application/auth/authenticate.use-case.js';
-import type { TransactionId } from '../../../domain/entities/transaction.js';
+import type { Transaction } from '../../../domain/entities/transaction.js';
 import { isAuthenticated } from '../../middlewares/is-authenticated.middleware.js';
 import { transactionSchema } from '../../schemas/transaction.schema.js';
 import { calendarDateSchema } from '../../schemas/calendar-date.schema.js';
@@ -60,7 +60,7 @@ export const updateTransactionRoute: FastifyPluginAsync<Options> = async (
             const { name, value, kind, date } = request.body;
 
             const [transaction, code] = await updateTransactionUseCase.execute(
-                request.params.id as TransactionId,
+                request.params.id as Transaction['id'],
                 request.session.userId,
                 name,
                 value,

@@ -1,7 +1,5 @@
 import type { TokenHasher } from '../ports/token-hasher.js';
-import type { UserId } from './user.js';
-
-export type SessionId = string & { readonly __brand: 'SessionId' };
+import type { User } from './user.js';
 
 export class Session {
     // Never set at runtime: only makes the class nominal, so a plain object can't be passed off as a Session without
@@ -12,8 +10,9 @@ export class Session {
     private static readonly DURATION = 30 * 24 * 60 * 60 * 1000;
 
     private constructor(
-        public readonly id: SessionId,
-        public readonly userId: UserId,
+        // Branded: an ID of another entity, or any string, can't be passed off as this one
+        public readonly id: string & { readonly __brand: 'SessionId' },
+        public readonly userId: User['id'],
         // Only the token's hash is stored: a copy of the database then can't be used to act as anyone
         public readonly tokenHash: string,
         public readonly expiresAt: Date,
@@ -21,7 +20,7 @@ export class Session {
         public readonly updatedAt: Date,
     ) {}
 
-    static create = (id: SessionId, userId: UserId, token: string, tokenHasher: TokenHasher, now: Date) => {
+    static create = (id: Session['id'], userId: User['id'], token: string, tokenHasher: TokenHasher, now: Date) => {
         // Token length is a security property, not an incidental format detail: a token of
         // the wrong length means the caller's TokenGenerator wiring is broken, which could
         // silently weaken every session lookup (sessions are found by their token's hash alone, with no
@@ -48,8 +47,8 @@ export class Session {
     };
 
     static reconstitute = (
-        id: SessionId,
-        userId: UserId,
+        id: Session['id'],
+        userId: User['id'],
         tokenHash: string,
         expiresAt: Date,
         createdAt: Date,

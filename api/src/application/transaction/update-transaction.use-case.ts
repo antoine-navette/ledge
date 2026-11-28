@@ -1,5 +1,5 @@
-import type { UserId } from '../../domain/entities/user.js';
-import type { Transaction, TransactionId } from '../../domain/entities/transaction.js';
+import type { User } from '../../domain/entities/user.js';
+import type { Transaction } from '../../domain/entities/transaction.js';
 import { CalendarDate } from '../../domain/value-objects/calendar-date.js';
 import type { TransactionRepository } from '../../domain/repositories/transaction.repository.js';
 
@@ -7,8 +7,8 @@ export class UpdateTransactionUseCase {
     constructor(private transactionRepository: TransactionRepository) {}
 
     execute = async (
-        id: TransactionId,
-        userId: UserId,
+        id: Transaction['id'],
+        userId: User['id'],
         name: string,
         value: number,
         kind: Transaction['kind'],

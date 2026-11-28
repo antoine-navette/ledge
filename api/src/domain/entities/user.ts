@@ -39,8 +39,6 @@ class EmailVerification {
     };
 }
 
-export type UserId = string & { readonly __brand: 'UserId' };
-
 export class User {
     // Never set at runtime: only makes the class nominal, so a plain object can't be passed off as a User without
     // going through its factories
@@ -49,7 +47,8 @@ export class User {
     static readonly EMAIL_VERIFICATION_TOKEN_LENGTH = EmailVerification.TOKEN_LENGTH;
 
     private constructor(
-        public readonly id: UserId,
+        // Branded: an ID of another entity, or any string, can't be passed off as this one
+        public readonly id: string & { readonly __brand: 'UserId' },
         public readonly email: string,
         public readonly passwordHash: string,
         public readonly isEmailVerified: boolean,
@@ -62,7 +61,7 @@ export class User {
     // so validation and hashing always happen in order, atomically, in a single call — a
     // caller has no way to hash an invalid password by forgetting to validate it first.
     static register = async (
-        id: UserId,
+        id: User['id'],
         email: string,
         password: string,
         passwordHasher: PasswordHasher,
@@ -146,7 +145,7 @@ export class User {
     };
 
     static reconstitute = (
-        id: UserId,
+        id: User['id'],
         email: string,
         passwordHash: string,
         isEmailVerified: boolean,

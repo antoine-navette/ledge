@@ -1,6 +1,6 @@
-import type { UserId } from '../../../domain/entities/user.js';
+import type { User } from '../../../domain/entities/user.js';
 import { ObjectId } from 'mongodb';
-import { Session, type SessionId } from '../../../domain/entities/session.js';
+import { Session } from '../../../domain/entities/session.js';
 import type { MongoSessionDocument } from '../documents/mongo.session.document.js';
 
 export const MongoSessionMapper = {
@@ -15,8 +15,8 @@ export const MongoSessionMapper = {
 
     toDomain: (document: MongoSessionDocument): Session =>
         Session.reconstitute(
-            document._id.toString() as SessionId,
-            document.userId.toString() as UserId,
+            document._id.toString() as Session['id'],
+            document.userId.toString() as User['id'],
             document.tokenHash,
             document.expiresAt,
             document.createdAt,

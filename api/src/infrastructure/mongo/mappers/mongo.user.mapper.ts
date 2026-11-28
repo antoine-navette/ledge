@@ -1,4 +1,4 @@
-import { User, type UserId } from '../../../domain/entities/user.js';
+import { User } from '../../../domain/entities/user.js';
 import type { MongoUserDocument } from '../documents/mongo.user.document.js';
 import { ObjectId } from 'mongodb';
 
@@ -21,7 +21,7 @@ export const MongoUserMapper = {
 
     toDomain: (document: MongoUserDocument): User =>
         User.reconstitute(
-            document._id.toString() as UserId,
+            document._id.toString() as User['id'],
             document.email,
             document.passwordHash,
             document.isEmailVerified,

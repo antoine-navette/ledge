@@ -1,7 +1,5 @@
-import type { UserId } from './user.js';
+import type { User } from './user.js';
 import { CalendarDate } from '../value-objects/calendar-date.js';
-
-export type TransactionId = string & { readonly __brand: 'TransactionId' };
 
 export class Transaction {
     // Never set at runtime: only makes the class nominal, so a plain object can't be passed off as a Transaction without
@@ -9,8 +7,9 @@ export class Transaction {
     declare private readonly brand: 'Transaction';
 
     private constructor(
-        public readonly id: TransactionId,
-        public readonly userId: UserId,
+        // Branded: an ID of another entity, or any string, can't be passed off as this one
+        public readonly id: string & { readonly __brand: 'TransactionId' },
+        public readonly userId: User['id'],
         public readonly name: string,
         public readonly value: number,
         // Income or expense, with what only applies to each: an income can't have a category, since there's no field
@@ -25,8 +24,8 @@ export class Transaction {
     ) {}
 
     static create = (
-        id: TransactionId,
-        userId: UserId,
+        id: Transaction['id'],
+        userId: User['id'],
         name: string,
         value: number,
         kind: Transaction['kind'],
@@ -72,8 +71,8 @@ export class Transaction {
     };
 
     static reconstitute = (
-        id: TransactionId,
-        userId: UserId,
+        id: Transaction['id'],
+        userId: User['id'],
         name: string,
         value: number,
         kind: Transaction['kind'],

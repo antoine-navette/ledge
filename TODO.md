@@ -41,10 +41,6 @@ Dans cet ordre, une étape par branche ou par commit :
   migration) : un utilisateur de test et quelques mois de transactions variées (revenus, dépenses de chaque catégorie,
   plusieurs « Courses » le même mois). Passe par les entités, donc les données respectent les règles, et refuse de
   tourner hors développement. Avec une option pour vider ce qu'il a créé.
-- **Ne plus exporter les types d'ID** (`UserId`, `TransactionId`, `SessionId`) : écrire la marque dans l'entité
-  (`id: string & { readonly __brand: 'UserId' }`) et toujours `User['id']`, `Transaction['userId']`… Une seule façon
-  d'écrire un type du domaine, comme `Transaction['kind']` plutôt qu'un type exporté en plus. Un renommage sans
-  changement de comportement, à part, qui change aussi l'exemple de `api-conventions`.
 - **Rendre la catégorie obligatoire pour une dépense** : le `null` ne sert qu'aux dépenses saisies avant l'arrivée des
   catégories. Il faut d'abord classer ces anciennes dépenses en prod (à la main, ou une catégorie par défaut), puis une
   migration vérifie qu'il n'en reste plus. À faire à part, pour ne pas tout mélanger.

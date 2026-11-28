@@ -4,8 +4,8 @@ import type { PasswordHasher } from '../../domain/ports/password-hasher.js';
 import type { IdGenerator } from '../../domain/ports/id-generator.js';
 import type { TokenGenerator } from '../../domain/ports/token-generator.js';
 import type { TokenHasher } from '../../domain/ports/token-hasher.js';
-import { User, type UserId } from '../../domain/entities/user.js';
-import { Session, type SessionId } from '../../domain/entities/session.js';
+import { User } from '../../domain/entities/user.js';
+import { Session } from '../../domain/entities/session.js';
 
 export class RegisterUseCase {
     constructor(
@@ -21,7 +21,7 @@ export class RegisterUseCase {
         const now = new Date();
 
         const [user, userCode] = await User.register(
-            this.idGenerator.generate() as UserId,
+            this.idGenerator.generate() as User['id'],
             email,
             password,
             this.passwordHasher,
@@ -34,7 +34,13 @@ export class RegisterUseCase {
         if (createCode) return [null, createCode] as const;
 
         const token = this.tokenGenerator.generate(Session.TOKEN_LENGTH);
-        const session = Session.create(this.idGenerator.generate() as SessionId, user.id, token, this.tokenHasher, now);
+        const session = Session.create(
+            this.idGenerator.generate() as Session['id'],
+            user.id,
+            token,
+            this.tokenHasher,
+            now,
+        );
         await this.sessionRepository.create(session);
 
         return [Object.assign(session, { token, user }), null] as const;
