@@ -6,8 +6,8 @@ export type MongoTransactionDocument = {
     userId: ObjectId;
     name: string;
     value: number;
-    type: 'income' | 'expense';
-    category: 'need' | 'want' | 'investment' | null;
+    // A subdocument, replaced as a whole on each save: an income that was an expense loses its category with it
+    kind: { type: 'income' } | { type: 'expense'; category: 'need' | 'want' | 'investment' | null };
     date: MongoCalendarDateDocument;
     createdAt: Date;
     updatedAt: Date;

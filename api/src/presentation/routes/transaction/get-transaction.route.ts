@@ -3,7 +3,7 @@ import type { FastifyZodOpenApiSchema, FastifyZodOpenApiTypeProvider } from 'fas
 import z from 'zod';
 import type { GetTransactionUseCase } from '../../../application/transaction/get-transaction.use-case.js';
 import type { AuthenticateUseCase } from '../../../application/auth/authenticate.use-case.js';
-import type { TransactionId } from '../../../domain/entities/transaction.js';
+import type { Transaction } from '../../../domain/entities/transaction.js';
 import { isAuthenticated } from '../../middlewares/is-authenticated.middleware.js';
 import { transactionSchema } from '../../schemas/transaction.schema.js';
 import { badRequestSchema } from '../../schemas/bad-request.schema.js';
@@ -44,7 +44,7 @@ export const getTransactionRoute: FastifyPluginAsync<Options> = async (
         preHandler: isAuthenticated(authenticateUseCase),
         handler: async (request, reply) => {
             const [transaction, code] = await getTransactionUseCase.execute(
-                request.params.id as TransactionId,
+                request.params.id as Transaction['id'],
                 request.session.userId,
             );
             if (code) {

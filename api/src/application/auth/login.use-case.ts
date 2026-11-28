@@ -4,7 +4,7 @@ import type { PasswordHasher } from '../../domain/ports/password-hasher.js';
 import type { IdGenerator } from '../../domain/ports/id-generator.js';
 import type { TokenGenerator } from '../../domain/ports/token-generator.js';
 import type { TokenHasher } from '../../domain/ports/token-hasher.js';
-import { Session, type SessionId } from '../../domain/entities/session.js';
+import { Session } from '../../domain/entities/session.js';
 
 export class LoginUseCase {
     constructor(
@@ -26,7 +26,13 @@ export class LoginUseCase {
         if (!isPasswordCorrect) return [null, 'PASSWORD_WRONG'] as const;
 
         const token = this.tokenGenerator.generate(Session.TOKEN_LENGTH);
-        const session = Session.create(this.idGenerator.generate() as SessionId, user.id, token, this.tokenHasher, now);
+        const session = Session.create(
+            this.idGenerator.generate() as Session['id'],
+            user.id,
+            token,
+            this.tokenHasher,
+            now,
+        );
         await this.sessionRepository.create(session);
 
         return [Object.assign(session, { token, user }), null] as const;

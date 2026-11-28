@@ -3,7 +3,7 @@ import type { FastifyZodOpenApiSchema, FastifyZodOpenApiTypeProvider } from 'fas
 import z from 'zod';
 import type { DeleteTransactionUseCase } from '../../../application/transaction/delete-transaction.use-case.js';
 import type { AuthenticateUseCase } from '../../../application/auth/authenticate.use-case.js';
-import type { TransactionId } from '../../../domain/entities/transaction.js';
+import type { Transaction } from '../../../domain/entities/transaction.js';
 import { isAuthenticated } from '../../middlewares/is-authenticated.middleware.js';
 import { badRequestSchema } from '../../schemas/bad-request.schema.js';
 import { unauthorizedSchema } from '../../schemas/unauthorized.schema.js';
@@ -46,7 +46,7 @@ export const deleteTransactionRoute: FastifyPluginAsync<Options> = async (
         preHandler: isAuthenticated(authenticateUseCase),
         handler: async (request, reply) => {
             const [transaction, code] = await deleteTransactionUseCase.execute(
-                request.params.id as TransactionId,
+                request.params.id as Transaction['id'],
                 request.session.userId,
             );
             if (code) {

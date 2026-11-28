@@ -1,7 +1,5 @@
-import type { UserId } from './user.js';
+import type { User } from './user.js';
 import { CalendarDate } from '../value-objects/calendar-date.js';
-
-export type TransactionId = string & { readonly __brand: 'TransactionId' };
 
 export class Transaction {
     // Never set at runtime: only makes the class nominal, so a plain object can't be passed off as a Transaction without
@@ -9,58 +7,45 @@ export class Transaction {
     declare private readonly brand: 'Transaction';
 
     private constructor(
-        public readonly id: TransactionId,
-        public readonly userId: UserId,
+        // Branded: an ID of another entity, or any string, can't be passed off as this one
+        public readonly id: string & { readonly __brand: 'TransactionId' },
+        public readonly userId: User['id'],
         public readonly name: string,
         public readonly value: number,
-        public readonly type: 'income' | 'expense',
-        public readonly category: 'need' | 'want' | 'investment' | null,
+        // Income or expense, with what only applies to each: an income can't have a category, since there's no field
+        // for it. Always set and replaced as a whole, so the type and the category can never disagree
+        public readonly kind:
+            | { readonly type: 'income' }
+            // The category is optional only for the expenses entered before categories existed
+            | { readonly type: 'expense'; readonly category: 'need' | 'want' | 'investment' | null },
         public readonly date: CalendarDate,
         public readonly createdAt: Date,
         public readonly updatedAt: Date,
     ) {}
 
     static create = (
-        id: TransactionId,
-        userId: UserId,
+        id: Transaction['id'],
+        userId: User['id'],
         name: string,
         value: number,
-        type: 'income' | 'expense',
-        category: 'need' | 'want' | 'investment' | null,
+        kind: Transaction['kind'],
         date: CalendarDate,
         now: Date,
     ) => {
-        const code = Transaction.validate(name, value, type, category, date, now);
+        const code = Transaction.validate(name, value, date, now);
         if (code) return [null, code] as const;
 
-        return [new Transaction(id, userId, name, value, type, category, date, now, now), null] as const;
+        return [new Transaction(id, userId, name, value, kind, date, now, now), null] as const;
     };
 
-    update = (
-        name: string,
-        value: number,
-        type: 'income' | 'expense',
-        category: 'need' | 'want' | 'investment' | null,
-        date: CalendarDate,
-        now: Date,
-    ) => {
-        const code = Transaction.validate(name, value, type, category, date, now);
+    update = (name: string, value: number, kind: Transaction['kind'], date: CalendarDate, now: Date) => {
+        const code = Transaction.validate(name, value, date, now);
         if (code) return [null, code] as const;
 
-        return [
-            new Transaction(this.id, this.userId, name, value, type, category, date, this.createdAt, now),
-            null,
-        ] as const;
+        return [new Transaction(this.id, this.userId, name, value, kind, date, this.createdAt, now), null] as const;
     };
 
-    private static validate = (
-        name: string,
-        value: number,
-        type: 'income' | 'expense',
-        category: 'need' | 'want' | 'investment' | null,
-        date: CalendarDate,
-        now: Date,
-    ) => {
+    private static validate = (name: string, value: number, date: CalendarDate, now: Date) => {
         // Strict on purpose: the name must already be trimmed, it is stored exactly as sent
         if (name !== name.trim() || name.length < 1 || name.length > 99) {
             return 'TRANSACTION_NAME_INVALID' as const;
@@ -72,11 +57,6 @@ export class Transaction {
         // Number.isFinite first: NaN fails every comparison below, so it would otherwise pass
         if (!Number.isFinite(value) || value < 0.01 || value > 999999999.99 || (decimals && decimals.length > 2)) {
             return 'TRANSACTION_VALUE_INVALID' as const;
-        }
-
-        // category only makes sense for an expense, and even then it stays optional
-        if (type === 'income' && category !== null) {
-            return 'TRANSACTION_CATEGORY_INVALID' as const;
         }
 
         // From 1970 to today, where today is taken as tomorrow in UTC: the user may already be on the next day (up to
@@ -91,16 +71,15 @@ export class Transaction {
     };
 
     static reconstitute = (
-        id: TransactionId,
-        userId: UserId,
+        id: Transaction['id'],
+        userId: User['id'],
         name: string,
         value: number,
-        type: 'income' | 'expense',
-        category: 'need' | 'want' | 'investment' | null,
+        kind: Transaction['kind'],
         date: CalendarDate,
         createdAt: Date,
         updatedAt: Date,
     ) => {
-        return new Transaction(id, userId, name, value, type, category, date, createdAt, updatedAt);
+        return new Transaction(id, userId, name, value, kind, date, createdAt, updatedAt);
     };
 }

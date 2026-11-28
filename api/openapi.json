@@ -6,6 +6,51 @@
     },
     "components": {
         "schemas": {
+            "TransactionKind": {
+                "oneOf": [
+                    {
+                        "type": "object",
+                        "properties": {
+                            "type": {
+                                "type": "string",
+                                "const": "income"
+                            }
+                        },
+                        "required": [
+                            "type"
+                        ]
+                    },
+                    {
+                        "type": "object",
+                        "properties": {
+                            "type": {
+                                "type": "string",
+                                "const": "expense"
+                            },
+                            "category": {
+                                "anyOf": [
+                                    {
+                                        "type": "string",
+                                        "enum": [
+                                            "need",
+                                            "want",
+                                            "investment"
+                                        ]
+                                    },
+                                    {
+                                        "type": "null"
+                                    }
+                                ]
+                            }
+                        },
+                        "required": [
+                            "type",
+                            "category"
+                        ]
+                    }
+                ],
+                "type": "object"
+            },
             "CalendarDate": {
                 "type": "object",
                 "properties": {
@@ -29,8 +74,7 @@
                     "year",
                     "month",
                     "day"
-                ],
-                "additionalProperties": false
+                ]
             },
             "User": {
                 "type": "object",
@@ -248,30 +292,11 @@
                     "value": {
                         "type": "number"
                     },
-                    "type": {
-                        "type": "string",
-                        "enum": [
-                            "income",
-                            "expense"
-                        ]
-                    },
-                    "category": {
-                        "anyOf": [
-                            {
-                                "type": "string",
-                                "enum": [
-                                    "need",
-                                    "want",
-                                    "investment"
-                                ]
-                            },
-                            {
-                                "type": "null"
-                            }
-                        ]
+                    "kind": {
+                        "$ref": "#/components/schemas/TransactionKindOutput"
                     },
                     "date": {
-                        "$ref": "#/components/schemas/CalendarDate"
+                        "$ref": "#/components/schemas/CalendarDateOutput"
                     },
                     "createdAt": {
                         "type": "string",
@@ -289,8 +314,7 @@
                     "userId",
                     "name",
                     "value",
-                    "type",
-                    "category",
+                    "kind",
                     "date",
                     "createdAt",
                     "updatedAt"
@@ -320,6 +344,79 @@
                 },
                 "required": [
                     "code"
+                ],
+                "additionalProperties": false
+            },
+            "TransactionKindOutput": {
+                "oneOf": [
+                    {
+                        "type": "object",
+                        "properties": {
+                            "type": {
+                                "type": "string",
+                                "const": "income"
+                            }
+                        },
+                        "required": [
+                            "type"
+                        ],
+                        "additionalProperties": false
+                    },
+                    {
+                        "type": "object",
+                        "properties": {
+                            "type": {
+                                "type": "string",
+                                "const": "expense"
+                            },
+                            "category": {
+                                "anyOf": [
+                                    {
+                                        "type": "string",
+                                        "enum": [
+                                            "need",
+                                            "want",
+                                            "investment"
+                                        ]
+                                    },
+                                    {
+                                        "type": "null"
+                                    }
+                                ]
+                            }
+                        },
+                        "required": [
+                            "type",
+                            "category"
+                        ],
+                        "additionalProperties": false
+                    }
+                ],
+                "type": "object"
+            },
+            "CalendarDateOutput": {
+                "type": "object",
+                "properties": {
+                    "year": {
+                        "type": "integer",
+                        "minimum": -9007199254740991,
+                        "maximum": 9007199254740991
+                    },
+                    "month": {
+                        "type": "integer",
+                        "minimum": -9007199254740991,
+                        "maximum": 9007199254740991
+                    },
+                    "day": {
+                        "type": "integer",
+                        "minimum": -9007199254740991,
+                        "maximum": 9007199254740991
+                    }
+                },
+                "required": [
+                    "year",
+                    "month",
+                    "day"
                 ],
                 "additionalProperties": false
             }
@@ -858,27 +955,8 @@
                                     "value": {
                                         "type": "number"
                                     },
-                                    "type": {
-                                        "type": "string",
-                                        "enum": [
-                                            "income",
-                                            "expense"
-                                        ]
-                                    },
-                                    "category": {
-                                        "anyOf": [
-                                            {
-                                                "type": "string",
-                                                "enum": [
-                                                    "need",
-                                                    "want",
-                                                    "investment"
-                                                ]
-                                            },
-                                            {
-                                                "type": "null"
-                                            }
-                                        ]
+                                    "kind": {
+                                        "$ref": "#/components/schemas/TransactionKind"
                                     },
                                     "date": {
                                         "$ref": "#/components/schemas/CalendarDate"
@@ -887,8 +965,7 @@
                                 "required": [
                                     "name",
                                     "value",
-                                    "type",
-                                    "category",
+                                    "kind",
                                     "date"
                                 ]
                             }
@@ -1166,27 +1243,8 @@
                                     "value": {
                                         "type": "number"
                                     },
-                                    "type": {
-                                        "type": "string",
-                                        "enum": [
-                                            "income",
-                                            "expense"
-                                        ]
-                                    },
-                                    "category": {
-                                        "anyOf": [
-                                            {
-                                                "type": "string",
-                                                "enum": [
-                                                    "need",
-                                                    "want",
-                                                    "investment"
-                                                ]
-                                            },
-                                            {
-                                                "type": "null"
-                                            }
-                                        ]
+                                    "kind": {
+                                        "$ref": "#/components/schemas/TransactionKind"
                                     },
                                     "date": {
                                         "$ref": "#/components/schemas/CalendarDate"
@@ -1195,8 +1253,7 @@
                                 "required": [
                                     "name",
                                     "value",
-                                    "type",
-                                    "category",
+                                    "kind",
                                     "date"
                                 ]
                             }

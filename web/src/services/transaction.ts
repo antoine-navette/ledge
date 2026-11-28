@@ -3,16 +3,10 @@ import type { Transaction } from '../entities/Transaction.ts';
 import type { CalendarDate } from '../entities/CalendarDate.ts';
 import { TransactionMapper } from '../mappers/TransactionMapper.ts';
 
-export const createTransaction = async (
-    name: string,
-    value: number,
-    type: Transaction['type'],
-    category: Transaction['category'],
-    date: CalendarDate,
-) => {
+export const createTransaction = async (name: string, value: number, kind: Transaction['kind'], date: CalendarDate) => {
     const response = await http
         .POST('/transactions', {
-            body: { name, value, type, category, date },
+            body: { name, value, kind, date },
         })
         .catch(() => null);
     if (!response) return [null, 'NETWORK_ERROR'] as const;
@@ -41,14 +35,13 @@ export const updateTransaction = async (
     id: Transaction['id'],
     name: string,
     value: number,
-    type: Transaction['type'],
-    category: Transaction['category'],
+    kind: Transaction['kind'],
     date: CalendarDate,
 ) => {
     const response = await http
         .PUT('/transactions/{id}', {
             params: { path: { id } },
-            body: { name, value, type, category, date },
+            body: { name, value, kind, date },
         })
         .catch(() => null);
     if (!response) return [null, 'NETWORK_ERROR'] as const;

@@ -1,7 +1,7 @@
-import type { UserId } from '../../domain/entities/user.js';
+import type { User } from '../../domain/entities/user.js';
 import { CalendarDate } from '../../domain/value-objects/calendar-date.js';
 import type { TransactionRepository } from '../../domain/repositories/transaction.repository.js';
-import { Transaction, type TransactionId } from '../../domain/entities/transaction.js';
+import { Transaction } from '../../domain/entities/transaction.js';
 import type { IdGenerator } from '../../domain/ports/id-generator.js';
 
 export class CreateTransactionUseCase {
@@ -11,11 +11,10 @@ export class CreateTransactionUseCase {
     ) {}
 
     execute = async (
-        userId: UserId,
+        userId: User['id'],
         name: string,
         value: number,
-        type: 'income' | 'expense',
-        category: 'need' | 'want' | 'investment' | null,
+        kind: Transaction['kind'],
         date: { year: number; month: number; day: number },
     ) => {
         const now = new Date();
@@ -24,12 +23,11 @@ export class CreateTransactionUseCase {
         if (dateCode) return [null, dateCode] as const;
 
         const [transaction, code] = Transaction.create(
-            this.idGenerator.generate() as TransactionId,
+            this.idGenerator.generate() as Transaction['id'],
             userId,
             name,
             value,
-            type,
-            category,
+            kind,
             calendarDate,
             now,
         );
