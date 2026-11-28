@@ -25,6 +25,10 @@ Dans cet ordre, une étape par branche ou par commit :
   - **Modifier son mot de passe** depuis le profil, et **mot de passe oublié** par lien envoyé par email.
   - **Modifier son email**, confirmé par un lien envoyé à la nouvelle adresse.
   - **2FA** (TOTP, avec une application d'authentification).
+  - À envisager : des value objects **`Email`** et **`Password`** (`Email.create(raw)`, comme `CalendarDate`), si la
+    même règle finit par servir à plusieurs use cases (inscription, changement d'email ou de mot de passe,
+    réinitialisation). `Password` ne serait jamais stocké, seulement validé. Les paramètres des use cases restent des
+    `string`, puisque ce sont des données brutes.
 - **Une page de graphiques** : la répartition des dépenses par catégorie sur un mois ou une année, l'évolution des
   dépenses mois après mois, le moment du mois où l'on dépense le plus… Avec la même case « Hide investments » que la
   page d'un mois.
@@ -37,6 +41,13 @@ Dans cet ordre, une étape par branche ou par commit :
   migration) : un utilisateur de test et quelques mois de transactions variées (revenus, dépenses de chaque catégorie,
   plusieurs « Courses » le même mois). Passe par les entités, donc les données respectent les règles, et refuse de
   tourner hors développement. Avec une option pour vider ce qu'il a créé.
+- **Ne plus exporter les types d'ID** (`UserId`, `TransactionId`, `SessionId`) : écrire la marque dans l'entité
+  (`id: string & { readonly __brand: 'UserId' }`) et toujours `User['id']`, `Transaction['userId']`… Une seule façon
+  d'écrire un type du domaine, comme `Transaction['kind']` plutôt qu'un type exporté en plus. Un renommage sans
+  changement de comportement, à part, qui change aussi l'exemple de `api-conventions`.
+- **Rendre la catégorie obligatoire pour une dépense** : le `null` ne sert qu'aux dépenses saisies avant l'arrivée des
+  catégories. Il faut d'abord classer ces anciennes dépenses en prod (à la main, ou une catégorie par défaut), puis une
+  migration vérifie qu'il n'en reste plus. À faire à part, pour ne pas tout mélanger.
 
 ## Web
 
