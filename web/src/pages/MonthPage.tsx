@@ -364,6 +364,21 @@ const MonthPage = () => {
                                     {toast.transaction.kind.type === 'income' ? '+' : '-'} {toast.transaction.value} €
                                 </span>{' '}
                                 on {formatDate(toast.transaction.date)}
+                                {/* Same badge as in the list, so the category can be checked without looking for the
+                                    transaction there */}
+                                {toast.transaction.kind.type === 'expense' && toast.transaction.kind.category && (
+                                    <span
+                                        className={`ml-2 text-xs px-2 py-0.5 rounded-full capitalize font-medium ${
+                                            toast.transaction.kind.category === 'need'
+                                                ? 'bg-blue-100 text-blue-700'
+                                                : toast.transaction.kind.category === 'want'
+                                                  ? 'bg-red-100 text-red-700'
+                                                  : 'bg-green-100 text-green-700'
+                                        }`}
+                                    >
+                                        {toast.transaction.kind.category}
+                                    </span>
+                                )}
                             </p>
                         </div>
                         <button
