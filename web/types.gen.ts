@@ -1088,7 +1088,7 @@ export interface components {
             /** @enum {string} */
             type: "income" | "expense";
             category: ("need" | "want" | "investment") | null;
-            date: components["schemas"]["CalendarDate"];
+            date: components["schemas"]["CalendarDateOutput"];
             /** Format: date-time */
             createdAt: string;
             /** Format: date-time */
@@ -1101,6 +1101,11 @@ export interface components {
         TransactionNotFound: {
             /** @constant */
             code: "TRANSACTION_NOT_FOUND";
+        };
+        CalendarDateOutput: {
+            year: number;
+            month: number;
+            day: number;
         };
     };
     responses: never;

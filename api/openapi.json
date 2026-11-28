@@ -29,8 +29,7 @@
                     "year",
                     "month",
                     "day"
-                ],
-                "additionalProperties": false
+                ]
             },
             "User": {
                 "type": "object",
@@ -271,7 +270,7 @@
                         ]
                     },
                     "date": {
-                        "$ref": "#/components/schemas/CalendarDate"
+                        "$ref": "#/components/schemas/CalendarDateOutput"
                     },
                     "createdAt": {
                         "type": "string",
@@ -320,6 +319,32 @@
                 },
                 "required": [
                     "code"
+                ],
+                "additionalProperties": false
+            },
+            "CalendarDateOutput": {
+                "type": "object",
+                "properties": {
+                    "year": {
+                        "type": "integer",
+                        "minimum": -9007199254740991,
+                        "maximum": 9007199254740991
+                    },
+                    "month": {
+                        "type": "integer",
+                        "minimum": -9007199254740991,
+                        "maximum": 9007199254740991
+                    },
+                    "day": {
+                        "type": "integer",
+                        "minimum": -9007199254740991,
+                        "maximum": 9007199254740991
+                    }
+                },
+                "required": [
+                    "year",
+                    "month",
+                    "day"
                 ],
                 "additionalProperties": false
             }
